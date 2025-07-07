@@ -5,13 +5,13 @@ on:
     branches:
       - develop
     paths:
-      - 'infra/**'
+      - 'Weather-dashboard-API/infra/**'
       - '.github/workflows/infra-ci.yml'
   pull_request:
     branches:
       - develop
     paths:
-      - 'infra/**'
+      - 'Weather-dashboard-API/infra/**'
 
 jobs:
   validate-terraform:
@@ -29,18 +29,18 @@ jobs:
 
       - name: 'Terraform Init'
         run: terraform init
-        working-directory: ./infra/environments/dev
+        working-directory: ./Weather-dashboard-API/infra/environments/dev
 
       - name: 'Terraform Format'
         run: terraform fmt -check
-        working-directory: ./infra
+        working-directory: ./Weather-dashboard-API/infra
 
       - name: 'Terraform Validate'
         run: terraform validate
-        working-directory: ./infra/environments/dev
+        working-directory: ./Weather-dashboard-API/infra/environments/dev
 
       - name: 'Run Checkov Security Scan'
         uses: bridgecrewio/checkov-action@v12 # Pinning to a specific major version
         with:
-          directory: ./infra/
+          directory: ./Weather-dashboard-API/infra/
           framework: terraform

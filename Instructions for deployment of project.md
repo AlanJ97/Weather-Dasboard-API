@@ -53,3 +53,25 @@ This document provides a step-by-step guide to setting up and deploying the Weat
         *   Installs application and testing dependencies (`flake8`, `pytest`).
         *   Runs `flake8` to lint the Python code.
         *   Includes a placeholder step for running `pytest`.
+
+## Workflow Trigger Debugging
+
+1.  **Diagnose Workflow Trigger Issue:**
+    *   **Problem:** After creating the initial CI pipelines, it was observed that the GitHub Actions workflows were not being triggered on pull requests.
+    *   **Diagnosis:** The `.github/workflows` directory was incorrectly placed inside the `Weather-dashboard-API/` subfolder. GitHub requires this directory to be at the root of the repository to automatically discover and run workflows.
+
+2.  **Correct Workflow Path:**
+    *   The `.github` directory was moved from `c:\Users\AlanSegundo\OneDrive - SPS\Capacitaciones SPS\AWS DevOps Profesional\Weather-dashboard-API\.github` to the repository root `c:\Users\AlanSegundo\OneDrive - SPS\Capacitaciones SPS\AWS DevOps Profesional\.github`.
+    *   The `paths` and `working-directory` configurations in `infra-ci.yml` and `app-ci.yml` were updated to remove the `Weather-dashboard-API/` prefix, aligning them with the new root location.
+
+3.  **Resolve Git Push Authentication Error:**
+    *   **Problem:** When attempting to push the updated workflow files, Git returned a `remote rejected` error.
+    *   **Error Message:** `refusing to allow a Personal Access Token to create or update workflow '.github/workflows/app-ci.yml' without 'workflow' scope`.
+    *   **Diagnosis:** This security measure prevents Personal Access Tokens (PATs) from modifying workflow files without explicit permission. The fine-grained token being used lacked the `workflow` scope.
+    *   **Resolution:**
+        *   Navigated to **GitHub Settings** > **Developer settings** > **Personal access tokens** > **Fine-grained tokens**.
+        *   Edited the token used for this repository.
+        *   Under the **Permissions** tab, located the **Repository permissions** section.
+        *   Granted `Read and write` access for the `Contents` permission and ensured the `workflow` scope was included by granting `Read and write` access to **Actions**.
+        *   Saved the changes to the token.
+    *   After updating the token, the `git push` command completed successfully.
