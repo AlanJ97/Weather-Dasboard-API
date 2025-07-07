@@ -174,6 +174,7 @@ If you run into any issues, please consult the [Troubleshooting Guide](./trouble
 - **AWS Config:** Implementar reglas para auditar la conformidad de la configuración de los recursos (e.g., "los Security Groups no deben tener el puerto 22 abierto a todo el mundo"). Su rol es detectar desviaciones de las buenas prácticas.
 
 
+
 ### Módulo 11: Documentación y buenas prácticas de entrega
 - **README.md:** Mantenerlo como la fuente central de información del proyecto.
 - **Diagramas:** Versionar el diagrama de arquitectura (`devops-architecture.mermaid`) junto con el código.
