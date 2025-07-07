@@ -5,13 +5,13 @@ on:
     branches:
       - develop
     paths:
-      - 'Weather-dashboard-API/app/**'
+      - 'app/**'
       - '.github/workflows/app-ci.yml'
   pull_request:
     branches:
       - develop
     paths:
-      - 'Weather-dashboard-API/app/**'
+      - 'app/**'
 
 jobs:
   lint-and-test:
@@ -30,15 +30,15 @@ jobs:
       - name: 'Install dependencies'
         run: |
           python -m pip install --upgrade pip
-          pip install -r Weather-dashboard-API/app/requirements.txt
+          pip install -r app/requirements.txt
           pip install flake8 pytest
 
       - name: 'Lint with flake8'
         run: |
           # stop the build if there are Python syntax errors or undefined names
-          flake8 Weather-dashboard-API/app --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 app --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-          flake8 Weather-dashboard-API/app --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          flake8 app --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: 'Test with pytest'
         run: |
