@@ -29,6 +29,7 @@ This document provides a step-by-step guide to setting up and deploying the Weat
 6.  **Implement CODEOWNERS:**
     *   The `.github/CODEOWNERS` file was created and configured to automatically assign reviewers for pull requests based on the directory being changed.
     *   This enforces that the right people review changes to the `app/`, `infra/`, and `docs/` directories.
+    *   **Note on Self-Approval:** By default, PR authors cannot approve their own PRs. As a solo administrator, the "Merge without waiting for requirements to be met (bypass rules)" option must be used to merge changes.
 
 ## Module 3: Continuous Integration (CI)
 
@@ -41,3 +42,4 @@ This document provides a step-by-step guide to setting up and deploying the Weat
         *   Runs `terraform init` to initialize the configuration.
         *   Runs `terraform fmt -check` to ensure code is formatted correctly.
         *   Runs `terraform validate` to check the syntax of the Terraform files.
+        *   Runs `checkov` using the `bridgecrewio/checkov-action@v12` action to perform a security scan of the IaC.
