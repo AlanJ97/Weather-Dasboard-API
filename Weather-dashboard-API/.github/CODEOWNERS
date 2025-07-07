@@ -1,6 +1,6 @@
 # Assign default owners for different parts of the codebase
 
-*       @owner_username
-/infra/  @infra-team
-/app/    @app-team
-/docs/   @docs-team
+*       @AlanJ97
+/infra/  @AlanJ97
+/app/    @AlanJ97
+/docs/   @AlanJ97
