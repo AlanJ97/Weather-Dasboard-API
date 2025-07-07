@@ -43,3 +43,13 @@ This document provides a step-by-step guide to setting up and deploying the Weat
         *   Runs `terraform fmt -check` to ensure code is formatted correctly.
         *   Runs `terraform validate` to check the syntax of the Terraform files.
         *   Runs `checkov` using the `bridgecrewio/checkov-action@v12` action to perform a security scan of the IaC.
+
+2.  **Create Initial Application Pipeline:**
+    *   Created the workflow file at `.github/workflows/app-ci.yml`.
+    *   The workflow is configured to trigger on pushes or pull requests to the `develop` branch that affect the `app/` directory.
+    *   **Initial Steps:**
+        *   Checks out the code.
+        *   Sets up Python.
+        *   Installs application and testing dependencies (`flake8`, `pytest`).
+        *   Runs `flake8` to lint the Python code.
+        *   Includes a placeholder step for running `pytest`.
