@@ -6,6 +6,7 @@ on:
       - develop
     paths:
       - 'Weather-dashboard-API/infra/**'
+      - '.github/workflows/infra-ci.yml'
   pull_request:
     branches:
       - develop
