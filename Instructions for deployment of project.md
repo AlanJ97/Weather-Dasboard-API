@@ -25,3 +25,19 @@ This document provides a step-by-step guide to setting up and deploying the Weat
         *   "Require a pull request before merging" is enabled.
         *   "Require approvals" is enabled and set to `1`.
     *   **Note:** The "Require status checks to pass" option will be configured later, once the CI pipelines are in place.
+
+6.  **Implement CODEOWNERS:**
+    *   The `.github/CODEOWNERS` file was created and configured to automatically assign reviewers for pull requests based on the directory being changed.
+    *   This enforces that the right people review changes to the `app/`, `infra/`, and `docs/` directories.
+
+## Module 3: Continuous Integration (CI)
+
+1.  **Create Initial Infrastructure Pipeline:**
+    *   Created the workflow file at `.github/workflows/infra-ci.yml`.
+    *   The workflow is configured to trigger on pushes or pull requests to the `develop` branch that affect the `infra/` directory.
+    *   **Initial Steps:**
+        *   Checks out the code.
+        *   Sets up a specific version of Terraform.
+        *   Runs `terraform init` to initialize the configuration.
+        *   Runs `terraform fmt -check` to ensure code is formatted correctly.
+        *   Runs `terraform validate` to check the syntax of the Terraform files.
