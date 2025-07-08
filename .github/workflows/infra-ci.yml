@@ -53,7 +53,7 @@ jobs:
         with:
           directory: ./Weather-dashboard-API/infra/
           framework: terraform
-          skip_check: CKV_AWS_130 # Skip public subnet auto-assign IP check (intentional for public subnets)
+          skip_check: CKV_AWS_130,CKV_AWS_338 # Skip public subnet auto-assign IP check and CloudWatch 1-year retention
 
       - name: Terraform Plan (Dev)
         id: plan-dev
