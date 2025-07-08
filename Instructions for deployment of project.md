@@ -25,23 +25,15 @@ This document provides a step-by-step guide to setting up and deploying the Weat
 
 ## Module 3: Continuous Integration (CI)
 
-1.  **Create Initial Infrastructure Pipeline (`infra-ci.yml`):**
+1.  **Create Infrastructure Pipeline (`infra-ci.yml`):**
     *   Configured to trigger on pull requests targeting the `develop` branch when files in the `infra/` directory are changed.
-    *   Steps include: checking out code, setting up Terraform, running `init`, `fmt`, `validate`, and a `checkov` security scan.
+    *   Steps include: checking out code, setting up Terraform, running `init`, `fmt`, `validate`, security scanning with Checkov, and `terraform plan`.
 
-2.  **Create Initial Application Pipeline (`app-ci.yml`):**
+2.  **Create Application Pipeline (`app-ci.yml`):**
     *   Configured to trigger on pull requests targeting the `develop` branch when files in the `app/` directory are changed.
     *   Steps include: checking out code, setting up Python, installing dependencies, and running `flake8` for linting.
 
-## Workflow Trigger Debugging & Setup
-
-1.  **Correct Workflow Path:**
-    *   The `.github` directory was moved to the repository root to ensure GitHub Actions could be discovered.
-
-2.  **Resolve Git Push Authentication Error:**
-    *   The Personal Access Token (PAT) permissions were updated to include the `workflow` scope, which is required to create or modify workflow files.
-
-## Module 4: Foundational Infrastructure with Terraform
+## Module 4: Infrastructure as Code (IaC) with Terraform
 
 1.  **Configure Terraform S3 Backend:**
     *   `backend.tf` files were created in each environment (`dev`, `staging`, `prod`) to configure remote state storage in a shared S3 bucket, with separate state files for each environment.
@@ -60,18 +52,15 @@ This document provides a step-by-step guide to setting up and deploying the Weat
 5.  **Create the Reusable VPC Module**:
     *   A reusable Terraform module for the VPC was created in `infra/modules/vpc/`.
     *   This module defines the VPC, public/private subnets, Internet Gateway, NAT Gateway, and all necessary route tables.
+    *   **Security Features**: Includes VPC flow logging, restricted default security group, and least-privilege IAM roles.
 
 6.  **Use the VPC Module in Environments**:
     *   The `dev`, `staging`, and `prod` environments were updated to use the new VPC module, each with its own unique CIDR block defined in its respective `variables.tf` file.
 
 7.  **Update CI Pipeline for Validation**:
     *   The `infra-ci.yml` workflow was updated to run `terraform plan` within the `dev` environment's directory to validate the module changes in pull requests.
+    *   Includes Checkov security scanning with documented exceptions for project-appropriate configurations.
 
-8.  **Fixing OIDC Trust Policy for Feature Branches**:
-    *   **Problem**: The CI workflow failed with an `sts:AssumeRoleWithWebIdentity` error when running on feature branches.
-    *   **Diagnosis**: The IAM Role's trust policy was too restrictive, only allowing the `develop` branch to assume the role.
-    *   **Solution**: The `scripts/setup_aws_oidc.sh` script was updated to use a wildcard (`...:ref:refs/heads/*`), allowing any branch to assume the role for PR validation checks.
-
-9.  **Implement Manual Infrastructure Destroy Workflow**:
+8.  **Implement Manual Infrastructure Destroy Workflow**:
     *   A new workflow, `.github/workflows/infra-destroy.yml`, was created.
     *   This is triggered manually and allows you to run `terraform destroy` on a specific environment (`dev`, `staging`, or `prod`) to manage costs.
