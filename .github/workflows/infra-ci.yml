@@ -53,3 +53,10 @@ jobs:
         with:
           directory: ./Weather-dashboard-API/infra/
           framework: terraform
+
+      - name: Terraform Plan (Dev)
+        id: plan-dev
+        run: |
+          cd infra/environments/dev
+          terraform plan -input=false -no-color
+        continue-on-error: true

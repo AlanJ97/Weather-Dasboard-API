@@ -75,3 +75,52 @@ This document provides a step-by-step guide to setting up and deploying the Weat
         *   Granted `Read and write` access for the `Contents` permission and ensured the `workflow` scope was included by granting `Read and write` access to **Actions**.
         *   Saved the changes to the token.
     *   After updating the token, the `git push` command completed successfully.
+
+## Module 4: Foundational Infrastructure with Terraform
+
+### Objective
+Define and provision the core network infrastructure (VPC, subnets, etc.) using a reusable Terraform module.
+
+### Steps
+
+1.  **Create the VPC Module**:
+    *   In `infra/modules/vpc/`, create `main.tf`, `variables.tf`, and `outputs.tf`.
+    *   **`main.tf`**: Define the core VPC resources:
+        *   `aws_vpc`
+        *   Public and private `aws_subnet`s
+        *   `aws_internet_gateway`
+        *   `aws_nat_gateway` with an `aws_eip`
+        *   Public and private `aws_route_table`s and associations.
+    *   **`variables.tf`**: Define input variables (`env`, `vpc_cidr`, `public_subnet_cidrs`, `private_subnet_cidrs`, `aws_region`).
+    *   **`outputs.tf`**: Define outputs (`vpc_id`, `public_subnet_ids`, `private_subnet_ids`).
+
+2.  **Use the VPC Module in Environments**:
+    *   Update `infra/environments/dev/main.tf` to use the `vpc` module.
+    *   Create `infra/environments/dev/variables.tf` to provide values for the VPC module, including a unique CIDR block (e.g., `10.0.0.0/16`).
+    *   Repeat for the `staging` and `prod` environments, ensuring each has a unique CIDR block (e.g., `10.1.0.0/16` for staging, `10.2.0.0/16` for prod).
+
+3.  **Update CI Pipeline for Validation**:
+    *   Modify `.github/workflows/infra-ci.yml` to run `terraform plan` on the `dev` environment. This validates the new module and its integration before any deployment.
+
+4.  **Configure Terraform S3 Backend:**
+    *   **Goal:** To store the Terraform state file (`.tfstate`) remotely in a secure and versioned S3 bucket.
+    *   Created `backend.tf` files in each environment directory (`infra/environments/dev`, `staging`, `prod`).
+    *   Each file was configured to use the `weather-app-backend-terraform-bucket-2025` S3 bucket, with a unique key for each environment (e.g., `dev/terraform.tfstate`).
+
+5.  **Automate Backend Creation:**
+    *   To make the S3 bucket setup repeatable, the `scripts/setup_terraform_backend.sh` script was created.
+    *   This script automates the creation of the S3 bucket and enables versioning on it using the AWS CLI.
+
+6.  **Handle Line Endings for Cross-Platform Compatibility:**
+    *   **Problem:** A `LF will be replaced by CRLF` warning appeared when adding shell scripts on Windows.
+    *   **Solution:** A `.gitattributes` file was created in the root directory to enforce that all `.sh` files use Unix-style LF line endings, ensuring they are runnable in the Linux-based GitHub Actions environment.
+
+7.  **Enable Secure AWS Authentication from GitHub Actions (OIDC):**
+    *   **Problem:** The `terraform init` step in the CI pipeline failed because the GitHub runner lacked AWS credentials to access the S3 backend.
+    *   **Solution:** Configured a secure, passwordless connection between GitHub Actions and AWS using OpenID Connect (OIDC).
+    *   **Workflow Update:** The `aws-actions/configure-aws-credentials@v4` action was added to the `infra-ci.yml` workflow.
+    *   **Automation Script:** The `scripts/setup_aws_oidc.sh` script was created to automate the entire AWS-side configuration. This script:
+        *   Creates the OIDC Identity Provider in IAM to trust GitHub.
+        *   Creates an IAM Role with a trust policy scoped specifically to the `develop` branch of the `Weather-Dasboard-API` repository.
+        *   Creates and attaches an IAM policy granting the role the necessary S3 permissions for the Terraform backend.
+    *   **Final Step:** The ARN of the created IAM role was added as a secret named `AWS_ROLE_TO_ASSUME` in the GitHub repository settings. This allowed the workflow to assume the role and successfully initialize the Terraform backend.
