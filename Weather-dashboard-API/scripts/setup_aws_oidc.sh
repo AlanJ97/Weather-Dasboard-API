@@ -18,6 +18,8 @@ POLICY_NAME="GitHubActions-Terraform-S3-Policy"
 BUCKET_NAME="weather-app-backend-terraform-bucket-2025"
 AWS_REGION="us-east-1"
 
+
+
 # --- OIDC Provider Details ---
 OIDC_PROVIDER_URL="token.actions.githubusercontent.com"
 AUDIENCE="sts.amazonaws.com"
