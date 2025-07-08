@@ -1,0 +1,121 @@
+#!/bin/bash
+
+# This script automates the setup of an AWS IAM OIDC provider for GitHub Actions
+# and creates an IAM role that can be assumed by a specific GitHub repository.
+#
+# Prerequisites:
+# - AWS CLI installed and configured with necessary permissions (iam:Create*, iam:Get*, sts:Get*).
+# - Git Bash or WSL to run the script on Windows.
+
+set -e # Exit immediately if a command exits with a non-zero status.
+
+# --- Configuration ---
+# Please verify these values before running the script.
+GITHUB_ORG="AlanJ97"
+REPO_NAME="Weather-Dasboard-API"
+ROLE_NAME="GitHubActions-Terraform-Backend-Role"
+POLICY_NAME="GitHubActions-Terraform-S3-Policy"
+BUCKET_NAME="weather-app-backend-terraform-bucket-2025"
+AWS_REGION="us-east-1"
+
+# --- OIDC Provider Details ---
+OIDC_PROVIDER_URL="token.actions.githubusercontent.com"
+AUDIENCE="sts.amazonaws.com"
+
+echo "Fetching AWS Account ID..."
+ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+if [ -z "$ACCOUNT_ID" ]; then
+    echo "Error: Could not retrieve AWS Account ID. Please ensure AWS CLI is configured correctly."
+    exit 1
+fi
+echo "AWS Account ID: $ACCOUNT_ID"
+
+OIDC_PROVIDER_ARN="arn:aws:iam::${ACCOUNT_ID}:oidc-provider/${OIDC_PROVIDER_URL}"
+
+echo "Checking for existing OIDC provider..."
+if aws iam get-open-id-connect-provider --open-id-connect-provider-arn "$OIDC_PROVIDER_ARN" >/dev/null 2>&1; then
+    echo "OIDC provider already exists."
+else
+    echo "OIDC provider not found. Creating a new one..."
+    aws iam create-open-id-connect-provider --url "https://${OIDC_PROVIDER_URL}" --client-id-list "$AUDIENCE" --thumbprint-list "6938fd4d98bab03faadb97b34396831e3780aea1" # Standard thumbprint for GitHub OIDC
+    echo "OIDC provider created successfully."
+fi
+
+# --- Define Trust Policy ---
+echo "Defining IAM role trust policy..."
+TRUST_POLICY=$(cat <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "${OIDC_PROVIDER_ARN}"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {
+                    "${OIDC_PROVIDER_URL}:sub": "repo:${GITHUB_ORG}/${REPO_NAME}:ref:refs/heads/develop"
+                }
+            }
+        }
+    ]
+}
+EOF
+)
+
+# --- Define Permissions Policy ---
+echo "Defining IAM permissions policy for Terraform S3 backend..."
+PERMISSIONS_POLICY=$(cat <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::${BUCKET_NAME}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": "arn:aws:s3:::${BUCKET_NAME}/*"
+        }
+    ]
+}
+EOF
+)
+
+# --- Create Role and Attach Policy ---
+echo "Creating IAM role: ${ROLE_NAME}..."
+ROLE_ARN=$(aws iam create-role --role-name "$ROLE_NAME" --assume-role-policy-document "$TRUST_POLICY" --query "Role.Arn" --output text)
+
+if [ -z "$ROLE_ARN" ]; then
+    echo "Error: Failed to create IAM role. It might already exist. Please check the AWS console."
+    # Attempt to fetch the ARN of the existing role
+    ROLE_ARN=$(aws iam get-role --role-name "$ROLE_NAME" --query "Role.Arn" --output text)
+    if [ -z "$ROLE_ARN" ]; then
+        echo "Could not retrieve ARN for existing role. Exiting."
+        exit 1
+    fi
+else
+    echo "Role created successfully."
+fi
+
+echo "Creating and attaching IAM policy: ${POLICY_NAME}..."
+POLICY_ARN=$(aws iam create-policy --policy-name "$POLICY_NAME" --policy-document "$PERMISSIONS_POLICY" --query "Policy.Arn" --output text)
+aws iam attach-role-policy --role-name "$ROLE_NAME" --policy-arn "$POLICY_ARN"
+
+echo "IAM role and policy have been attached."
+echo ""
+echo "--- SETUP COMPLETE ---"
+echo "The IAM Role ARN is: ${ROLE_ARN}"
+echo ""
+echo "Next Step: Add this ARN as a secret in your GitHub repository."
+echo "  1. Go to your repository > Settings > Secrets and variables > Actions."
+echo "  2. Create a new repository secret named 'AWS_ROLE_TO_ASSUME'."
+echo "  3. Paste the ARN above as the value."
+
