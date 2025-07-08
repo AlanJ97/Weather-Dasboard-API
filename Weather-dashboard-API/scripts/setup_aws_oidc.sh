@@ -86,6 +86,19 @@ PERMISSIONS_POLICY=$(cat <<EOF
                 "s3:DeleteObject"
             ],
             "Resource": "arn:aws:s3:::${BUCKET_NAME}/*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:DescribeLogGroups",
+                "iam:CreateRole",
+                "iam:GetRole",
+                "iam:PutRolePolicy",
+                "iam:AttachRolePolicy",
+                "iam:PassRole"
+            ],
+            "Resource": "*"
         }
     ]
 }
