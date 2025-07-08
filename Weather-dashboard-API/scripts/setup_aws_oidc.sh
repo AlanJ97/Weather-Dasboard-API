@@ -132,7 +132,22 @@ if ! aws iam get-policy --policy-arn "$POLICY_ARN" >/dev/null 2>&1; then
     aws iam create-policy --policy-name "$POLICY_NAME" --policy-document "$PERMISSIONS_POLICY"
     echo "Policy created successfully."
 else
-    echo "Policy already exists. No changes made."
+    echo "Policy already exists. Creating new version..."
+    aws iam create-policy-version --policy-arn "$POLICY_ARN" --policy-document "$PERMISSIONS_POLICY" --set-as-default
+    echo "Policy updated with new version successfully."
+    
+    echo "Cleaning up old policy versions..."
+    # Get all non-default versions and delete them
+    OLD_VERSIONS=$(aws iam list-policy-versions --policy-arn "$POLICY_ARN" --query 'Versions[?!IsDefaultVersion].VersionId' --output text)
+    if [ -n "$OLD_VERSIONS" ]; then
+        for version in $OLD_VERSIONS; do
+            echo "Deleting old policy version: $version"
+            aws iam delete-policy-version --policy-arn "$POLICY_ARN" --version-id "$version"
+        done
+        echo "Old policy versions cleaned up."
+    else
+        echo "No old versions to clean up."
+    fi
 fi
 
 echo "Attaching policy to role..."
