@@ -13,65 +13,54 @@ This document provides a step-by-step guide to setting up and deploying the Weat
 3.  **Set Up GitHub Project:**
     *   A new project board was created in the repository using the "Kanban" template.
     *   The board is configured with columns: `Backlog`, `In Progress`, `Review`, and `Done`.
-    *   Tasks are added to the `Backlog` as issues and moved across the board to track progress.
 
 4.  **Configure GitFlow Branching Strategy:**
     *   The `develop` branch was created from the `master` branch to serve as the primary integration branch.
-    *   Command used: `git checkout -b develop` followed by `git push -u origin develop`.
 
 5.  **Set Up Branch Protection Rules:**
-    *   Protection rules were configured for both the `master` and `develop` branches in the repository settings (`Settings` > `Branches`).
-    *   **Rules Applied:**
-        *   "Require a pull request before merging" is enabled.
-        *   "Require approvals" is enabled and set to `1`.
-    *   **Note:** The "Require status checks to pass" option will be configured later, once the CI pipelines are in place.
+    *   Protection rules were configured for both `master` and `develop` branches, requiring a pull request and at least one approval before merging.
 
 6.  **Implement CODEOWNERS:**
-    *   The `.github/CODEOWNERS` file was created and configured to automatically assign reviewers for pull requests based on the directory being changed.
-    *   This enforces that the right people review changes to the `app/`, `infra/`, and `docs/` directories.
-    *   **Note on Self-Approval:** By default, PR authors cannot approve their own PRs. As a solo administrator, the "Merge without waiting for requirements to be met (bypass rules)" option must be used to merge changes.
+    *   The `.github/CODEOWNERS` file was created to automatically assign reviewers for pull requests based on the directory being changed.
 
 ## Module 3: Continuous Integration (CI)
 
-1.  **Create Initial Infrastructure Pipeline:**
-    *   Created the workflow file at `.github/workflows/infra-ci.yml`.
-    *   The workflow is configured to trigger on pushes or pull requests to the `develop` branch that affect the `infra/` directory.
-    *   **Initial Steps:**
-        *   Checks out the code.
-        *   Sets up a specific version of Terraform.
-        *   Runs `terraform init` to initialize the configuration.
-        *   Runs `terraform fmt -check` to ensure code is formatted correctly.
-        *   Runs `terraform validate` to check the syntax of the Terraform files.
-        *   Runs `checkov` using the `bridgecrewio/checkov-action@v12` action to perform a security scan of the IaC.
+1.  **Create Infrastructure Pipeline (`infra-ci.yml`):**
+    *   Configured to trigger on pull requests targeting the `develop` branch when files in the `infra/` directory are changed.
+    *   Steps include: checking out code, setting up Terraform, running `init`, `fmt`, `validate`, security scanning with Checkov, and `terraform plan`.
 
-2.  **Create Initial Application Pipeline:**
-    *   Created the workflow file at `.github/workflows/app-ci.yml`.
-    *   The workflow is configured to trigger on pushes or pull requests to the `develop` branch that affect the `app/` directory.
-    *   **Initial Steps:**
-        *   Checks out the code.
-        *   Sets up Python.
-        *   Installs application and testing dependencies (`flake8`, `pytest`).
-        *   Runs `flake8` to lint the Python code.
-        *   Includes a placeholder step for running `pytest`.
+2.  **Create Application Pipeline (`app-ci.yml`):**
+    *   Configured to trigger on pull requests targeting the `develop` branch when files in the `app/` directory are changed.
+    *   Steps include: checking out code, setting up Python, installing dependencies, and running `flake8` for linting.
 
-## Workflow Trigger Debugging
+## Module 4: Infrastructure as Code (IaC) with Terraform
 
-1.  **Diagnose Workflow Trigger Issue:**
-    *   **Problem:** After creating the initial CI pipelines, it was observed that the GitHub Actions workflows were not being triggered on pull requests.
-    *   **Diagnosis:** The `.github/workflows` directory was incorrectly placed inside the `Weather-dashboard-API/` subfolder. GitHub requires this directory to be at the root of the repository to automatically discover and run workflows.
+1.  **Configure Terraform S3 Backend:**
+    *   `backend.tf` files were created in each environment (`dev`, `staging`, `prod`) to configure remote state storage in a shared S3 bucket, with separate state files for each environment.
 
-2.  **Correct Workflow Path:**
-    *   The `.github` directory was moved from `c:\Users\AlanSegundo\OneDrive - SPS\Capacitaciones SPS\AWS DevOps Profesional\Weather-dashboard-API\.github` to the repository root `c:\Users\AlanSegundo\OneDrive - SPS\Capacitaciones SPS\AWS DevOps Profesional\.github`.
-    *   The `paths` and `working-directory` configurations in `infra-ci.yml` and `app-ci.yml` were updated to remove the `Weather-dashboard-API/` prefix, aligning them with the new root location.
+2.  **Automate Backend Creation:**
+    *   The `scripts/setup_terraform_backend.sh` script was created to automate the creation and versioning of the S3 bucket for Terraform state.
 
-3.  **Resolve Git Push Authentication Error:**
-    *   **Problem:** When attempting to push the updated workflow files, Git returned a `remote rejected` error.
-    *   **Error Message:** `refusing to allow a Personal Access Token to create or update workflow '.github/workflows/app-ci.yml' without 'workflow' scope`.
-    *   **Diagnosis:** This security measure prevents Personal Access Tokens (PATs) from modifying workflow files without explicit permission. The fine-grained token being used lacked the `workflow` scope.
-    *   **Resolution:**
-        *   Navigated to **GitHub Settings** > **Developer settings** > **Personal access tokens** > **Fine-grained tokens**.
-        *   Edited the token used for this repository.
-        *   Under the **Permissions** tab, located the **Repository permissions** section.
-        *   Granted `Read and write` access for the `Contents` permission and ensured the `workflow` scope was included by granting `Read and write` access to **Actions**.
-        *   Saved the changes to the token.
-    *   After updating the token, the `git push` command completed successfully.
+3.  **Handle Line Endings (`.gitattributes`):**
+    *   A `.gitattributes` file was added to enforce Unix-style LF line endings for `.sh` files, ensuring cross-platform compatibility.
+
+4.  **Enable Secure AWS Authentication (OIDC):**
+    *   The `infra-ci.yml` workflow was updated to use the `aws-actions/configure-aws-credentials` action for secure, passwordless authentication.
+    *   The `scripts/setup_aws_oidc.sh` script was created to automate the setup of the OIDC provider and the necessary IAM Role in AWS.
+    *   The role's ARN was stored as a GitHub secret (`AWS_ROLE_TO_ASSUME`).
+
+5.  **Create the Reusable VPC Module**:
+    *   A reusable Terraform module for the VPC was created in `infra/modules/vpc/`.
+    *   This module defines the VPC, public/private subnets, Internet Gateway, NAT Gateway, and all necessary route tables.
+    *   **Security Features**: Includes VPC flow logging, restricted default security group, and least-privilege IAM roles.
+
+6.  **Use the VPC Module in Environments**:
+    *   The `dev`, `staging`, and `prod` environments were updated to use the new VPC module, each with its own unique CIDR block defined in its respective `variables.tf` file.
+
+7.  **Update CI Pipeline for Validation**:
+    *   The `infra-ci.yml` workflow was updated to run `terraform plan` within the `dev` environment's directory to validate the module changes in pull requests.
+    *   Includes Checkov security scanning with documented exceptions for project-appropriate configurations.
+
+8.  **Implement Manual Infrastructure Destroy Workflow**:
+    *   A new workflow, `.github/workflows/infra-destroy.yml`, was created.
+    *   This is triggered manually and allows you to run `terraform destroy` on a specific environment (`dev`, `staging`, or `prod`) to manage costs.
