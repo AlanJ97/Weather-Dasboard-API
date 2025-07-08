@@ -96,7 +96,14 @@ PERMISSIONS_POLICY=$(cat <<EOF
                 "iam:GetRole",
                 "iam:PutRolePolicy",
                 "iam:AttachRolePolicy",
-                "iam:PassRole"
+                "iam:PassRole",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeInternetGateways",
+                "ec2:DescribeNatGateways",
+                "ec2:DescribeRouteTables",
+                "ec2:DescribeSecurityGroups"
             ],
             "Resource": "*"
         }
