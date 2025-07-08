@@ -57,6 +57,6 @@ jobs:
       - name: Terraform Plan (Dev)
         id: plan-dev
         run: |
-          cd infra/environments/dev
+          cd Weather-dashboard-API/infra/environments/dev
           terraform plan -input=false -no-color
         continue-on-error: true
