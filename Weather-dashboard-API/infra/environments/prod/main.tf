@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "vpc" {
-  source = "../modules/vpc"
+  source = "../../modules/vpc"
 
   env                  = var.env
   aws_region           = var.aws_region
