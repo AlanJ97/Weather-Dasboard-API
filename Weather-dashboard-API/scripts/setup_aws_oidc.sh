@@ -55,7 +55,10 @@ TRUST_POLICY=$(cat <<EOF
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
                 "StringEquals": {
-                    "${OIDC_PROVIDER_URL}:sub": "repo:${GITHUB_ORG}/${REPO_NAME}:ref:refs/heads/develop"
+                    "${OIDC_PROVIDER_URL}:aud": "sts.amazonaws.com"
+                },
+                "StringLike": {
+                    "${OIDC_PROVIDER_URL}:sub": "repo:${GITHUB_ORG}/${REPO_NAME}:*"
                 }
             }
         }
@@ -83,30 +86,71 @@ PERMISSIONS_POLICY=$(cat <<EOF
                 "s3:DeleteObject"
             ],
             "Resource": "arn:aws:s3:::${BUCKET_NAME}/*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:DescribeLogGroups",
+                "iam:CreateRole",
+                "iam:GetRole",
+                "iam:PutRolePolicy",
+                "iam:AttachRolePolicy",
+                "iam:PassRole",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeInternetGateways",
+                "ec2:DescribeNatGateways",
+                "ec2:DescribeRouteTables",
+                "ec2:DescribeSecurityGroups"
+            ],
+            "Resource": "*"
         }
     ]
 }
 EOF
 )
 
-# --- Create Role and Attach Policy ---
-echo "Creating IAM role: ${ROLE_NAME}..."
-ROLE_ARN=$(aws iam create-role --role-name "$ROLE_NAME" --assume-role-policy-document "$TRUST_POLICY" --query "Role.Arn" --output text)
+# --- Create/Update Role and Policy ---
 
-if [ -z "$ROLE_ARN" ]; then
-    echo "Error: Failed to create IAM role. It might already exist. Please check the AWS console."
-    # Attempt to fetch the ARN of the existing role
-    ROLE_ARN=$(aws iam get-role --role-name "$ROLE_NAME" --query "Role.Arn" --output text)
-    if [ -z "$ROLE_ARN" ]; then
-        echo "Could not retrieve ARN for existing role. Exiting."
-        exit 1
-    fi
+echo "Checking for IAM role: ${ROLE_NAME}..."
+if ! ROLE_ARN=$(aws iam get-role --role-name "$ROLE_NAME" --query "Role.Arn" --output text 2>/dev/null); then
+    echo "Role not found. Creating new role..."
+    ROLE_ARN=$(aws iam create-role --role-name "$ROLE_NAME" --assume-role-policy-document "$TRUST_POLICY" --query "Role.Arn" --output text)
+    echo "Role created successfully with ARN: ${ROLE_ARN}"
 else
-    echo "Role created successfully."
+    echo "Role already exists. Updating trust policy..."
+    aws iam update-assume-role-policy --role-name "$ROLE_NAME" --policy-document "$TRUST_POLICY"
+    echo "Trust policy updated successfully."
 fi
 
-echo "Creating and attaching IAM policy: ${POLICY_NAME}..."
-POLICY_ARN=$(aws iam create-policy --policy-name "$POLICY_NAME" --policy-document "$PERMISSIONS_POLICY" --query "Policy.Arn" --output text)
+POLICY_ARN="arn:aws:iam::${ACCOUNT_ID}:policy/${POLICY_NAME}"
+echo "Checking for IAM policy: ${POLICY_NAME}..."
+if ! aws iam get-policy --policy-arn "$POLICY_ARN" >/dev/null 2>&1; then
+    echo "Policy not found. Creating new policy..."
+    aws iam create-policy --policy-name "$POLICY_NAME" --policy-document "$PERMISSIONS_POLICY"
+    echo "Policy created successfully."
+else
+    echo "Policy already exists. Creating new version..."
+    aws iam create-policy-version --policy-arn "$POLICY_ARN" --policy-document "$PERMISSIONS_POLICY" --set-as-default
+    echo "Policy updated with new version successfully."
+    
+    echo "Cleaning up old policy versions..."
+    # Get all non-default versions and delete them
+    OLD_VERSIONS=$(aws iam list-policy-versions --policy-arn "$POLICY_ARN" --query 'Versions[?!IsDefaultVersion].VersionId' --output text)
+    if [ -n "$OLD_VERSIONS" ]; then
+        for version in $OLD_VERSIONS; do
+            echo "Deleting old policy version: $version"
+            aws iam delete-policy-version --policy-arn "$POLICY_ARN" --version-id "$version"
+        done
+        echo "Old policy versions cleaned up."
+    else
+        echo "No old versions to clean up."
+    fi
+fi
+
+echo "Attaching policy to role..."
 aws iam attach-role-policy --role-name "$ROLE_NAME" --policy-arn "$POLICY_ARN"
 
 echo "IAM role and policy have been attached."
