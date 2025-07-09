@@ -72,12 +72,12 @@ jobs:
           echo "   • CKV_AWS_91: ALB requires to have access logs enabled"
           echo "   • CKV_AWS_131: ALB requires to have the logs enables"
           echo "   • CKV2_AWS_20: Ensure that ALB redirects HTTP requests into HTTPS ones"
-          echo "   • CKV2_AWS_28: "Ensure public facing ALB are protected by WA"
-          echo "   • CKV_AWS_103: "Ensure that load balancer is using at least TLS 1.2"
-          echo "   • CKV_AWS_378: "Ensure AWS Load Balancer doesn't use HTTP protocol"
-          echo "   • CKV_AWS_126: "Ensure that detailed monitoring is enabled for EC2 instances"
-          echo "   • CKV_AWS_135: "Ensure that EC2 is EBS optimized"
-          echo "   • CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+          echo "   • CKV2_AWS_28: Ensure public facing ALB are protected by WA"
+          echo "   • CKV_AWS_103: Ensure that load balancer is using at least TLS 1.2"
+          echo "   • CKV_AWS_378: Ensure AWS Load Balancer doesnt use HTTP protocol"
+          echo "   • CKV_AWS_126: Ensure that detailed monitoring is enabled for EC2 instances"
+          echo "   • CKV_AWS_135: Ensure that EC2 is EBS optimized"
+          echo "   • CKV_AWS_382: Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
       - name: Terraform Plan (Dev)
         id: plan-dev
         run: terraform plan -input=false -no-color -out=tfplan
