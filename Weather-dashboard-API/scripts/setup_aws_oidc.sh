@@ -105,6 +105,7 @@ PERMISSIONS_POLICY=$(cat <<EOF
                 "ec2:DescribeNatGateways",
                 "ec2:DescribeRouteTables",
                 "ec2:DescribeSecurityGroups"
+                "ec2:DescribeImages"
             ],
             "Resource": "*"
         }

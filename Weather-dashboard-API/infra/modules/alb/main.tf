@@ -60,10 +60,13 @@ resource "aws_lb" "main" {
 
   enable_deletion_protection = var.enable_deletion_protection
 
-  access_logs {
-    bucket  = var.access_logs_bucket
-    prefix  = "${var.env}-weather-alb"
-    enabled = var.enable_access_logs
+  dynamic "access_logs" {
+    for_each = var.enable_access_logs ? [1] : []
+    content {
+      bucket  = var.access_logs_bucket
+      prefix  = "${var.env}-weather-alb"
+      enabled = var.enable_access_logs
+    }
   }
 
   tags = {
