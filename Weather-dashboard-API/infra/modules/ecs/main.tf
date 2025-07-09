@@ -124,7 +124,7 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
 resource "aws_security_group" "ecs_tasks" {
   name_prefix = "${var.env}-weather-ecs-tasks-"
   vpc_id      = var.vpc_id
-
+  description = "Security group for ECS tasks in the Weather Dashboard application"
   ingress {
     description     = "HTTP from ALB"
     from_port       = var.api_port

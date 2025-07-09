@@ -91,8 +91,8 @@ resource "aws_iam_role_policy" "bastion" {
         ]
       },
       {
-        Effect = "Allow"
-        Action = [
+        Effect   = "Allow"
+        Action   = [
           "ecs:DescribeClusters",
           "ecs:DescribeServices",
           "ecs:DescribeTasks",
@@ -100,16 +100,16 @@ resource "aws_iam_role_policy" "bastion" {
           "ecs:ListServices",
           "ecs:ListTasks"
         ]
-        Resource = "*"
+        Resource = [var.ecs_cluster_arn]
       },
       {
-        Effect = "Allow"
-        Action = [
+        Effect   = "Allow"
+        Action   = [
           "logs:DescribeLogGroups",
           "logs:DescribeLogStreams",
           "logs:GetLogEvents"
         ]
-        Resource = "*"
+        Resource = [for arn in var.log_group_arns : "arn:aws:logs:${var.aws_region}:*:log-group:${arn}:*"]
       }
     ]
   })

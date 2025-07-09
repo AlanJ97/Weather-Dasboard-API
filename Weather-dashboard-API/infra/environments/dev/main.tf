@@ -84,4 +84,6 @@ module "bastion" {
   public_subnet_id      = module.vpc.public_subnet_ids[0]
   public_key            = var.bastion_public_key
   allowed_cidr_blocks   = var.bastion_allowed_cidr_blocks
+  ecs_cluster_arn       = module.ecs.cluster_arn
+  log_group_arns        = module.ecs.log_group_arns
 }

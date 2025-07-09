@@ -87,3 +87,13 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "ecs_cluster_arn" {
+  description = "ARN of the ECS cluster the bastion needs to access"
+  type        = string
+}
+
+variable "log_group_arns" {
+  description = "ARNs of the CloudWatch log groups the bastion needs to access"
+  type        = list(string)
+}

@@ -83,3 +83,11 @@ output "task_definition_arns" {
     frontend = aws_ecs_task_definition.frontend.arn
   }
 }
+
+output "log_group_arns" {
+  description = "ARNs of the CloudWatch log groups for the services"
+  value = [
+    "/ecs/${var.env}-weather-api",
+    "/ecs/${var.env}-weather-frontend"
+  ]
+}
