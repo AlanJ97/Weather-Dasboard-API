@@ -100,6 +100,7 @@ jobs:
     name: 'Deploy infra with Terraform to AWS'
     runs-on: ubuntu-latest
     needs: validate-terraform
+    if: github.event_name == 'push'
     permissions:
       id-token: write
       contents: read
@@ -113,7 +114,7 @@ jobs:
           echo "Head ref: ${{ github.head_ref }}"
           echo "Base ref: ${{ github.base_ref }}"
           echo "Validation job result: ${{ needs.validate-terraform.result }}"
-          echo "This job is running - no conditions applied!"
+          echo "✅ Deploy job is running!"
       - name: 'Checkout'
         uses: actions/checkout@v3
 
