@@ -106,15 +106,26 @@ jobs:
       contents: read
 
     steps:
-      - name: 'Debug Context'
+      - name: 'Full Debug Context'
         run: |
-          echo "Event name: ${{ github.event_name }}"
-          echo "Ref: ${{ github.ref }}"
-          echo "Branch name: ${{ github.ref_name }}"
-          echo "Head ref: ${{ github.head_ref }}"
-          echo "Base ref: ${{ github.base_ref }}"
-          echo "Validation job result: ${{ needs.validate-terraform.result }}"
-          echo "✅ Deploy job is running!"
+          echo "=== GITHUB CONTEXT DEBUG ==="
+          echo "Event name: '${{ github.event_name }}'"
+          echo "Ref: '${{ github.ref }}'"
+          echo "Branch name: '${{ github.ref_name }}'"
+          echo "Head ref: '${{ github.head_ref }}'"
+          echo "Base ref: '${{ github.base_ref }}'"
+          echo "Repository: '${{ github.repository }}'"
+          echo "Actor: '${{ github.actor }}'"
+          echo "Workflow: '${{ github.workflow }}'"
+          echo "Run ID: '${{ github.run_id }}'"
+          echo "SHA: '${{ github.sha }}'"
+          echo "=== CONDITIONS TEST ==="
+          echo "Is push? ${{ github.event_name == 'push' }}"
+          echo "Is develop? ${{ github.ref == 'refs/heads/develop' }}"
+          echo "Combined? ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}"
+          echo "=== JOB DEPENDENCY ==="
+          echo "Validation job result: '${{ needs.validate-terraform.result }}'"
+          echo "✅ Deploy job is running without conditions!"
       - name: 'Checkout'
         uses: actions/checkout@v3
 
