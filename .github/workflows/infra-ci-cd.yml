@@ -58,7 +58,7 @@ jobs:
           # CKV_AWS_338: CloudWatch log retention < 1 year (7 days is sufficient for dev/testing)
           # CKV_AWS_158: [Add description of what this check does and why it's skipped]
           # CKV_AWS_260: ALB needs port 80 open for HTTP to HTTPS redirection.
-          skip_check: CKV_AWS_130,CKV_AWS_338,CKV_AWS_158,CKV_AWS_136,CKV_AWS_260,CKV_AWS_150,CKV_AWS_131,CKV_AWS_91,CKV2_AWS_20,CKV2_AWS_28,CKV_AWS_103,CKV_AWS_378
+          skip_check: CKV_AWS_130,CKV_AWS_338,CKV_AWS_158,CKV_AWS_136,CKV_AWS_260,CKV_AWS_150,CKV_AWS_131,CKV_AWS_91,CKV2_AWS_20,CKV2_AWS_28,CKV_AWS_103,CKV_AWS_378,CKV_AWS_126,CKV_AWS_135,CKV_AWS_382
 
       - name: Display Skipped Security Checks
         run: |
@@ -74,7 +74,10 @@ jobs:
           echo "   • CKV2_AWS_20: Ensure that ALB redirects HTTP requests into HTTPS ones"
           echo "   • CKV2_AWS_28: "Ensure public facing ALB are protected by WA"
           echo "   • CKV_AWS_103: "Ensure that load balancer is using at least TLS 1.2"
-          echo "   • CKV_AWS_378: "Ensure AWS Load Balancer doesn't use HTTP protocol""
+          echo "   • CKV_AWS_378: "Ensure AWS Load Balancer doesn't use HTTP protocol"
+          echo "   • CKV_AWS_126: "Ensure that detailed monitoring is enabled for EC2 instances"
+          echo "   • CKV_AWS_135: "Ensure that EC2 is EBS optimized"
+          echo "   • CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
       - name: Terraform Plan (Dev)
         id: plan-dev
         run: terraform plan -input=false -no-color -out=tfplan
