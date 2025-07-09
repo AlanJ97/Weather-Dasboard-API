@@ -6,7 +6,7 @@ on:
       - develop
     paths:
       - 'Weather-dashboard-API/infra/**'
-      - '.github/workflows/infra-ci.yml'
+      - '.github/workflows/infra-ci-cd.yml'
   pull_request:
     branches:
       - develop
@@ -125,10 +125,11 @@ jobs:
       - name: 'Terraform Init'
         run: terraform init
         working-directory: ./Weather-dashboard-API/infra/environments/dev
-        env:
-          TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}
-          TF_VAR_bastion_allowed_cidr_blocks: ${{ secrets.LOCAL_IP }}
+
 
       - name: 'Terraform Apply'
         run: terraform apply -auto-approve tfplan
         working-directory: ./Weather-dashboard-API/infra/environments/dev
+        env:
+          TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}
+          TF_VAR_bastion_allowed_cidr_blocks: ${{ secrets.LOCAL_IP }}

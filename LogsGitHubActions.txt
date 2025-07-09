@@ -1,0 +1,664 @@
+Run terraform plan -input=false -no-color -out=tfplan
+  terraform plan -input=false -no-color -out=tfplan
+  shell: /usr/bin/bash -e {0}
+  env:
+    AWS_DEFAULT_REGION: us-east-1
+    AWS_REGION: us-east-1
+    AWS_ACCESS_KEY_ID: ***
+    AWS_SECRET_ACCESS_KEY: ***
+    AWS_SESSION_TOKEN: ***
+    TERRAFORM_CLI_PATH: /home/runner/work/_temp/887b9be8-f102-4db8-ae2b-e8994aa9b391
+    CHECKOV_RESULTS: 
+         _               _
+     ___| |__   ___  ___| | _______   __
+    / __| '_ \ / _ \/ __| |/ / _ \ \ / /
+   | (__| | | |  __/ (__|   < (_) \ V /
+    \___|_| |_|\___|\___|_|\_\___/ \_/
+  
+  By Prisma Cloud | version: 3.2.449 
+  terraform scan results:
+  
+  Passed checks: 97, Failed checks: 0, Skipped checks: 0
+  
+  Check: CKV_AWS_41: "Ensure no hard coded AWS access key and secret key exists in provider"
+  	PASSED for resource: aws.default
+  	File: /environments/dev/main.tf:1-3
+  	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/secrets-policies/bc-aws-secrets-5
+  Check: CKV_AWS_41: "Ensure no hard coded AWS access key and secret key exists in provider"
+  	PASSED for resource: aws.default
+  	File: /environments/prod/main.tf:1-3
+  	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/secrets-policies/bc-aws-secrets-5
+  Check: CKV_AWS_41: "Ensure no hard coded AWS access key and secret key exists in provider"
+  	PASSED for resource: aws.default
+  	File: /enviro
+    TF_VAR_bastion_public_key: ***
+    TF_VAR_bastion_allowed_cidr_blocks: ***
+  
+module.vpc.data.aws_availability_zones.available: Reading...
+module.bastion.data.aws_ami.amazon_linux: Reading...
+module.vpc.data.aws_availability_zones.available: Read complete after 0s [id=us-east-1]
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+Terraform planned the following actions, but then encountered a problem:
+  # module.alb.aws_lb_target_group.api will be created
+  + resource "aws_lb_target_group" "api" {
+      + arn                                = (known after apply)
+      + arn_suffix                         = (known after apply)
+      + connection_termination             = (known after apply)
+      + deregistration_delay               = "300"
+      + id                                 = (known after apply)
+      + ip_address_type                    = (known after apply)
+      + lambda_multi_value_headers_enabled = false
+      + load_balancer_arns                 = (known after apply)
+      + load_balancing_algorithm_type      = (known after apply)
+      + load_balancing_anomaly_mitigation  = (known after apply)
+      + load_balancing_cross_zone_enabled  = (known after apply)
+      + name                               = "dev-weather-api-tg"
+      + name_prefix                        = (known after apply)
+      + port                               = 8000
+      + preserve_client_ip                 = (known after apply)
+      + protocol                           = "HTTP"
+      + protocol_version                   = (known after apply)
+      + proxy_protocol_v2                  = false
+      + region                             = "us-east-1"
+      + slow_start                         = 0
+      + tags                               = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-api-tg"
+          + "Project"     = "weather-dashboard"
+        }
+      + tags_all                           = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-api-tg"
+          + "Project"     = "weather-dashboard"
+        }
+      + target_type                        = "ip"
+      + vpc_id                             = (known after apply)
+      + health_check {
+          + enabled             = true
+          + healthy_threshold   = 2
+          + interval            = 30
+          + matcher             = "200"
+          + path                = "/health"
+          + port                = "traffic-port"
+          + protocol            = "HTTP"
+          + timeout             = 5
+          + unhealthy_threshold = 2
+        }
+    }
+  # module.alb.aws_lb_target_group.frontend will be created
+  + resource "aws_lb_target_group" "frontend" {
+      + arn                                = (known after apply)
+      + arn_suffix                         = (known after apply)
+      + connection_termination             = (known after apply)
+      + deregistration_delay               = "300"
+      + id                                 = (known after apply)
+      + ip_address_type                    = (known after apply)
+      + lambda_multi_value_headers_enabled = false
+      + load_balancer_arns                 = (known after apply)
+      + load_balancing_algorithm_type      = (known after apply)
+      + load_balancing_anomaly_mitigation  = (known after apply)
+      + load_balancing_cross_zone_enabled  = (known after apply)
+      + name                               = "dev-weather-frontend-tg"
+      + name_prefix                        = (known after apply)
+      + port                               = 8501
+      + preserve_client_ip                 = (known after apply)
+      + protocol                           = "HTTP"
+      + protocol_version                   = (known after apply)
+      + proxy_protocol_v2                  = false
+      + region                             = "us-east-1"
+      + slow_start                         = 0
+      + tags                               = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-frontend-tg"
+          + "Project"     = "weather-dashboard"
+        }
+      + tags_all                           = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-frontend-tg"
+          + "Project"     = "weather-dashboard"
+        }
+      + target_type                        = "ip"
+      + vpc_id                             = (known after apply)
+      + health_check {
+          + enabled             = true
+          + healthy_threshold   = 2
+          + interval            = 30
+          + matcher             = "200"
+          + path                = "/"
+          + port                = "traffic-port"
+          + protocol            = "HTTP"
+          + timeout             = 5
+          + unhealthy_threshold = 2
+        }
+    }
+  # module.alb.aws_security_group.alb will be created
+  + resource "aws_security_group" "alb" {
+      + arn                    = (known after apply)
+      + description            = "Security group for the Weather Dashboard Application Load Balancer"
+      + egress                 = [
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = "Allow outbound traffic to API target"
+              + from_port        = 8000
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 8000
+            },
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = "Allow outbound traffic to Frontend target"
+              + from_port        = 8501
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 8501
+            },
+        ]
+      + id                     = (known after apply)
+      + ingress                = [
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = "HTTP"
+              + from_port        = 80
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 80
+            },
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = "HTTPS"
+              + from_port        = 443
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 443
+            },
+        ]
+      + name                   = (known after apply)
+      + name_prefix            = "dev-weather-alb-"
+      + owner_id               = (known after apply)
+      + region                 = "us-east-1"
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-alb-sg"
+          + "Project"     = "weather-dashboard"
+        }
+      + tags_all               = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-alb-sg"
+          + "Project"     = "weather-dashboard"
+        }
+      + vpc_id                 = (known after apply)
+    }
+  # module.bastion.aws_iam_instance_profile.bastion will be created
+  + resource "aws_iam_instance_profile" "bastion" {
+      + arn         = (known after apply)
+      + create_date = (known after apply)
+      + id          = (known after apply)
+      + name        = "dev-weather-bastion-profile"
+      + name_prefix = (known after apply)
+      + path        = "/"
+      + role        = "dev-weather-bastion-role"
+      + tags        = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-bastion-profile"
+          + "Project"     = "weather-dashboard"
+        }
+      + tags_all    = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-bastion-profile"
+          + "Project"     = "weather-dashboard"
+        }
+      + unique_id   = (known after apply)
+    }
+  # module.bastion.aws_iam_role.bastion will be created
+  + resource "aws_iam_role" "bastion" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "ec2.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "dev-weather-bastion-role"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-bastion-role"
+          + "Project"     = "weather-dashboard"
+        }
+      + tags_all              = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-bastion-role"
+          + "Project"     = "weather-dashboard"
+        }
+      + unique_id             = (known after apply)
+    }
+  # module.bastion.aws_iam_role_policy.bastion will be created
+  + resource "aws_iam_role_policy" "bastion" {
+      + id          = (known after apply)
+      + name        = "dev-weather-bastion-policy"
+      + name_prefix = (known after apply)
+      + policy      = (known after apply)
+      + role        = (known after apply)
+    }
+  # module.bastion.aws_key_pair.bastion will be created
+  + resource "aws_key_pair" "bastion" {
+      + arn             = (known after apply)
+      + fingerprint     = (known after apply)
+      + id              = (known after apply)
+      + key_name        = "dev-weather-bastion-key"
+      + key_name_prefix = (known after apply)
+      + key_pair_id     = (known after apply)
+      + key_type        = (known after apply)
+      + public_key      = (sensitive value)
+      + region          = "us-east-1"
+      + tags            = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-bastion-key"
+          + "Project"     = "weather-dashboard"
+        }
+      + tags_all        = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-bastion-key"
+          + "Project"     = "weather-dashboard"
+        }
+    }
+  # module.bastion.aws_security_group.bastion will be created
+  + resource "aws_security_group" "bastion" {
+      + arn                    = (known after apply)
+      + description            = "Security group for the Weather Dashboard Bastion Host"
+      + egress                 = [
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = "All outbound traffic"
+              + from_port        = 0
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 0
+            },
+        ]
+      + id                     = (known after apply)
+      + ingress                = [
+          + {
+              + cidr_blocks      = [
+                  + "***",
+                ]
+              + description      = "SSH"
+              + from_port        = 22
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 22
+            },
+        ]
+      + name                   = (known after apply)
+      + name_prefix            = "dev-weather-bastion-"
+      + owner_id               = (known after apply)
+      + region                 = "us-east-1"
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-bastion-sg"
+          + "Project"     = "weather-dashboard"
+        }
+      + tags_all               = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-bastion-sg"
+          + "Project"     = "weather-dashboard"
+        }
+      + vpc_id                 = (known after apply)
+    }
+  # module.ecr.aws_ecr_lifecycle_policy.weather_api_policy will be created
+  + resource "aws_ecr_lifecycle_policy" "weather_api_policy" {
+      + id          = (known after apply)
+      + policy      = jsonencode(
+            {
+              + rules = [
+                  + {
+                      + action       = {
+                          + type = "expire"
+                        }
+                      + description  = "Keep last 10 production images"
+                      + rulePriority = 1
+                      + selection    = {
+                          + countNumber   = 10
+                          + countType     = "imageCountMoreThan"
+                          + tagPrefixList = [
+                              + "prod",
+                            ]
+                          + tagStatus     = "tagged"
+                        }
+                    },
+                  + {
+                      + action       = {
+                          + type = "expire"
+                        }
+                      + description  = "Keep last 5 development images"
+                      + rulePriority = 2
+                      + selection    = {
+                          + countNumber   = 5
+                          + countType     = "imageCountMoreThan"
+                          + tagPrefixList = [
+                              + "dev",
+                              + "staging",
+                            ]
+                          + tagStatus     = "tagged"
+                        }
+                    },
+                  + {
+                      + action       = {
+                          + type = "expire"
+                        }
+                      + description  = "Expire untagged images older than 1 day"
+                      + rulePriority = 3
+                      + selection    = {
+                          + countNumber = 1
+                          + countType   = "sinceImagePushed"
+                          + countUnit   = "days"
+                          + tagStatus   = "untagged"
+                        }
+                    },
+                ]
+            }
+        )
+      + region      = "us-east-1"
+      + registry_id = (known after apply)
+      + repository  = "dev-weather-api"
+    }
+  # module.ecr.aws_ecr_lifecycle_policy.weather_frontend_policy will be created
+  + resource "aws_ecr_lifecycle_policy" "weather_frontend_policy" {
+      + id          = (known after apply)
+      + policy      = jsonencode(
+            {
+              + rules = [
+                  + {
+                      + action       = {
+                          + type = "expire"
+                        }
+                      + description  = "Keep last 10 production images"
+                      + rulePriority = 1
+                      + selection    = {
+                          + countNumber   = 10
+                          + countType     = "imageCountMoreThan"
+                          + tagPrefixList = [
+                              + "prod",
+                            ]
+                          + tagStatus     = "tagged"
+                        }
+                    },
+                  + {
+                      + action       = {
+                          + type = "expire"
+                        }
+                      + description  = "Keep last 5 development images"
+                      + rulePriority = 2
+                      + selection    = {
+                          + countNumber   = 5
+                          + countType     = "imageCountMoreThan"
+                          + tagPrefixList = [
+                              + "dev",
+                              + "staging",
+                            ]
+                          + tagStatus     = "tagged"
+                        }
+                    },
+                  + {
+                      + action       = {
+                          + type = "expire"
+                        }
+                      + description  = "Expire untagged images older than 1 day"
+                      + rulePriority = 3
+                      + selection    = {
+                          + countNumber = 1
+                          + countType   = "sinceImagePushed"
+                          + countUnit   = "days"
+                          + tagStatus   = "untagged"
+                        }
+                    },
+                ]
+            }
+        )
+      + region      = "us-east-1"
+      + registry_id = (known after apply)
+      + repository  = "dev-weather-frontend"
+    }
+  # module.ecr.aws_ecr_repository.weather_api will be created
+  + resource "aws_ecr_repository" "weather_api" {
+      + arn                  = (known after apply)
+      + id                   = (known after apply)
+      + image_tag_mutability = "IMMUTABLE"
+      + name                 = "dev-weather-api"
+      + region               = "us-east-1"
+      + registry_id          = (known after apply)
+      + repository_url       = (known after apply)
+      + tags                 = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-api"
+          + "Project"     = "weather-dashboard"
+        }
+      + tags_all             = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-api"
+          + "Project"     = "weather-dashboard"
+        }
+      + encryption_configuration {
+          + encryption_type = "AES256"
+          + kms_key         = (known after apply)
+        }
+      + image_scanning_configuration {
+          + scan_on_push = true
+        }
+    }
+  # module.ecr.aws_ecr_repository.weather_frontend will be created
+  + resource "aws_ecr_repository" "weather_frontend" {
+      + arn                  = (known after apply)
+      + id                   = (known after apply)
+      + image_tag_mutability = "IMMUTABLE"
+      + name                 = "dev-weather-frontend"
+      + region               = "us-east-1"
+      + registry_id          = (known after apply)
+      + repository_url       = (known after apply)
+      + tags                 = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-frontend"
+          + "Project"     = "weather-dashboard"
+        }
+      + tags_all             = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "dev-weather-frontend"
+          + "Project"     = "weather-dashboard"
+        }
+      + encryption_configuration {
+          + encryption_type = "AES256"
+          + kms_key         = (known after apply)
+        }
+      + image_scanning_configuration {
+          + scan_on_push = true
+        }
+    }
+  # module.ecs.aws_cloudwatch_log_group.ecs will be created
+                      + Principal = {
+                          + Service = "vpc-flow-logs.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "dev-vpc-flow-log-role"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+    }
+  # module.vpc.aws_iam_role_policy.flow_log_policy will be created
+  + resource "aws_iam_role_policy" "flow_log_policy" {
+      + id          = (known after apply)
+      + name        = "dev-vpc-flow-log-policy"
+      + name_prefix = (known after apply)
+      + policy      = (known after apply)
+      + role        = (known after apply)
+    }
+  # module.vpc.aws_internet_gateway.gw will be created
+  + resource "aws_internet_gateway" "gw" {
+      + arn      = (known after apply)
+      + id       = (known after apply)
+      + owner_id = (known after apply)
+      + region   = "us-east-1"
+      + tags     = {
+          + "Name" = "dev-igw"
+        }
+      + tags_all = {
+          + "Name" = "dev-igw"
+        }
+      + vpc_id   = (known after apply)
+    }
+  # module.vpc.aws_nat_gateway.nat will be created
+  + resource "aws_nat_gateway" "nat" {
+      + allocation_id                      = (known after apply)
+      + association_id                     = (known after apply)
+      + connectivity_type                  = "public"
+      + id                                 = (known after apply)
+      + network_interface_id               = (known after apply)
+      + private_ip                         = (known after apply)
+      + public_ip                          = (known after apply)
+      + region                             = "us-east-1"
+      + secondary_private_ip_address_count = (known after apply)
+      + secondary_private_ip_addresses     = (known after apply)
+      + subnet_id                          = (known after apply)
+      + tags                               = {
+          + "Name" = "dev-nat-gw"
+        }
+      + tags_all                           = {
+          + "Name" = "dev-nat-gw"
+        }
+    }
+  # module.vpc.aws_route_table.private will be created
+  + resource "aws_route_table" "private" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + region           = "us-east-1"
+      + route            = [
+          + {
+              + cidr_block                 = "0.0.0.0/0"
+              + nat_gateway_id             = (known after apply)
+                # (11 unchanged attributes hidden)
+            },
+        ]
+      + tags             = {
+          + "Name" = "dev-private-rt"
+        }
+      + tags_all         = {
+          + "Name" = "dev-private-rt"
+        }
+      + vpc_id           = (known after apply)
+    }
+  # module.vpc.aws_route_table.public will be created
+  + resource "aws_route_table" "public" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + region           = "us-east-1"
+      + route            = [
+          + {
+              + cidr_block                 = "0.0.0.0/0"
+              + gateway_id                 = (known after apply)
+                # (11 unchanged attributes hidden)
+            },
+        ]
+      + tags             = {
+          + "Name" = "dev-public-rt"
+        }
+      + tags_all         = {
+          + "Name" = "dev-public-rt"
+        }
+      + vpc_id           = (known after apply)
+    }
+  # module.vpc.aws_route_table_association.private[0] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + region         = "us-east-1"
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+  # module.vpc.aws_route_table_association.private[1] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + region         = "us-east-1"
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+  # module.vpc.aws_route_table_association.public[0] will be created
+  + resource "aws_route_table_association" "public" {
+      + id             = (known after apply)
+      + region         = "us-east-1"
+0s
