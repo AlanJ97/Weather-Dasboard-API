@@ -15,6 +15,7 @@ resource "aws_key_pair" "bastion" {
 resource "aws_security_group" "bastion" {
   name_prefix = "${var.env}-weather-bastion-"
   vpc_id      = var.vpc_id
+  description = "Security group for the Weather Dashboard Bastion Host"
 
   ingress {
     description = "SSH"

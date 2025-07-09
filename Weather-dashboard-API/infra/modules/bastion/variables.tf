@@ -26,7 +26,6 @@ variable "public_key" {
 variable "allowed_cidr_blocks" {
   description = "CIDR blocks allowed to access the bastion host via SSH"
   type        = list(string)
-  default     = ["0.0.0.0/0"]
 }
 
 variable "instance_type" {

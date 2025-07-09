@@ -150,31 +150,12 @@ variable "ecs_log_retention_days" {
 
 # Bastion Host Variables
 variable "bastion_public_key" {
-  description = "Public key for the bastion host key pair"
+  description = "Public key for the bastion host"
   type        = string
-  # This should be provided as an environment variable or through terraform.tfvars
+  sensitive   = true
 }
 
 variable "bastion_allowed_cidr_blocks" {
-  description = "CIDR blocks allowed to access the bastion host via SSH"
+  description = "List of CIDR blocks allowed to access the bastion host"
   type        = list(string)
-  default     = ["0.0.0.0/0"]  # For dev environment - restrict this in production!
-}
-
-variable "bastion_instance_type" {
-  description = "Instance type for the bastion host"
-  type        = string
-  default     = "t3.micro"
-}
-
-variable "bastion_root_volume_size" {
-  description = "Size of the root volume in GB"
-  type        = number
-  default     = 20
-}
-
-variable "bastion_enable_termination_protection" {
-  description = "Enable termination protection for the bastion host"
-  type        = bool
-  default     = false
 }

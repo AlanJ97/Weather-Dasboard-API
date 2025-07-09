@@ -2,6 +2,7 @@
 resource "aws_security_group" "alb" {
   name_prefix = "${var.env}-weather-alb-"
   vpc_id      = var.vpc_id
+  description = "Security group for the Weather Dashboard Application Load Balancer"
 
   ingress {
     description = "HTTP"

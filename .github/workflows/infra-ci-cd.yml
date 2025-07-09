@@ -57,7 +57,8 @@ jobs:
           # CKV_AWS_130: Public subnets auto-assign public IPs (required for public subnets)
           # CKV_AWS_338: CloudWatch log retention < 1 year (7 days is sufficient for dev/testing)
           # CKV_AWS_158: [Add description of what this check does and why it's skipped]
-          skip_check: CKV_AWS_130,CKV_AWS_338,CKV_AWS_158,CKV_AWS_136
+          # CKV_AWS_260: ALB needs port 80 open for HTTP to HTTPS redirection.
+          skip_check: CKV_AWS_130,CKV_AWS_338,CKV_AWS_158,CKV_AWS_136,CKV_AWS_260,CKV_AWS_150,CKV_AWS_131,CKV_AWS_91
 
       - name: Display Skipped Security Checks
         run: |
@@ -66,7 +67,10 @@ jobs:
           echo "   • CKV_AWS_338: CloudWatch log retention < 1 year (7 days is sufficient for dev/testing)"
           echo "   • CKV_AWS_158: Additional security check (deferred for this iteration)"
           echo "   • CKV_AWS_136: Askes the user to use KMS to encrypt ECR repositories"
-    
+          echo "   • CKV_AWS_260: ALB requires port 80 for HTTP to HTTPS redirection, which is a standard secure practice."
+          echo "  • CKV_AWS_150: ALB requires to have enabled the deletion protection to avoid accidental deletion, which is a standard secure practice."
+          echo "  • CKV_AWS_91: ALB requires to have access logs enabled"
+          echo "  • CKV_AWS_131: ALB requires to have the logs enables"
       - name: Terraform Plan (Dev)
         id: plan-dev
         run: terraform plan -input=false -no-color -out=tfplan

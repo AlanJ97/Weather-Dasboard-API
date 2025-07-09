@@ -78,13 +78,10 @@ module "ecs" {
 module "bastion" {
   source = "../../modules/bastion"
 
-  env                           = var.env
-  aws_region                    = var.aws_region
-  vpc_id                        = module.vpc.vpc_id
-  public_subnet_id              = module.vpc.public_subnet_ids[0]
-  public_key                    = var.bastion_public_key
-  allowed_cidr_blocks           = var.bastion_allowed_cidr_blocks
-  instance_type                 = var.bastion_instance_type
-  root_volume_size              = var.bastion_root_volume_size
-  enable_termination_protection = var.bastion_enable_termination_protection
+  env                   = var.env
+  aws_region            = var.aws_region
+  vpc_id                = module.vpc.vpc_id
+  public_subnet_id      = module.vpc.public_subnet_ids[0]
+  public_key            = var.bastion_public_key
+  allowed_cidr_blocks   = var.bastion_allowed_cidr_blocks
 }
