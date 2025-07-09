@@ -1,7 +1,7 @@
 # ECR Repository for Weather Dashboard API
 resource "aws_ecr_repository" "weather_api" {
   name                 = "${var.env}-weather-api"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
@@ -22,7 +22,7 @@ resource "aws_ecr_repository" "weather_api" {
 # ECR Repository for Streamlit Frontend
 resource "aws_ecr_repository" "weather_frontend" {
   name                 = "${var.env}-weather-frontend"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true

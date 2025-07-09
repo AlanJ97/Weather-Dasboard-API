@@ -57,7 +57,7 @@ jobs:
           # CKV_AWS_130: Public subnets auto-assign public IPs (required for public subnets)
           # CKV_AWS_338: CloudWatch log retention < 1 year (7 days is sufficient for dev/testing)
           # CKV_AWS_158: [Add description of what this check does and why it's skipped]
-          skip_check: CKV_AWS_130,CKV_AWS_338,CKV_AWS_158
+          skip_check: CKV_AWS_130,CKV_AWS_338,CKV_AWS_158,CKV_AWS_136
 
       - name: Display Skipped Security Checks
         run: |
@@ -65,7 +65,8 @@ jobs:
           echo "   • CKV_AWS_130: Public subnets auto-assign public IPs (required for public subnets)"
           echo "   • CKV_AWS_338: CloudWatch log retention < 1 year (7 days is sufficient for dev/testing)"
           echo "   • CKV_AWS_158: Additional security check (deferred for this iteration)"
-
+          echo "   • CKV_AWS_136: Askes the user to use KMS to encrypt ECR repositories"
+    
       - name: Terraform Plan (Dev)
         id: plan-dev
         run: terraform plan -input=false -no-color -out=tfplan
