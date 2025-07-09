@@ -19,10 +19,21 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # The ALB needs to send health checks and traffic to the targets.
+  # We restrict this to the ports used by the API and Frontend services.
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "Allow outbound traffic to API target"
+    from_port   = var.api_port
+    to_port     = var.api_port
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow outbound traffic to Frontend target"
+    from_port   = var.frontend_port
+    to_port     = var.frontend_port
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -156,12 +167,6 @@ resource "aws_lb_listener" "https" {
     target_group_arn = aws_lb_target_group.frontend.arn
   }
 
-  tags = {
-    Name        = "${var.env}-weather-https-listener"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
 }
 
 # HTTP Listener for environments without SSL
