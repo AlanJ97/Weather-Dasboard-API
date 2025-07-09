@@ -74,8 +74,6 @@ module "ecs" {
   log_retention_days = var.ecs_log_retention_days
 }
 
-
-
 # Bastion Host Module
 module "bastion" {
   source = "../../modules/bastion"

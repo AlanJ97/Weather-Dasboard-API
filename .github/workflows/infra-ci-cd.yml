@@ -100,7 +100,7 @@ jobs:
     name: 'Deploy infra with Terraform to AWS'
     runs-on: ubuntu-latest
     needs: validate-terraform
-    if: github.event_name == 'push'
+    #if: github.event_name == 'push'
     permissions:
       id-token: write
       contents: read
