@@ -82,6 +82,9 @@ jobs:
         id: plan-dev
         run: terraform plan -input=false -no-color -out=tfplan
         working-directory: ./Weather-dashboard-API/infra/environments/dev
+        env:
+          TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}
+          TF_VAR_bastion_allowed_cidr_blocks: ${{ secrets.LOCAL_IP }}
 
       - name: Upload Terraform Plan
         uses: actions/upload-artifact@v4
@@ -122,6 +125,9 @@ jobs:
       - name: 'Terraform Init'
         run: terraform init
         working-directory: ./Weather-dashboard-API/infra/environments/dev
+        env:
+          TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}
+          TF_VAR_bastion_allowed_cidr_blocks: ${{ secrets.LOCAL_IP }}
 
       - name: 'Terraform Apply'
         run: terraform apply -auto-approve tfplan
