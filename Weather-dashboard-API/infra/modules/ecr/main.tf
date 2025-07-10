@@ -13,6 +13,7 @@ resource "aws_ecr_repository" "weather_api" {
   }
 
 
+
   tags = {
     Name        = "${var.env}-weather-api"
     Environment = var.env
