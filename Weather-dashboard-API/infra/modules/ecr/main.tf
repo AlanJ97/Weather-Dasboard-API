@@ -7,6 +7,7 @@ resource "aws_ecr_repository" "weather_api" {
     scan_on_push = true
   }
 
+
   encryption_configuration {
     encryption_type = "AES256"
   }
