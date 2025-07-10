@@ -20,7 +20,6 @@ jobs:
   validate-terraform:
     name: 'Validate Terraform (PR to develop)'
     runs-on: ubuntu-latest
-    if: github.event.action != 'closed'
     permissions:
       id-token: write
       contents: read
