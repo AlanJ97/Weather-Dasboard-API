@@ -94,7 +94,7 @@ PERMISSIONS_POLICY=$(cat <<EOF
                 "logs:CreateLogGroup",
                 "logs:DescribeLogGroups",
                 "logs:TagResource",
-                "logs:PutRetentionPolicy"
+                "logs:PutRetentionPolicy",
                 "iam:CreateRole",
                 "iam:GetRole",
                 "iam:TagRole",
@@ -111,10 +111,10 @@ PERMISSIONS_POLICY=$(cat <<EOF
                 "ec2:DescribeSecurityGroups",
                 "ec2:DescribeImages",
                 "ec2:ImportKeyPair",
-                "ec2:AllocateAddress"
+                "ec2:AllocateAddress",
                 "ec2:CreateVpc",
                 "ecr:CreateRepository",
-                "ecs:CreateCluster",
+                "ecs:CreateCluster"
                 
             ],
             "Resource": "*"
