@@ -20,6 +20,7 @@ resource "aws_ecr_repository" "weather_api" {
   }
 }
 
+
 # ECR Repository for Streamlit Frontend
 resource "aws_ecr_repository" "weather_frontend" {
   name                 = "${var.env}-weather-frontend"
