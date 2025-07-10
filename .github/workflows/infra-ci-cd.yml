@@ -84,7 +84,7 @@ jobs:
         id: plan-dev
         run: |
           echo "Starting Terraform plan..."
-          terraform plan -input=false -no-color -out=tfplan
+          terraform plan -input=false -no-color -out=tfplandev
           echo "Terraform plan completed successfully"
         working-directory: ${{ env.WORKING_DIR }}
         env:
@@ -169,7 +169,7 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
 
       - name: 'Terraform Apply'
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve dev
         working-directory: ${{ env.WORKING_DIR }}
         env:
           TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}
