@@ -15,6 +15,10 @@ ROLES=(
     "dev-weather-ecs-task-execution-role"
     "dev-weather-ecs-task-role" 
     "dev-vpc-flow-log-role"
+)
+
+# List of IAM Instance Profiles to delete
+INSTANCE_PROFILES=(
     "dev-weather-bastion-profile"
 )
 
@@ -29,6 +33,32 @@ KEY_PAIRS=(
     "dev-weather-bastion-key"
 )
 
+echo "🗑️  Deleting conflicting IAM Instance Profiles..."
+for instance_profile in "${INSTANCE_PROFILES[@]}"; do
+    echo "Checking IAM Instance Profile: $instance_profile"
+    if aws iam get-instance-profile --instance-profile-name "$instance_profile" >/dev/null 2>&1; then
+        echo "  Found instance profile: $instance_profile"
+        
+        # List roles attached to the instance profile
+        ATTACHED_ROLES=$(aws iam get-instance-profile --instance-profile-name "$instance_profile" --query 'InstanceProfile.Roles[].RoleName' --output text 2>/dev/null || echo "")
+        
+        # Remove roles from instance profile
+        if [ -n "$ATTACHED_ROLES" ]; then
+            for role_name in $ATTACHED_ROLES; do
+                echo "    Removing role $role_name from instance profile $instance_profile"
+                aws iam remove-role-from-instance-profile --instance-profile-name "$instance_profile" --role-name "$role_name"
+            done
+        fi
+        
+        echo "    Deleting instance profile: $instance_profile"
+        aws iam delete-instance-profile --instance-profile-name "$instance_profile"
+        echo "  ✅ Deleted instance profile: $instance_profile"
+    else
+        echo "  ℹ️  Instance Profile $instance_profile does not exist, skipping"
+    fi
+done
+
+echo ""
 echo "🗑️  Deleting conflicting IAM roles..."
 for role in "${ROLES[@]}"; do
     echo "Checking IAM role: $role"
