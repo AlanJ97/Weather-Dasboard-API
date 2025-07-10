@@ -84,7 +84,7 @@ jobs:
         id: plan-dev
         run: |
           echo "Starting Terraform plan..."
-          terraform plan -input=false -no-color -out=tfplandev
+          terraform plan -input=false -no-color -out=tfplan-dev
           echo "Terraform plan completed successfully"
         working-directory: ${{ env.WORKING_DIR }}
         env:
