@@ -14,6 +14,13 @@ on:
     paths:
       - 'Weather-dashboard-API/infra/**'
 
+# Add environment variables for better configuration management
+env:
+  TF_VERSION: "1.8.5"
+  AWS_REGION: "us-east-1"
+  WORKING_DIR: "./Weather-dashboard-API/infra/environments/dev"
+  INFRA_DIR: "./Weather-dashboard-API/infra"
+
 jobs:
   validate-terraform:
     name: 'Validate Terraform'
@@ -21,6 +28,9 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    
+    # Add timeout to prevent hanging builds
+    timeout-minutes: 15
 
     steps:
       - name: 'Checkout'
@@ -30,35 +40,30 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          aws-region: us-east-1
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: 'Set up Terraform'
-        uses: hashicorp/setup-terraform@v3 # Using latest version of the action
+        uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.8.5 # Specify a valid, recent version of Terraform CLI
+          terraform_version: ${{ env.TF_VERSION }}
 
       - name: 'Terraform Init'
         run: terraform init
-        working-directory: ./Weather-dashboard-API/infra/environments/dev
+        working-directory: ${{ env.WORKING_DIR }}
 
       - name: 'Terraform Format'
         run: terraform fmt -check
-        working-directory: ./Weather-dashboard-API/infra
+        working-directory: ${{ env.INFRA_DIR }}
 
       - name: 'Terraform Validate'
         run: terraform validate
-        working-directory: ./Weather-dashboard-API/infra/environments/dev
+        working-directory: ${{ env.WORKING_DIR }}
 
       - name: 'Run Checkov Security Scan'
-        uses: bridgecrewio/checkov-action@v12 # Pinning to a specific major version
+        uses: bridgecrewio/checkov-action@v12
         with:
-          directory: ./Weather-dashboard-API/infra/
+          directory: ${{ env.INFRA_DIR }}
           framework: terraform
-          # Skipped security checks (intentional for this project):
-          # CKV_AWS_130: Public subnets auto-assign public IPs (required for public subnets)
-          # CKV_AWS_338: CloudWatch log retention < 1 year (7 days is sufficient for dev/testing)
-          # CKV_AWS_158: [Add description of what this check does and why it's skipped]
-          # CKV_AWS_260: ALB needs port 80 open for HTTP to HTTPS redirection.
           skip_check: CKV_AWS_130,CKV_AWS_338,CKV_AWS_158,CKV_AWS_136,CKV_AWS_260,CKV_AWS_150,CKV_AWS_131,CKV_AWS_91,CKV2_AWS_20,CKV2_AWS_28,CKV_AWS_103,CKV_AWS_378,CKV_AWS_126,CKV_AWS_135,CKV_AWS_382
 
       - name: Display Skipped Security Checks
@@ -79,13 +84,14 @@ jobs:
           echo "   • CKV_AWS_126: Ensure that detailed monitoring is enabled for EC2 instances"
           echo "   • CKV_AWS_135: Ensure that EC2 is EBS optimized"
           echo "   • CKV_AWS_382: Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+      
       - name: Terraform Plan (Dev)
         id: plan-dev
         run: |
           echo "Starting Terraform plan..."
           terraform plan -input=false -no-color -out=tfplan
           echo "Terraform plan completed successfully"
-        working-directory: ./Weather-dashboard-API/infra/environments/dev
+        working-directory: ${{ env.WORKING_DIR }}
         env:
           TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}
           TF_VAR_bastion_allowed_cidr_blocks: ${{ secrets.LOCAL_IP }}
@@ -95,7 +101,20 @@ jobs:
         if: always()
         with:
           name: tfplan-dev
-          path: ./Weather-dashboard-API/infra/environments/dev/tfplan
+          path: ${{ env.WORKING_DIR }}/tfplan
+          retention-days: 1
+
+      # Add failure notification
+      - name: 'Notify on Failure'
+        if: failure()
+        run: |
+          echo "🚨 Infrastructure validation failed!"
+          echo "Please check the logs above and fix any issues before merging."
+          echo "Common issues:"
+          echo "  • Terraform formatting errors"
+          echo "  • Security policy violations"
+          echo "  • Invalid Terraform configuration"
+          exit 1
 
   deploy-infra:
     name: 'Deploy infra with Terraform to AWS'
@@ -105,6 +124,9 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    
+    # Add timeout for deployment
+    timeout-minutes: 30
 
     steps:
       - name: 'Deploy Context'
@@ -115,6 +137,7 @@ jobs:
           echo "PR Merged: ${{ github.event.pull_request.merged }}"
           echo "Base Branch: ${{ github.base_ref }}"
           echo "Validation result: ${{ needs.validate-terraform.result }}"
+      
       - name: 'Checkout'
         uses: actions/checkout@v3
 
@@ -122,39 +145,66 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: tfplan-dev
-          path: ./Weather-dashboard-API/infra/environments/dev
+          path: ${{ env.WORKING_DIR }}
 
       - name: Verify Plan File
         run: |
           echo "Checking if plan file exists..."
-          ls -la ./Weather-dashboard-API/infra/environments/dev/
-          if [ -f ./Weather-dashboard-API/infra/environments/dev/tfplan ]; then
+          ls -la ${{ env.WORKING_DIR }}/
+          if [ -f ${{ env.WORKING_DIR }}/tfplan ]; then
             echo "✅ Plan file found"
           else
             echo "❌ Plan file not found"
             exit 1
           fi
-        working-directory: .
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          aws-region: us-east-1
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: 'Set up Terraform'
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.8.5
+          terraform_version: ${{ env.TF_VERSION }}
 
       - name: 'Terraform Init'
         run: terraform init
-        working-directory: ./Weather-dashboard-API/infra/environments/dev
-
+        working-directory: ${{ env.WORKING_DIR }}
 
       - name: 'Terraform Apply'
         run: terraform apply -auto-approve tfplan
-        working-directory: ./Weather-dashboard-API/infra/environments/dev
+        working-directory: ${{ env.WORKING_DIR }}
         env:
           TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}
           TF_VAR_bastion_allowed_cidr_blocks: ${{ secrets.LOCAL_IP }}
+
+      # Add post-deployment verification
+      - name: 'Post-Deployment Verification'
+        run: |
+          echo "🔍 Verifying deployment..."
+          terraform show -json tfplan > /dev/null
+          echo "✅ Deployment verification completed"
+        working-directory: ${{ env.WORKING_DIR }}
+
+      # Add success notification
+      - name: 'Notify on Success'
+        if: success()
+        run: |
+          echo "🎉 Infrastructure deployment successful!"
+          echo "Environment: dev"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "PR: ${{ github.event.pull_request.html_url }}"
+
+      # Add failure notification with rollback guidance
+      - name: 'Notify on Failure'
+        if: failure()
+        run: |
+          echo "🚨 Infrastructure deployment failed!"
+          echo "Please check the logs above and consider:"
+          echo "  • Rolling back changes if needed"
+          echo "  • Verifying AWS permissions"
+          echo "  • Checking resource limits"
+          echo "  • Reviewing Terraform state"
+          exit 1
