@@ -36,9 +36,12 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-        working-directory: infra/environments/${{ github.event.inputs.environment }}
+        working-directory: Weather-dashboard-API/infra/environments/${{ github.event.inputs.environment }}
 
       - name: Terraform Destroy
         id: destroy
         run: terraform destroy -auto-approve -input=false
-        working-directory: infra/environments/${{ github.event.inputs.environment }}
+        working-directory: Weather-dashboard-API/infra/environments/${{ github.event.inputs.environment }}
+        env:
+          TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}
+          TF_VAR_bastion_allowed_cidr_blocks: ${{ secrets.LOCAL_IP }}

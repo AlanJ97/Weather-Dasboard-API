@@ -12,6 +12,7 @@ resource "aws_ecr_repository" "weather_api" {
     encryption_type = "AES256"
   }
 
+
   tags = {
     Name        = "${var.env}-weather-api"
     Environment = var.env

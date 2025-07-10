@@ -23,6 +23,11 @@ LOG_GROUPS=(
     "/aws/vpc/flow-logs-dev"
 )
 
+# List of EC2 Key Pairs to delete  
+KEY_PAIRS=(
+    "dev-weather-bastion-key"
+)
+
 echo "🗑️  Deleting conflicting IAM roles..."
 for role in "${ROLES[@]}"; do
     echo "Checking IAM role: $role"
@@ -75,6 +80,19 @@ if MSYS_NO_PATHCONV=1 aws logs describe-log-groups --region "$AWS_REGION" --quer
 else
     echo "  ℹ️  Log group /aws/vpc/flow-logs-dev does not exist, skipping"
 fi
+
+echo ""
+echo "🗑️  Deleting conflicting EC2 Key Pairs..."
+for key_pair in "${KEY_PAIRS[@]}"; do
+    echo "Checking EC2 Key Pair: $key_pair"
+    if aws ec2 describe-key-pairs --key-names "$key_pair" --region "$AWS_REGION" >/dev/null 2>&1; then
+        echo "  Deleting EC2 Key Pair: $key_pair"
+        aws ec2 delete-key-pair --key-name "$key_pair" --region "$AWS_REGION"
+        echo "  ✅ Deleted EC2 Key Pair: $key_pair"
+    else
+        echo "  ℹ️  EC2 Key Pair $key_pair does not exist, skipping"
+    fi
+done
 
 echo ""
 echo "✅ Cleanup completed!"
