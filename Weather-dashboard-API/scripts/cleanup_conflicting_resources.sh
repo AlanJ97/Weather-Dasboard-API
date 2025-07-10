@@ -15,6 +15,7 @@ ROLES=(
     "dev-weather-ecs-task-execution-role"
     "dev-weather-ecs-task-role" 
     "dev-vpc-flow-log-role"
+    "dev-weather-bastion-profile"
 )
 
 # List of CloudWatch log groups to delete
