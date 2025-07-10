@@ -8,6 +8,7 @@ on:
       - 'Weather-dashboard-API/infra/**'
       - '.github/workflows/infra-ci-cd.yml'
   pull_request:
+    types: [opened, synchronize, closed]
     branches:
       - develop
     paths:
@@ -100,32 +101,20 @@ jobs:
     name: 'Deploy infra with Terraform to AWS'
     runs-on: ubuntu-latest
     needs: validate-terraform
-    #if: github.event_name == 'push'
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.base_ref == 'develop'
     permissions:
       id-token: write
       contents: read
 
     steps:
-      - name: 'Full Debug Context'
+      - name: 'Deploy Context'
         run: |
-          echo "=== GITHUB CONTEXT DEBUG ==="
-          echo "Event name: '${{ github.event_name }}'"
-          echo "Ref: '${{ github.ref }}'"
-          echo "Branch name: '${{ github.ref_name }}'"
-          echo "Head ref: '${{ github.head_ref }}'"
-          echo "Base ref: '${{ github.base_ref }}'"
-          echo "Repository: '${{ github.repository }}'"
-          echo "Actor: '${{ github.actor }}'"
-          echo "Workflow: '${{ github.workflow }}'"
-          echo "Run ID: '${{ github.run_id }}'"
-          echo "SHA: '${{ github.sha }}'"
-          echo "=== CONDITIONS TEST ==="
-          echo "Is push? ${{ github.event_name == 'push' }}"
-          echo "Is develop? ${{ github.ref == 'refs/heads/develop' }}"
-          echo "Combined? ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}"
-          echo "=== JOB DEPENDENCY ==="
-          echo "Validation job result: '${{ needs.validate-terraform.result }}'"
-          echo "✅ Deploy job is running without conditions!"
+          echo "🚀 Deploying to AWS after PR merge to develop"
+          echo "Event: ${{ github.event_name }}"
+          echo "PR Action: ${{ github.event.action }}"
+          echo "PR Merged: ${{ github.event.pull_request.merged }}"
+          echo "Base Branch: ${{ github.base_ref }}"
+          echo "Validation result: ${{ needs.validate-terraform.result }}"
       - name: 'Checkout'
         uses: actions/checkout@v3
 
