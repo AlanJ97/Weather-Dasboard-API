@@ -1,18 +1,13 @@
-name: Infrastructure CI
+name: Infrastructure CI/CD
 
 on:
-  push:
-    branches:
-      - develop
-    paths:
-      - 'Weather-dashboard-API/infra/**'
-      - '.github/workflows/infra-ci-cd.yml'
   pull_request:
     types: [opened, synchronize, closed]
     branches:
       - develop
     paths:
       - 'Weather-dashboard-API/infra/**'
+      - '.github/workflows/infra-ci-cd.yml'
 
 # Add environment variables for better configuration management
 env:
@@ -23,8 +18,9 @@ env:
 
 jobs:
   validate-terraform:
-    name: 'Validate Terraform'
+    name: 'Validate Terraform (PR to develop)'
     runs-on: ubuntu-latest
+    if: github.event.action != 'closed'
     permissions:
       id-token: write
       contents: read
