@@ -8,6 +8,8 @@ resource "aws_ecr_repository" "weather_api" {
   }
 
 
+
+
   encryption_configuration {
     encryption_type = "AES256"
   }
