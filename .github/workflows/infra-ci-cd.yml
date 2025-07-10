@@ -96,7 +96,7 @@ jobs:
         if: always()
         with:
           name: tfplan-dev
-          path: ${{ env.WORKING_DIR }}/tfplan
+          path: ${{ env.WORKING_DIR }}/tfplan-dev
           retention-days: 1
 
       # Add failure notification
@@ -146,7 +146,7 @@ jobs:
         run: |
           echo "Checking if plan file exists..."
           ls -la ${{ env.WORKING_DIR }}/
-          if [ -f ${{ env.WORKING_DIR }}/tfplan ]; then
+          if [ -f ${{ env.WORKING_DIR }}/tfplan-dev ]; then
             echo "✅ Plan file found"
           else
             echo "❌ Plan file not found"
@@ -169,7 +169,7 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
 
       - name: 'Terraform Apply'
-        run: terraform apply -auto-approve dev
+        run: terraform apply -auto-approve tfplan-dev
         working-directory: ${{ env.WORKING_DIR }}
         env:
           TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}
@@ -179,7 +179,7 @@ jobs:
       - name: 'Post-Deployment Verification'
         run: |
           echo "🔍 Verifying deployment..."
-          terraform show -json tfplan > /dev/null
+          terraform show -json tfplan-dev > /dev/null
           echo "✅ Deployment verification completed"
         working-directory: ${{ env.WORKING_DIR }}
 
