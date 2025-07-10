@@ -1,0 +1,160 @@
+name: Infrastructure CI
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'Weather-dashboard-API/infra/**'
+      - '.github/workflows/infra-ci-cd.yml'
+  pull_request:
+    types: [opened, synchronize, closed]
+    branches:
+      - develop
+    paths:
+      - 'Weather-dashboard-API/infra/**'
+
+jobs:
+  validate-terraform:
+    name: 'Validate Terraform'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: us-east-1
+
+      - name: 'Set up Terraform'
+        uses: hashicorp/setup-terraform@v3 # Using latest version of the action
+        with:
+          terraform_version: 1.8.5 # Specify a valid, recent version of Terraform CLI
+
+      - name: 'Terraform Init'
+        run: terraform init
+        working-directory: ./Weather-dashboard-API/infra/environments/dev
+
+      - name: 'Terraform Format'
+        run: terraform fmt -check
+        working-directory: ./Weather-dashboard-API/infra
+
+      - name: 'Terraform Validate'
+        run: terraform validate
+        working-directory: ./Weather-dashboard-API/infra/environments/dev
+
+      - name: 'Run Checkov Security Scan'
+        uses: bridgecrewio/checkov-action@v12 # Pinning to a specific major version
+        with:
+          directory: ./Weather-dashboard-API/infra/
+          framework: terraform
+          # Skipped security checks (intentional for this project):
+          # CKV_AWS_130: Public subnets auto-assign public IPs (required for public subnets)
+          # CKV_AWS_338: CloudWatch log retention < 1 year (7 days is sufficient for dev/testing)
+          # CKV_AWS_158: [Add description of what this check does and why it's skipped]
+          # CKV_AWS_260: ALB needs port 80 open for HTTP to HTTPS redirection.
+          skip_check: CKV_AWS_130,CKV_AWS_338,CKV_AWS_158,CKV_AWS_136,CKV_AWS_260,CKV_AWS_150,CKV_AWS_131,CKV_AWS_91,CKV2_AWS_20,CKV2_AWS_28,CKV_AWS_103,CKV_AWS_378,CKV_AWS_126,CKV_AWS_135,CKV_AWS_382
+
+      - name: Display Skipped Security Checks
+        run: |
+          echo "ℹ️  The following Checkov security checks were intentionally skipped:"
+          echo "   • CKV_AWS_130: Public subnets auto-assign public IPs (required for public subnets)"
+          echo "   • CKV_AWS_338: CloudWatch log retention < 1 year (7 days is sufficient for dev/testing)"
+          echo "   • CKV_AWS_158: Additional security check (deferred for this iteration)"
+          echo "   • CKV_AWS_136: Askes the user to use KMS to encrypt ECR repositories"
+          echo "   • CKV_AWS_260: ALB requires port 80 for HTTP to HTTPS redirection, which is a standard secure practice."
+          echo "   • CKV_AWS_150: ALB requires to have enabled the deletion protection to avoid accidental deletion, which is a standard secure practice."
+          echo "   • CKV_AWS_91: ALB requires to have access logs enabled"
+          echo "   • CKV_AWS_131: ALB requires to have the logs enables"
+          echo "   • CKV2_AWS_20: Ensure that ALB redirects HTTP requests into HTTPS ones"
+          echo "   • CKV2_AWS_28: Ensure public facing ALB are protected by WA"
+          echo "   • CKV_AWS_103: Ensure that load balancer is using at least TLS 1.2"
+          echo "   • CKV_AWS_378: Ensure AWS Load Balancer doesnt use HTTP protocol"
+          echo "   • CKV_AWS_126: Ensure that detailed monitoring is enabled for EC2 instances"
+          echo "   • CKV_AWS_135: Ensure that EC2 is EBS optimized"
+          echo "   • CKV_AWS_382: Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+      - name: Terraform Plan (Dev)
+        id: plan-dev
+        run: |
+          echo "Starting Terraform plan..."
+          terraform plan -input=false -no-color -out=tfplan
+          echo "Terraform plan completed successfully"
+        working-directory: ./Weather-dashboard-API/infra/environments/dev
+        env:
+          TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}
+          TF_VAR_bastion_allowed_cidr_blocks: ${{ secrets.LOCAL_IP }}
+
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tfplan-dev
+          path: ./Weather-dashboard-API/infra/environments/dev/tfplan
+
+  deploy-infra:
+    name: 'Deploy infra with Terraform to AWS'
+    runs-on: ubuntu-latest
+    needs: validate-terraform
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.base_ref == 'develop'
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: 'Deploy Context'
+        run: |
+          echo "🚀 Deploying to AWS after PR merge to develop"
+          echo "Event: ${{ github.event_name }}"
+          echo "PR Action: ${{ github.event.action }}"
+          echo "PR Merged: ${{ github.event.pull_request.merged }}"
+          echo "Base Branch: ${{ github.base_ref }}"
+          echo "Validation result: ${{ needs.validate-terraform.result }}"
+      - name: 'Checkout'
+        uses: actions/checkout@v3
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-dev
+          path: ./Weather-dashboard-API/infra/environments/dev
+
+      - name: Verify Plan File
+        run: |
+          echo "Checking if plan file exists..."
+          ls -la ./Weather-dashboard-API/infra/environments/dev/
+          if [ -f ./Weather-dashboard-API/infra/environments/dev/tfplan ]; then
+            echo "✅ Plan file found"
+          else
+            echo "❌ Plan file not found"
+            exit 1
+          fi
+        working-directory: .
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: us-east-1
+
+      - name: 'Set up Terraform'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+
+      - name: 'Terraform Init'
+        run: terraform init
+        working-directory: ./Weather-dashboard-API/infra/environments/dev
+
+
+      - name: 'Terraform Apply'
+        run: terraform apply -auto-approve tfplan
+        working-directory: ./Weather-dashboard-API/infra/environments/dev
+        env:
+          TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}
+          TF_VAR_bastion_allowed_cidr_blocks: ${{ secrets.LOCAL_IP }}
