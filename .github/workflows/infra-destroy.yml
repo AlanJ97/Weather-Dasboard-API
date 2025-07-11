@@ -42,7 +42,10 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: |
+          echo "🔧 Initializing Terraform with S3 backend..."
+          terraform init -input=false
+          echo "✅ Terraform initialized successfully"
         working-directory: Weather-dashboard-API/infra/environments/${{ github.event.inputs.environment }}
 
       - name: Debug Current State
@@ -55,6 +58,9 @@ jobs:
           echo ""
           echo "🔧 Terraform workspace:"
           terraform workspace show
+          echo ""
+          echo "🗂️ Backend configuration:"
+          terraform version
         working-directory: Weather-dashboard-API/infra/environments/${{ github.event.inputs.environment }}
 
       - name: Terraform Plan Destroy
@@ -108,7 +114,10 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
 
       - name: Terraform Init
-        run: terraform init
+        run: |
+          echo "🔧 Initializing Terraform with S3 backend..."
+          terraform init -input=false
+          echo "✅ Terraform initialized successfully"
         working-directory: Weather-dashboard-API/infra/environments/${{ github.event.inputs.environment }}
 
       - name: Download Destroy Plan
