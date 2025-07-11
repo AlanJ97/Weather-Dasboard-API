@@ -45,7 +45,7 @@ output "frontend_target_group_name" {
 
 output "http_listener_arn" {
   description = "ARN of the HTTP listener"
-  value       = var.ssl_certificate_arn == null ? aws_lb_listener.http_default[0].arn : aws_lb_listener.http.arn
+  value       = var.ssl_certificate_arn == null ? aws_lb_listener.http_default[0].arn : aws_lb_listener.http[0].arn
 }
 
 output "https_listener_arn" {
@@ -63,7 +63,7 @@ output "target_group_arns" {
 
 output "frontend_listener_arn" {
   description = "The ARN of the default listener for the frontend"
-  value       = aws_lb_listener.http.arn
+  value       = var.ssl_certificate_arn == null ? aws_lb_listener.http_default[0].arn : aws_lb_listener.http[0].arn
 }
 
 output "api_listener_rule_arn" {
