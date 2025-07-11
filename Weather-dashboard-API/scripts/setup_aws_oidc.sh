@@ -158,6 +158,8 @@ EC2_POLICY=$(cat <<EOF
                 "ec2:DeleteRouteTable",
                 "ec2:DeleteSecurityGroup",
                 "ec2:DeleteSubnet",
+                "ec2:DescribeVolumes",
+                "ec2:DescribeInstanceCreditSpecifications",
                 "ec2:DeleteVpc",
                 "ec2:DescribeAddresses",
                 "ec2:DescribeInstances",
