@@ -65,3 +65,8 @@ output "frontend_listener_arn" {
   description = "The ARN of the default listener for the frontend"
   value       = aws_lb_listener.http.arn
 }
+
+output "api_listener_rule_arn" {
+  description = "The ARN of the listener rule for the API"
+  value       = aws_lb_listener_rule.api.arn
+}

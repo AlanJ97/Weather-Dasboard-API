@@ -305,7 +305,7 @@ resource "aws_ecs_service" "api" {
     container_port   = var.api_port
   }
 
-  depends_on = [aws_iam_role.ecs_task_role]
+  depends_on = [var.alb_api_listener_rule_arn]
 
   tags = {
     Name        = "${var.env}-weather-api-service"
@@ -335,7 +335,7 @@ resource "aws_ecs_service" "frontend" {
     container_port   = var.frontend_port
   }
 
-  depends_on = [aws_iam_role.ecs_task_role]
+  depends_on = [var.alb_api_listener_rule_arn]
 
   tags = {
     Name        = "${var.env}-weather-frontend-service"
