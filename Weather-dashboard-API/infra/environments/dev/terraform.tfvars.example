@@ -1,0 +1,51 @@
+# Example Terraform variables file for dev environment
+# Copy this file to terraform.tfvars and update the values
+
+# Environment configuration
+env        = "dev"
+aws_region = "us-east-1"
+
+# VPC Configuration
+vpc_cidr             = "10.0.0.0/16"
+public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs = ["10.0.3.0/24", "10.0.4.0/24"]
+
+# ECR Configuration
+ecr_image_tag_mutability = "MUTABLE"
+ecr_scan_on_push        = true
+ecr_prod_image_count    = 10
+ecr_dev_image_count     = 5
+ecr_untagged_image_days = 1
+
+# Application Configuration
+api_port      = 8000
+frontend_port = 8501
+
+# ALB Configuration
+alb_enable_deletion_protection = false
+ssl_certificate_arn           = null  # Set to ACM certificate ARN for HTTPS
+alb_enable_access_logs        = false
+alb_access_logs_bucket        = null  # Set to S3 bucket name for access logs
+
+# ECS Configuration
+ecs_api_cpu              = 256
+ecs_api_memory           = 512
+ecs_frontend_cpu         = 256
+ecs_frontend_memory      = 512
+ecs_api_desired_count    = 1
+ecs_frontend_desired_count = 1
+ecs_api_image_tag        = "latest"
+ecs_frontend_image_tag   = "latest"
+ecs_log_retention_days   = 7
+
+# Bastion Host Configuration
+# IMPORTANT: You must provide a public key for the bastion host
+# Generate one with: ssh-keygen -t rsa -b 4096 -f ~/.ssh/weather-dev-bastion
+# Then copy the content of ~/.ssh/weather-dev-bastion.pub here
+bastion_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQ... your-public-key-here"
+
+# For development, you can allow access from anywhere, but restrict this in production
+bastion_allowed_cidr_blocks           = ["0.0.0.0/0"]
+bastion_instance_type                 = "t3.micro"
+bastion_root_volume_size              = 20
+bastion_enable_termination_protection = false

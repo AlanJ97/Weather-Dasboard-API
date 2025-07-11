@@ -9,6 +9,8 @@ resource "aws_vpc" "main" {
   }
 }
 
+
+
 # VPC Flow Logs (for security monitoring)
 resource "aws_flow_log" "vpc_flow_log" {
   iam_role_arn    = aws_iam_role.flow_log_role.arn
@@ -174,7 +176,18 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private.id
 }
 
-# Data source for Availability Zones
+
+
+# Data source for Availability Zones that support NAT Gateway
 data "aws_availability_zones" "available" {
   state = "available"
+  filter {
+    name   = "opt-in-status"
+    values = ["opt-in-not-required"]
+  }
+  # Exclude AZs that are known to not support NAT Gateway
+  exclude_names = ["us-east-1e"]
 }
+
+
+

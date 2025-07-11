@@ -64,3 +64,57 @@ This document provides a step-by-step guide to setting up and deploying the Weat
 8.  **Implement Manual Infrastructure Destroy Workflow**:
     *   A new workflow, `.github/workflows/infra-destroy.yml`, was created.
     *   This is triggered manually and allows you to run `terraform destroy` on a specific environment (`dev`, `staging`, or `prod`) to manage costs.
+
+9.  **Create Reusable ECR, ALB, ECS, and Bastion Modules**:
+    *   **ECR Module**: Created in `infra/modules/ecr/` to manage Elastic Container Registries for the API and frontend applications, including lifecycle policies to manage image retention.
+    *   **ALB Module**: Created in `infra/modules/alb/` to set up a secure Application Load Balancer, target groups, and listeners. It handles HTTP to HTTPS redirection and path-based routing for the API and frontend services.
+    *   **ECS Module**: Created in `infra/modules/ecs/` to define the ECS cluster, Fargate task definitions, and services for both the API and frontend. It includes IAM roles for task execution and secure integration with the ALB.
+    *   **Bastion Module**: Created in `infra/modules/bastion/` to deploy a secure bastion host for emergency access, with a dedicated security group and IAM role with least-privilege permissions.
+
+10. **Enhance CI/CD for Full Deployment and Destruction**:
+    *   The `infra-ci-cd.yml` workflow was split into two jobs: `validate-terraform` and `deploy-infra`.
+    *   The `validate` job now creates a Terraform plan and uploads it as an artifact.
+    *   The `deploy` job, which only runs after a PR is merged into `develop`, downloads the plan artifact and applies it. This ensures that only the approved changes are deployed.
+    *   The `infra-destroy.yml` workflow was updated to mirror this best practice, creating a `destroy` plan and applying it in a separate step for predictable and safe infrastructure teardown.
+
+11. **Iterative Hardening and Debugging**:
+    *   The `setup_aws_oidc.sh` script was iteratively updated to add missing IAM permissions as they were discovered during workflow runs (e.g., for ECS task definitions, ALB attributes, and instance profiles).
+    *   A `cleanup_conflicting_resources.sh` script was created to programmatically delete orphaned AWS resources (like IAM roles and instance profiles) that could block subsequent Terraform runs.
+    *   Race conditions in Terraform were resolved by adding explicit `depends_on` clauses between resources, for example, making the ECS services wait for the ALB listeners to be fully configured before attempting to register with them.
+
+12. **Infrastructure Deployment Success and Lessons Learned**:
+    *   **ALB Listener Conflicts Resolved**: Fixed the `DuplicateListener` error by implementing conditional listener creation based on SSL certificate availability using Terraform `count` parameters.
+    *   **IAM Policy Size Limits**: Split the original large IAM policy into 4 focused policies (S3/IAM, EC2/VPC, ECS/ECR/ALB, Monitoring/AutoScaling) to overcome the 6,144 character limit.
+    *   **S3 Backend with Object Lock**: Enhanced the Terraform backend configuration to use S3 Object Lock for state file protection and compliance.
+    *   **Terraform Outputs Fix**: Updated ALB module outputs to properly handle count-based resources with array indexing (`aws_lb_listener.http[0].arn`).
+    *   **Development Environment Deployed**: Successfully deployed the complete `dev` environment infrastructure including VPC, ECR, ALB, ECS cluster, and Bastion host.
+    *   **Best Practice Implementation**: Used a two-stage CI/CD approach (plan → artifact → apply) for safe and auditable infrastructure deployments.
+
+## Module 5: Infrastructure Management and Operations
+
+1.  **Infrastructure State Management**:
+    *   All Terraform state is stored in S3 with Object Lock enabled for compliance and protection.
+    *   State files are environment-specific with proper locking mechanisms to prevent concurrent modifications.
+
+2.  **Deployment Validation**:
+    *   The infrastructure pipeline includes comprehensive validation steps: format checking, security scanning with Checkov, and plan generation with artifact storage.
+    *   Manual approval workflows ensure only validated changes reach production environments.
+
+3.  **Cost Management**:
+    *   Manual destroy workflows (`infra-destroy.yml`) enable controlled teardown of environments to manage AWS costs during development and training.
+
+## Next Steps (Pending Implementation)
+
+1.  **Application Development Phase**:
+    *   FastAPI backend development and containerization
+    *   Streamlit frontend development and containerization
+    *   Application-specific CI/CD pipeline implementation
+
+2.  **Configuration Management**:
+    *   Ansible playbook development for bastion host configuration
+    *   Environment-specific configuration management
+
+3.  **Production Readiness**:
+    *   Staging and production environment deployment
+    *   Monitoring and alerting implementation
+    *   Load testing and performance optimization

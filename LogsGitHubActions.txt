@@ -1,0 +1,31 @@
+ Warning: Value is base64 encoded
+│ 
+│   with module.bastion.aws_instance.bastion,
+│   on ../../modules/bastion/main.tf line 163, in resource "aws_instance" "bastion":
+│  163:   user_data               = local.user_data
+│ 
+│ The value is base64 encoded. If you want to use base64 encoding, please use
+│ the user_data_base64 argument. user_data attribute is set as cleartext in
+│ state
+╵
+
+
+
+╷
+│ Error: creating ECS Service (dev-weather-api): operation error ECS: CreateService, https response error StatusCode: 400, RequestID: bec864af-f6ae-454a-8dab-9493ad13e4cf, InvalidParameterException: The target group with targetGroupArn arn:aws:elasticloadbalancing:us-east-1:622233144821:targetgroup/dev-weather-api-tg/75fc7a6d80ea0381 does not have an associated load balancer.
+│ 
+│   with module.ecs.aws_ecs_service.api,
+│   on ../../modules/ecs/main.tf line 289, in resource "aws_ecs_service" "api":
+│  289: resource "aws_ecs_service" "api" {
+│ 
+╵
+╷
+│ Error: creating ECS Service (dev-weather-frontend): operation error ECS: CreateService, https response error StatusCode: 400, RequestID: 36ad27f1-aaea-46e4-8476-f19d7e6138de, InvalidParameterException: The target group with targetGroupArn arn:aws:elasticloadbalancing:us-east-1:622233144821:targetgroup/dev-weather-frontend-tg/9f74ee19a92eaf00 does not have an associated load balancer.
+│ 
+│   with module.ecs.aws_ecs_service.frontend,
+│   on ../../modules/ecs/main.tf line 319, in resource "aws_ecs_service" "frontend":
+│  319: resource "aws_ecs_service" "frontend" {
+│ 
+╵
+Error: Terraform exited with code 1.
+Error: Process completed with exit code 1.
