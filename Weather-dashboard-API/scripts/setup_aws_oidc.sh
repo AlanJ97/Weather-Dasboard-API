@@ -99,6 +99,8 @@ S3_POLICY=$(cat <<EOF
                 "logs:TagResource",
                 "logs:PutRetentionPolicy",
                 "logs:ListTagsForResource",
+                "logs:DeleteLogGroup",
+                "logs:UntagResource",
                 "iam:CreateRole",
                 "iam:GetRole",
                 "iam:TagRole",
@@ -118,7 +120,9 @@ S3_POLICY=$(cat <<EOF
                 "iam:DeleteRole",
                 "iam:DeleteRolePolicy",
                 "iam:DetachRolePolicy",
-                "iam:ListInstanceProfilesForRole"
+                "iam:ListInstanceProfilesForRole",
+                "iam:UntagRole",
+                "iam:UntagInstanceProfile"
             ],
             "Resource": "*"
         }
@@ -183,6 +187,10 @@ EC2_POLICY=$(cat <<EOF
                 "ec2:DescribeVpcAttribute",
                 "ec2:DetachInternetGateway",
                 "ec2:DisassociateRouteTable",
+                "ec2:DisassociateAddress",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface",
+                "ec2:DetachNetworkInterface",
                 "ec2:ImportKeyPair",
                 "ec2:ModifySubnetAttribute",
                 "ec2:ModifyVpcAttribute",
@@ -195,7 +203,8 @@ EC2_POLICY=$(cat <<EOF
                 "ec2:StartInstances",
                 "ec2:CreateLaunchTemplate",
                 "ec2:DeleteLaunchTemplate",
-                "ec2:DescribeLaunchTemplates"
+                "ec2:DescribeLaunchTemplates",
+                "ec2:UntagResource"
             ],
             "Resource": "*"
         }
@@ -221,6 +230,8 @@ ECS_POLICY=$(cat <<EOF
                 "ecr:DeleteRepository",
                 "ecr:BatchDeleteImage",
                 "ecr:GetAuthorizationToken",
+                "ecr:DeleteLifecyclePolicy",
+                "ecr:UntagResource",
                 "ecs:CreateCluster",
                 "ecs:TagResource",
                 "ecs:DescribeClusters",
@@ -240,6 +251,7 @@ ECS_POLICY=$(cat <<EOF
                 "ecs:DescribeTasks",
                 "ecs:StopTask",
                 "ecs:ListClusters",
+                "ecs:UntagResource",
                 "elasticloadbalancing:CreateLoadBalancer",
                 "elasticloadbalancing:CreateTargetGroup",
                 "elasticloadbalancing:CreateRule",
@@ -260,7 +272,8 @@ ECS_POLICY=$(cat <<EOF
                 "elasticloadbalancing:RemoveTags",
                 "elasticloadbalancing:DescribeRules",
                 "elasticloadbalancing:DeleteRule",
-                "elasticloadbalancing:ModifyRule"
+                "elasticloadbalancing:ModifyRule",
+                "elasticloadbalancing:UntagResource"
             ],
             "Resource": "*"
         }
