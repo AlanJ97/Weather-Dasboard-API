@@ -85,6 +85,7 @@ resource "aws_lb_target_group" "api" {
   vpc_id      = var.vpc_id
   target_type = "ip"
 
+
   health_check {
     enabled             = true
     healthy_threshold   = 2
