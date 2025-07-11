@@ -53,6 +53,7 @@ module "ecs" {
   alb_dns_name              = module.alb.alb_dns_name
   api_target_group_arn      = module.alb.api_target_group_arn
   frontend_target_group_arn = module.alb.frontend_target_group_arn
+  alb_frontend_listener_arn = module.alb.frontend_listener_arn
   
   # Container configuration
   api_port             = var.api_port

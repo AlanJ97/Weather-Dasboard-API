@@ -305,7 +305,7 @@ resource "aws_ecs_service" "api" {
     container_port   = var.api_port
   }
 
-  depends_on = [var.api_target_group_arn]
+  depends_on = [aws_iam_role.ecs_task_role]
 
   tags = {
     Name        = "${var.env}-weather-api-service"
@@ -335,7 +335,7 @@ resource "aws_ecs_service" "frontend" {
     container_port   = var.frontend_port
   }
 
-  depends_on = [var.frontend_target_group_arn]
+  depends_on = [aws_iam_role.ecs_task_role]
 
   tags = {
     Name        = "${var.env}-weather-frontend-service"

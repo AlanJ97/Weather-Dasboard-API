@@ -60,3 +60,8 @@ output "target_group_arns" {
     frontend = aws_lb_target_group.frontend.arn
   }
 }
+
+output "frontend_listener_arn" {
+  description = "The ARN of the default listener for the frontend"
+  value       = aws_lb_listener.http.arn
+}

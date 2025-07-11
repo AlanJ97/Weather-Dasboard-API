@@ -38,6 +38,11 @@ variable "frontend_target_group_arn" {
   type        = string
 }
 
+variable "alb_frontend_listener_arn" {
+  description = "The ARN of the ALB listener for the frontend"
+  type        = string
+}
+
 # Container configuration
 variable "api_port" {
   description = "Port for the API container"
