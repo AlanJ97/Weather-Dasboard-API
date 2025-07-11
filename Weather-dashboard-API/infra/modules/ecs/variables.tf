@@ -43,6 +43,12 @@ variable "alb_frontend_listener_arn" {
   type        = string
 }
 
+variable "alb_api_listener_rule_arn" {
+  description = "The ARN of the ALB listener rule for the API"
+  type        = string
+  default     = ""
+}
+
 # Container configuration
 variable "api_port" {
   description = "Port for the API container"

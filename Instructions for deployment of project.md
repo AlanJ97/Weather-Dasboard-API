@@ -64,3 +64,20 @@ This document provides a step-by-step guide to setting up and deploying the Weat
 8.  **Implement Manual Infrastructure Destroy Workflow**:
     *   A new workflow, `.github/workflows/infra-destroy.yml`, was created.
     *   This is triggered manually and allows you to run `terraform destroy` on a specific environment (`dev`, `staging`, or `prod`) to manage costs.
+
+9.  **Create Reusable ECR, ALB, ECS, and Bastion Modules**:
+    *   **ECR Module**: Created in `infra/modules/ecr/` to manage Elastic Container Registries for the API and frontend applications, including lifecycle policies to manage image retention.
+    *   **ALB Module**: Created in `infra/modules/alb/` to set up a secure Application Load Balancer, target groups, and listeners. It handles HTTP to HTTPS redirection and path-based routing for the API and frontend services.
+    *   **ECS Module**: Created in `infra/modules/ecs/` to define the ECS cluster, Fargate task definitions, and services for both the API and frontend. It includes IAM roles for task execution and secure integration with the ALB.
+    *   **Bastion Module**: Created in `infra/modules/bastion/` to deploy a secure bastion host for emergency access, with a dedicated security group and IAM role with least-privilege permissions.
+
+10. **Enhance CI/CD for Full Deployment and Destruction**:
+    *   The `infra-ci-cd.yml` workflow was split into two jobs: `validate-terraform` and `deploy-infra`.
+    *   The `validate` job now creates a Terraform plan and uploads it as an artifact.
+    *   The `deploy` job, which only runs after a PR is merged into `develop`, downloads the plan artifact and applies it. This ensures that only the approved changes are deployed.
+    *   The `infra-destroy.yml` workflow was updated to mirror this best practice, creating a `destroy` plan and applying it in a separate step for predictable and safe infrastructure teardown.
+
+11. **Iterative Hardening and Debugging**:
+    *   The `setup_aws_oidc.sh` script was iteratively updated to add missing IAM permissions as they were discovered during workflow runs (e.g., for ECS task definitions, ALB attributes, and instance profiles).
+    *   A `cleanup_conflicting_resources.sh` script was created to programmatically delete orphaned AWS resources (like IAM roles and instance profiles) that could block subsequent Terraform runs.
+    *   Race conditions in Terraform were resolved by adding explicit `depends_on` clauses between resources, for example, making the ECS services wait for the ALB listeners to be fully configured before attempting to register with them.
