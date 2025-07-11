@@ -179,6 +179,7 @@ PERMISSIONS_POLICY=$(cat <<EOF
                 "ecs:ListTagsForResource",
                 "ecs:PutClusterCapacityProviders",
                 "ecs:RegisterTaskDefinition",
+                "ec2:RunInstances",
                 "ecs:CreateService",
                 "ecs:UpdateService",
                 "ecs:DescribeServices",
