@@ -163,6 +163,7 @@ EC2_POLICY=$(cat <<EOF
                 "ec2:DescribeInstances",
                 "ec2:DescribeInstanceStatus",
                 "ec2:DescribeInstanceTypes",
+                "ec2:DescribeInstanceAttribute",
                 "ec2:DescribeInternetGateways",
                 "ec2:DescribeAddressesAttribute",
                 "ec2:DescribeAvailabilityZones",
