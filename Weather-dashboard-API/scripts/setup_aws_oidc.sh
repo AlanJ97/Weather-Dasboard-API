@@ -14,7 +14,8 @@ set -e # Exit immediately if a command exits with a non-zero status.
 GITHUB_ORG="AlanJ97"
 REPO_NAME="Weather-Dasboard-API"
 ROLE_NAME="GitHubActions-Terraform-Backend-Role"
-POLICY_NAME="GitHubActions-Terraform-S3-Policy"
+# We'll create multiple smaller policies instead of one large one
+POLICY_NAMES=("GitHubActions-Terraform-S3-Policy" "GitHubActions-Terraform-EC2-Policy" "GitHubActions-Terraform-ECS-Policy" "GitHubActions-Terraform-Monitoring-Policy")
 BUCKET_NAME="weather-app-backend-terraform-bucket-2025"
 AWS_REGION="us-east-1"
 
@@ -68,9 +69,11 @@ TRUST_POLICY=$(cat <<EOF
 EOF
 )
 
-# --- Define Permissions Policy ---
-echo "Defining IAM permissions policy for Terraform S3 backend..."
-PERMISSIONS_POLICY=$(cat <<EOF
+# --- Define Permissions Policies (Split into smaller policies) ---
+echo "Defining IAM permissions policies for Terraform..."
+
+# Policy 1: S3 Backend and Basic IAM
+S3_POLICY=$(cat <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -115,7 +118,23 @@ PERMISSIONS_POLICY=$(cat <<EOF
                 "iam:DeleteRole",
                 "iam:DeleteRolePolicy",
                 "iam:DetachRolePolicy",
-                "iam:ListInstanceProfilesForRole",
+                "iam:ListInstanceProfilesForRole"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+)
+
+# Policy 2: EC2 and VPC
+EC2_POLICY=$(cat <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
                 "ec2:AllocateAddress",
                 "ec2:AssociateAddress",
                 "ec2:AssociateRouteTable",
@@ -141,12 +160,14 @@ PERMISSIONS_POLICY=$(cat <<EOF
                 "ec2:DeleteSubnet",
                 "ec2:DeleteVpc",
                 "ec2:DescribeAddresses",
+                "ec2:DescribeInstances",
+                "ec2:DescribeInstanceStatus",
+                "ec2:DescribeInstanceTypes",
+                "ec2:DescribeInternetGateways",
                 "ec2:DescribeAddressesAttribute",
                 "ec2:DescribeAvailabilityZones",
                 "ec2:DescribeFlowLogs",
                 "ec2:DescribeImages",
-                "ec2:DescribeInstanceTypes",
-                "ec2:DescribeInternetGateways",
                 "ec2:DescribeKeyPairs",
                 "ec2:DescribeNatGateways",
                 "ec2:DescribeNetworkAcls",
@@ -154,6 +175,8 @@ PERMISSIONS_POLICY=$(cat <<EOF
                 "ec2:DescribeSecurityGroupRules",
                 "ec2:DescribeSecurityGroups",
                 "ec2:DescribeSubnets",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeTags",
                 "ec2:DescribeVpcAttribute",
                 "ec2:DetachInternetGateway",
                 "ec2:DisassociateRouteTable",
@@ -164,19 +187,43 @@ PERMISSIONS_POLICY=$(cat <<EOF
                 "ec2:RevokeSecurityGroupEgress",
                 "ec2:RevokeSecurityGroupIngress",
                 "ec2:RunInstances",
+                "ec2:TerminateInstances",
+                "ec2:StopInstances",
+                "ec2:StartInstances",
+                "ec2:CreateLaunchTemplate",
+                "ec2:DeleteLaunchTemplate",
+                "ec2:DescribeLaunchTemplates"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+)
+
+# Policy 3: ECS, ECR, and Load Balancing
+ECS_POLICY=$(cat <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
                 "ecr:CreateRepository",
                 "ecr:TagResource",
                 "ecr:DescribeRepositories",
                 "ecr:ListTagsForResource",
                 "ecr:PutLifecyclePolicy",
                 "ecr:GetLifecyclePolicy",
+                "ecr:DeleteRepository",
+                "ecr:BatchDeleteImage",
+                "ecr:GetAuthorizationToken",
                 "ecs:CreateCluster",
                 "ecs:TagResource",
                 "ecs:DescribeClusters",
                 "ecs:ListTagsForResource",
                 "ecs:PutClusterCapacityProviders",
                 "ecs:RegisterTaskDefinition",
-                "ec2:RunInstances",
                 "ecs:CreateService",
                 "ecs:UpdateService",
                 "ecs:DescribeServices",
@@ -185,6 +232,11 @@ PERMISSIONS_POLICY=$(cat <<EOF
                 "ecs:ListTasks",
                 "ecs:DescribeTaskDefinition",
                 "ecs:DeregisterTaskDefinition",
+                "ecs:DeleteCluster",
+                "ecs:DeleteService",
+                "ecs:DescribeTasks",
+                "ecs:StopTask",
+                "ecs:ListClusters",
                 "elasticloadbalancing:CreateLoadBalancer",
                 "elasticloadbalancing:CreateTargetGroup",
                 "elasticloadbalancing:CreateRule",
@@ -203,16 +255,9 @@ PERMISSIONS_POLICY=$(cat <<EOF
                 "elasticloadbalancing:DeleteLoadBalancer",
                 "elasticloadbalancing:DeleteListener",
                 "elasticloadbalancing:RemoveTags",
-                "ecr:DeleteRepository",
-                "ecr:BatchDeleteImage",
-                "ecs:DeleteCluster",
-                "ecs:DeleteService",
-                "elasticloadbalancing:DeleteLoadBalancer",
-                "elasticloadbalancing:DeleteTargetGroup",
-                "elasticloadbalancing:DeleteListener",
-                "elasticloadbalancing:DescribeTags"
-
-                
+                "elasticloadbalancing:DescribeRules",
+                "elasticloadbalancing:DeleteRule",
+                "elasticloadbalancing:ModifyRule"
             ],
             "Resource": "*"
         }
@@ -221,7 +266,51 @@ PERMISSIONS_POLICY=$(cat <<EOF
 EOF
 )
 
-# --- Create/Update Role and Policy ---
+# Policy 4: Monitoring and Auto Scaling
+MONITORING_POLICY=$(cat <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "application-autoscaling:RegisterScalableTarget",
+                "application-autoscaling:DeregisterScalableTarget",
+                "application-autoscaling:DescribeScalableTargets",
+                "application-autoscaling:PutScalingPolicy",
+                "application-autoscaling:DescribeScalingPolicies",
+                "application-autoscaling:DeleteScalingPolicy",
+                "cloudwatch:PutMetricAlarm",
+                "cloudwatch:DeleteAlarms",
+                "cloudwatch:DescribeAlarms",
+                "cloudwatch:PutMetricData",
+                "cloudwatch:GetMetricStatistics",
+                "cloudwatch:ListMetrics",
+                "cloudwatch:TagResource",
+                "cloudwatch:UntagResource",
+                "cloudwatch:ListTagsForResource",
+                "autoscaling:CreateAutoScalingGroup",
+                "autoscaling:DeleteAutoScalingGroup",
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:UpdateAutoScalingGroup",
+                "autoscaling:CreateLaunchConfiguration",
+                "autoscaling:DeleteLaunchConfiguration",
+                "autoscaling:DescribeLaunchConfigurations",
+                "autoscaling:PutScalingPolicy",
+                "autoscaling:DeletePolicy",
+                "autoscaling:DescribePolicies",
+                "autoscaling:CreateOrUpdateTags",
+                "autoscaling:DeleteTags",
+                "autoscaling:DescribeTags"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+)
+
+# --- Create/Update Role and Policies ---
 
 echo "Checking for IAM role: ${ROLE_NAME}..."
 if ! ROLE_ARN=$(aws iam get-role --role-name "$ROLE_NAME" --query "Role.Arn" --output text 2>/dev/null); then
@@ -234,33 +323,62 @@ else
     echo "Trust policy updated successfully."
 fi
 
-POLICY_ARN="arn:aws:iam::${ACCOUNT_ID}:policy/${POLICY_NAME}"
-echo "Checking for IAM policy: ${POLICY_NAME}..."
-if ! aws iam get-policy --policy-arn "$POLICY_ARN" >/dev/null 2>&1; then
-    echo "Policy not found. Creating new policy..."
-    aws iam create-policy --policy-name "$POLICY_NAME" --policy-document "$PERMISSIONS_POLICY"
-    echo "Policy created successfully."
-else
-    echo "Policy already exists. Creating new version..."
-    aws iam create-policy-version --policy-arn "$POLICY_ARN" --policy-document "$PERMISSIONS_POLICY" --set-as-default
-    echo "Policy updated with new version successfully."
-    
-    echo "Cleaning up old policy versions..."
-    # Get all non-default versions and delete them
-    OLD_VERSIONS=$(aws iam list-policy-versions --policy-arn "$POLICY_ARN" --query 'Versions[?!IsDefaultVersion].VersionId' --output text)
-    if [ -n "$OLD_VERSIONS" ]; then
-        for version in $OLD_VERSIONS; do
-            echo "Deleting old policy version: $version"
-            aws iam delete-policy-version --policy-arn "$POLICY_ARN" --version-id "$version"
-        done
-        echo "Old policy versions cleaned up."
-    else
-        echo "No old versions to clean up."
-    fi
-fi
+# Array of policies to create/update
+declare -A POLICIES
+POLICIES["${POLICY_NAMES[0]}"]="$S3_POLICY"
+POLICIES["${POLICY_NAMES[1]}"]="$EC2_POLICY" 
+POLICIES["${POLICY_NAMES[2]}"]="$ECS_POLICY"
+POLICIES["${POLICY_NAMES[3]}"]="$MONITORING_POLICY"
 
-echo "Attaching policy to role..."
-aws iam attach-role-policy --role-name "$ROLE_NAME" --policy-arn "$POLICY_ARN"
+# Create/update each policy with guaranteed cleanup and attachment
+for POLICY_NAME in "${POLICY_NAMES[@]}"; do
+    POLICY_ARN="arn:aws:iam::${ACCOUNT_ID}:policy/${POLICY_NAME}"
+    echo ""
+    echo "🔄 Processing IAM policy: ${POLICY_NAME}..."
+    
+    if ! aws iam get-policy --policy-arn "$POLICY_ARN" >/dev/null 2>&1; then
+        echo "  📄 Policy ${POLICY_NAME} not found. Creating new policy..."
+        aws iam create-policy --policy-name "$POLICY_NAME" --policy-document "${POLICIES[$POLICY_NAME]}"
+        echo "  ✅ Policy ${POLICY_NAME} created successfully."
+    else
+        echo "  📄 Policy ${POLICY_NAME} already exists. Updating with new version..."
+        
+        # Create new version and set as default
+        NEW_VERSION=$(aws iam create-policy-version --policy-arn "$POLICY_ARN" --policy-document "${POLICIES[$POLICY_NAME]}" --set-as-default --query 'PolicyVersion.VersionId' --output text)
+        echo "  🆕 Created new policy version: ${NEW_VERSION} (now default)"
+        
+        # Wait a moment for AWS to propagate the change
+        sleep 2
+        
+        # Clean up ALL old versions (keeping only the new default version)
+        echo "  🧹 Cleaning up old policy versions for ${POLICY_NAME}..."
+        OLD_VERSIONS=$(aws iam list-policy-versions --policy-arn "$POLICY_ARN" --query 'Versions[?!IsDefaultVersion].VersionId' --output text)
+        
+        if [ -n "$OLD_VERSIONS" ] && [ "$OLD_VERSIONS" != "None" ]; then
+            for version in $OLD_VERSIONS; do
+                echo "    🗑️  Deleting old policy version: $version"
+                aws iam delete-policy-version --policy-arn "$POLICY_ARN" --version-id "$version"
+            done
+            echo "  ✅ Old policy versions cleaned up for ${POLICY_NAME}."
+        else
+            echo "  ℹ️  No old versions to clean up for ${POLICY_NAME}."
+        fi
+    fi
+    
+    # Ensure policy is attached to role (idempotent - won't fail if already attached)
+    echo "  🔗 Ensuring policy ${POLICY_NAME} is attached to role..."
+    if aws iam attach-role-policy --role-name "$ROLE_NAME" --policy-arn "$POLICY_ARN" 2>/dev/null; then
+        echo "  ✅ Policy ${POLICY_NAME} attached to role successfully."
+    else
+        # Policy might already be attached, check if it's already there
+        if aws iam list-attached-role-policies --role-name "$ROLE_NAME" --query "AttachedPolicies[?PolicyArn=='$POLICY_ARN'].PolicyName" --output text | grep -q "$POLICY_NAME"; then
+            echo "  ℹ️  Policy ${POLICY_NAME} already attached to role."
+        else
+            echo "  ❌ Failed to attach policy ${POLICY_NAME} to role."
+            exit 1
+        fi
+    fi
+done
 
 echo "IAM role and policy have been attached."
 echo ""
