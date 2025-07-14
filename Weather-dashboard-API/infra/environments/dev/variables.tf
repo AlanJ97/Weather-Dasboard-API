@@ -159,3 +159,36 @@ variable "bastion_allowed_cidr_blocks" {
   description = "List of CIDR blocks allowed to access the bastion host"
   type        = list(string)
 }
+
+# AWS Account Variables
+variable "aws_account_id" {
+  description = "AWS Account ID"
+  type        = string
+  default     = "622233144821"
+}
+
+# GitHub Variables for CodePipeline
+variable "github_owner" {
+  description = "GitHub repository owner"
+  type        = string
+  default     = "AlanJ97"
+}
+
+variable "github_repo" {
+  description = "GitHub repository name"
+  type        = string
+  default     = "Weather-Dasboard-API"
+}
+
+variable "github_branch" {
+  description = "GitHub branch to trigger pipeline"
+  type        = string
+  default     = "main"
+}
+
+# CI/CD Variables
+variable "enable_pipeline_webhook" {
+  description = "Enable automatic pipeline triggers via CloudWatch Events"
+  type        = bool
+  default     = false
+}

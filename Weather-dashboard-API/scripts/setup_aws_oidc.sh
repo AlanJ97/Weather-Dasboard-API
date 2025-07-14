@@ -15,7 +15,7 @@ GITHUB_ORG="AlanJ97"
 REPO_NAME="Weather-Dasboard-API"
 ROLE_NAME="GitHubActions-Terraform-Backend-Role"
 # We'll create multiple smaller policies instead of one large one
-POLICY_NAMES=("GitHubActions-Terraform-S3-Policy" "GitHubActions-Terraform-EC2-Policy" "GitHubActions-Terraform-ECS-Policy" "GitHubActions-Terraform-Monitoring-Policy")
+POLICY_NAMES=("GitHubActions-Terraform-S3-Policy" "GitHubActions-Terraform-EC2-Policy" "GitHubActions-Terraform-ECS-Policy" "GitHubActions-Terraform-Monitoring-Policy" "GitHubActions-Terraform-CICD-Policy")
 BUCKET_NAME="weather-app-backend-terraform-bucket-2025"
 AWS_REGION="us-east-1"
 
@@ -326,6 +326,107 @@ MONITORING_POLICY=$(cat <<EOF
 EOF
 )
 
+# Policy 5: CI/CD Services (CodeBuild, CodePipeline, CodeDeploy, CodeStar)
+CICD_POLICY=$(cat <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "codebuild:CreateProject",
+                "codebuild:BatchGetProjects",
+                "codebuild:UpdateProject",
+                "codebuild:DeleteProject",
+                "codebuild:ListProjects",
+                "codebuild:CreateReportGroup",
+                "codebuild:BatchGetReportGroups",
+                "codebuild:UpdateReportGroup",
+                "codebuild:DeleteReportGroup",
+                "codebuild:ListReportGroups",
+                "codebuild:TagResource",
+                "codebuild:UntagResource",
+                "codebuild:ListTagsForResource",
+                "codepipeline:CreatePipeline",
+                "codepipeline:GetPipeline",
+                "codepipeline:UpdatePipeline",
+                "codepipeline:DeletePipeline",
+                "codepipeline:ListPipelines",
+                "codepipeline:GetPipelineState",
+                "codepipeline:GetPipelineExecution",
+                "codepipeline:ListPipelineExecutions",
+                "codepipeline:TagResource",
+                "codepipeline:UntagResource",
+                "codepipeline:ListTagsForResource",
+                "codedeploy:CreateApplication",
+                "codedeploy:GetApplication",
+                "codedeploy:UpdateApplication",
+                "codedeploy:DeleteApplication",
+                "codedeploy:ListApplications",
+                "codedeploy:CreateDeploymentGroup",
+                "codedeploy:GetDeploymentGroup",
+                "codedeploy:UpdateDeploymentGroup",
+                "codedeploy:DeleteDeploymentGroup",
+                "codedeploy:ListDeploymentGroups",
+                "codedeploy:CreateDeploymentConfig",
+                "codedeploy:GetDeploymentConfig",
+                "codedeploy:DeleteDeploymentConfig",
+                "codedeploy:ListDeploymentConfigs",
+                "codedeploy:TagResource",
+                "codedeploy:UntagResource",
+                "codedeploy:ListTagsForResource",
+                "codestar-connections:CreateConnection",
+                "codestar-connections:GetConnection",
+                "codestar-connections:ListConnections",
+                "codestar-connections:TagResource",
+                "codestar-connections:UntagResource",
+                "codestar-connections:ListTagsForResource",
+                "codestar-connections:DeleteConnection",
+                "events:PutRule",
+                "events:DeleteRule",
+                "events:DescribeRule",
+                "events:ListRules",
+                "events:PutTargets",
+                "events:RemoveTargets",
+                "events:ListTargetsByRule",
+                "events:TagResource",
+                "events:UntagResource",
+                "events:ListTagsForResource",
+                "s3:CreateBucket",
+                "s3:DeleteBucket",
+                "s3:GetBucketVersioning",
+                "s3:PutBucketVersioning",
+                "s3:GetBucketEncryption",
+                "s3:PutBucketEncryption",
+                "s3:GetBucketPublicAccessBlock",
+                "s3:PutBucketPublicAccessBlock",
+                "s3:GetBucketTagging",
+                "s3:PutBucketTagging",
+                "s3:DeleteBucketTagging"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject",
+                "s3:GetObjectVersion",
+                "s3:PutObjectVersionTagging",
+                "s3:GetObjectVersionTagging",
+                "s3:DeleteObjectVersionTagging"
+            ],
+            "Resource": [
+                "arn:aws:s3:::*-pipeline-artifacts/*",
+                "arn:aws:s3:::*-codebuild-cache/*"
+            ]
+        }
+    ]
+}
+EOF
+)
+
 # --- Create/Update Role and Policies ---
 
 echo "Checking for IAM role: ${ROLE_NAME}..."
@@ -345,6 +446,7 @@ POLICIES["${POLICY_NAMES[0]}"]="$S3_POLICY"
 POLICIES["${POLICY_NAMES[1]}"]="$EC2_POLICY" 
 POLICIES["${POLICY_NAMES[2]}"]="$ECS_POLICY"
 POLICIES["${POLICY_NAMES[3]}"]="$MONITORING_POLICY"
+POLICIES["${POLICY_NAMES[4]}"]="$CICD_POLICY"
 
 # Create/update each policy with guaranteed cleanup and attachment
 for POLICY_NAME in "${POLICY_NAMES[@]}"; do

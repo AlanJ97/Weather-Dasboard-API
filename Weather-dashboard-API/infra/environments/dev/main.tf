@@ -90,3 +90,49 @@ module "bastion" {
   ecs_cluster_arn       = module.ecs.cluster_arn
   log_group_arns        = module.ecs.log_group_arns
 }
+
+# CodeBuild Module
+module "codebuild" {
+  source = "../../modules/codebuild"
+
+  environment                   = var.env
+  aws_region                   = var.aws_region
+  aws_account_id               = var.aws_account_id
+  ecr_api_repository_name      = module.ecr.api_repository_name
+  ecr_frontend_repository_name = module.ecr.frontend_repository_name
+  source_bucket_name           = module.codepipeline.artifacts_bucket_name
+
+  depends_on = [module.ecr]
+}
+
+# CodeDeploy Module
+module "codedeploy" {
+  source = "../../modules/codedeploy"
+
+  environment                    = var.env
+  ecs_cluster_name              = module.ecs.cluster_name
+  ecs_api_service_name          = module.ecs.api_service_name
+  ecs_frontend_service_name     = module.ecs.frontend_service_name
+  alb_api_target_group_name     = module.alb.api_target_group_name
+  alb_frontend_target_group_name = module.alb.frontend_target_group_name
+
+  depends_on = [module.ecs, module.alb]
+}
+
+# CodePipeline Module
+module "codepipeline" {
+  source = "../../modules/codepipeline"
+
+  environment                           = var.env
+  github_owner                         = var.github_owner
+  github_repo                          = var.github_repo
+  github_branch                        = var.github_branch
+  codebuild_project_name               = module.codebuild.codebuild_project_name
+  codebuild_project_arn                = module.codebuild.codebuild_project_arn
+  codedeploy_application_name          = module.codedeploy.application_name
+  codedeploy_deployment_group_api      = module.codedeploy.api_deployment_group_name
+  codedeploy_deployment_group_frontend = module.codedeploy.frontend_deployment_group_name
+  enable_webhook                       = var.enable_pipeline_webhook
+
+  depends_on = [module.codebuild, module.codedeploy]
+}
