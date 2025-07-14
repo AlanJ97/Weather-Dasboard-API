@@ -10,50 +10,13 @@ resource "aws_codestarconnections_connection" "github" {
   }
 }
 
-# S3 Bucket for Pipeline Artifacts
-resource "aws_s3_bucket" "pipeline_artifacts" {
-  bucket = "${var.environment}-weather-dashboard-pipeline-artifacts"
-
-  tags = {
-    Environment = var.environment
-    Purpose     = "CodePipeline artifacts"
-    ManagedBy   = "terraform"
-  }
-}
-
-resource "aws_s3_bucket_versioning" "pipeline_artifacts_versioning" {
-  bucket = aws_s3_bucket.pipeline_artifacts.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "pipeline_artifacts_encryption" {
-  bucket = aws_s3_bucket.pipeline_artifacts.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "pipeline_artifacts_pab" {
-  bucket = aws_s3_bucket.pipeline_artifacts.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
 # CodePipeline
 resource "aws_codepipeline" "weather_dashboard" {
   name     = "${var.environment}-weather-dashboard-pipeline"
   role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
-    location = aws_s3_bucket.pipeline_artifacts.bucket
+    location = var.artifacts_bucket_name
     type     = "S3"
   }
 
@@ -182,8 +145,8 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
           "s3:PutObject"
         ]
         Resource = [
-          aws_s3_bucket.pipeline_artifacts.arn,
-          "${aws_s3_bucket.pipeline_artifacts.arn}/*"
+          "arn:aws:s3:::${var.artifacts_bucket_name}",
+          "arn:aws:s3:::${var.artifacts_bucket_name}/*"
         ]
       },
       {
@@ -245,7 +208,7 @@ resource "aws_cloudwatch_event_rule" "github_webhook" {
     detail-type = ["Object Created"]
     detail = {
       bucket = {
-        name = [aws_s3_bucket.pipeline_artifacts.bucket]
+        name = [var.artifacts_bucket_name]
       }
     }
   })

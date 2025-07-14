@@ -51,3 +51,8 @@ variable "enable_webhook" {
   type        = bool
   default     = false
 }
+
+variable "artifacts_bucket_name" {
+  description = "Name of the S3 bucket for pipeline artifacts (externally managed)"
+  type        = string
+}
