@@ -1,3 +1,15 @@
+terraform {
+  required_providers {
+    aws    = { 
+                source = "hashicorp/aws" 
+                version = ">= 6.4.0" 
+            }  # version constraint only
+    random = { 
+                source = "hashicorp/random" 
+                version = "~> 3.1"   
+        }
+  }
+}
 # AWS CodeStar Connection for GitHub
 resource "aws_codestarconnections_connection" "github" {
   name          = "${var.environment}-github-connection"

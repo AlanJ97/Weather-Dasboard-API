@@ -1,4 +1,17 @@
+terraform {
+  required_providers {
+    aws    = { 
+                source = "hashicorp/aws" 
+                version = ">= 6.4.0" 
+            }  # version constraint only
+    random = { 
+                source = "hashicorp/random" 
+                version = "~> 3.1"   
+        }
+  }
+}
 # VPC
+
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true

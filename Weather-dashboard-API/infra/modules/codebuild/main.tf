@@ -1,13 +1,13 @@
 terraform {
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.1"
-    }
+    aws    = { 
+                source = "hashicorp/aws" 
+                version = ">= 6.4.0" 
+            }  # version constraint only
+    random = { 
+                source = "hashicorp/random" 
+                version = "~> 3.1"   
+        }
   }
 }
 
@@ -98,6 +98,9 @@ resource "aws_s3_bucket" "codebuild_cache" {
 
   lifecycle {
     prevent_destroy = false
+  }
+    timeouts {
+    create = "15m"
   }
 }
 

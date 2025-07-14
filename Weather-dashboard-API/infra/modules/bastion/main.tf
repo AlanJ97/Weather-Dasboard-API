@@ -1,3 +1,15 @@
+terraform {
+  required_providers {
+    aws    = { 
+                source = "hashicorp/aws" 
+                version = ">= 6.4.0" 
+            }  # version constraint only
+    random = { 
+                source = "hashicorp/random" 
+                version = "~> 3.1"   
+        }
+  }
+}
 # Key Pair for Bastion Host
 resource "aws_key_pair" "bastion" {
   key_name   = "${var.env}-weather-bastion-key"

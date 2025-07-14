@@ -1,3 +1,16 @@
+terraform {
+  required_providers {
+    aws    = { 
+                source = "hashicorp/aws" 
+                version = ">= 6.4.0" 
+            }  # version constraint only
+    random = { 
+                source = "hashicorp/random" 
+                version = "~> 3.1"   
+        }
+  }
+}
+
 # Security Group for ALB
 resource "aws_security_group" "alb" {
   name_prefix = "${var.env}-weather-alb-"

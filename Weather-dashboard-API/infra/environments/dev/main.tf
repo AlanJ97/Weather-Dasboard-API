@@ -1,9 +1,9 @@
 terraform {
-  required_version = ">= 1.0"
+  required_version = ">= 1.5"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.48"
+      version = ">= 6.4.0" # waiter bug fixed
     }
     random = {
       source  = "hashicorp/random"
@@ -125,6 +125,9 @@ resource "aws_s3_bucket" "pipeline_artifacts" {
 
   lifecycle {
     prevent_destroy = false
+  }
+  timeouts {
+    create = "15m"
   }
 }
 
