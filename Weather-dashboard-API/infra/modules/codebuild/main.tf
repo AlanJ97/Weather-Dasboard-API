@@ -67,7 +67,8 @@ resource "aws_codebuild_project" "weather_dashboard" {
 
 # S3 Bucket for CodeBuild cache
 resource "aws_s3_bucket" "codebuild_cache" {
-  bucket = "${var.environment}-weather-dashboard-codebuild-cache"
+  bucket        = "${var.environment}-weather-dashboard-codebuild-cache"
+  force_destroy = false
 
   tags = {
     Environment = var.environment
@@ -76,11 +77,21 @@ resource "aws_s3_bucket" "codebuild_cache" {
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "codebuild_cache_pab" {
+  bucket = aws_s3_bucket.codebuild_cache.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_bucket_versioning" "codebuild_cache_versioning" {
   bucket = aws_s3_bucket.codebuild_cache.id
   versioning_configuration {
     status = "Enabled"
   }
+  depends_on = [aws_s3_bucket_public_access_block.codebuild_cache_pab]
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "codebuild_cache_encryption" {
@@ -91,6 +102,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "codebuild_cache_e
       sse_algorithm = "AES256"
     }
   }
+  depends_on = [aws_s3_bucket_versioning.codebuild_cache_versioning]
 }
 
 # CloudWatch Log Group for CodeBuild
