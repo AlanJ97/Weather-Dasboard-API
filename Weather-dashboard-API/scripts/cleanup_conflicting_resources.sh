@@ -15,6 +15,9 @@ ROLES=(
     "dev-weather-ecs-task-execution-role"
     "dev-weather-ecs-task-role" 
     "dev-vpc-flow-log-role"
+    "dev-weather-dashboard-codebuild-role"
+    "dev-weather-dashboard-codedeploy-role"
+    "dev-weather-dashboard-codepipeline-role"
 )
 
 # List of IAM Instance Profiles to delete
