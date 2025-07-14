@@ -93,29 +93,13 @@ module "bastion" {
 
 # S3 Bucket for CI/CD Pipeline Artifacts (shared between CodeBuild and CodePipeline)
 resource "aws_s3_bucket" "pipeline_artifacts" {
-  bucket = "${var.env}-weather-dashboard-pipeline-artifacts"
+  bucket        = "${var.env}-weather-dashboard-pipeline-artifacts"
+  force_destroy = false
 
   tags = {
     Environment = var.env
     Purpose     = "CodePipeline artifacts"
     ManagedBy   = "terraform"
-  }
-}
-
-resource "aws_s3_bucket_versioning" "pipeline_artifacts_versioning" {
-  bucket = aws_s3_bucket.pipeline_artifacts.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "pipeline_artifacts_encryption" {
-  bucket = aws_s3_bucket.pipeline_artifacts.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
   }
 }
 
@@ -126,6 +110,25 @@ resource "aws_s3_bucket_public_access_block" "pipeline_artifacts_pab" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "pipeline_artifacts_versioning" {
+  bucket = aws_s3_bucket.pipeline_artifacts.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+  depends_on = [aws_s3_bucket_public_access_block.pipeline_artifacts_pab]
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "pipeline_artifacts_encryption" {
+  bucket = aws_s3_bucket.pipeline_artifacts.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+  depends_on = [aws_s3_bucket_versioning.pipeline_artifacts_versioning]
 }
 
 # CodeBuild Module

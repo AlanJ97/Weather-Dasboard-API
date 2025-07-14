@@ -16,6 +16,11 @@ resource "aws_codedeploy_deployment_group" "api" {
   deployment_group_name = "${var.environment}-weather-api-deployment-group"
   service_role_arn      = aws_iam_role.codedeploy_role.arn
 
+  deployment_style {
+    deployment_type   = "BLUE_GREEN"
+    deployment_option = "WITH_TRAFFIC_CONTROL"
+  }
+
   auto_rollback_configuration {
     enabled = true
     events  = ["DEPLOYMENT_FAILURE"]
@@ -62,6 +67,11 @@ resource "aws_codedeploy_deployment_group" "frontend" {
   app_name              = aws_codedeploy_app.weather_dashboard.name
   deployment_group_name = "${var.environment}-weather-frontend-deployment-group"
   service_role_arn      = aws_iam_role.codedeploy_role.arn
+
+  deployment_style {
+    deployment_type   = "BLUE_GREEN"
+    deployment_option = "WITH_TRAFFIC_CONTROL"
+  }
 
   auto_rollback_configuration {
     enabled = true
