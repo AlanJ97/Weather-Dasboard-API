@@ -1,3 +1,17 @@
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
+    }
+  }
+}
+
 provider "aws" {
   region = var.aws_region
 }
@@ -91,15 +105,26 @@ module "bastion" {
   log_group_arns        = module.ecs.log_group_arns
 }
 
+# Random suffix for bucket names to ensure global uniqueness
+resource "random_string" "bucket_suffix" {
+  length  = 8
+  special = false
+  upper   = false
+}
+
 # S3 Bucket for CI/CD Pipeline Artifacts (shared between CodeBuild and CodePipeline)
 resource "aws_s3_bucket" "pipeline_artifacts" {
-  bucket        = "${var.env}-weather-dashboard-pipeline-artifacts"
+  bucket        = "${var.env}-weather-dashboard-pipeline-artifacts-${random_string.bucket_suffix.result}"
   force_destroy = false
 
   tags = {
     Environment = var.env
     Purpose     = "CodePipeline artifacts"
     ManagedBy   = "terraform"
+  }
+
+  lifecycle {
+    prevent_destroy = false
   }
 }
 
