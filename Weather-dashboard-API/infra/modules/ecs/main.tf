@@ -293,6 +293,10 @@ resource "aws_ecs_service" "api" {
   desired_count   = var.api_desired_count
   launch_type     = "FARGATE"
 
+  deployment_controller {
+    type = "CODE_DEPLOY"
+  }
+
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
     subnets          = var.private_subnet_ids
@@ -322,6 +326,10 @@ resource "aws_ecs_service" "frontend" {
   task_definition = aws_ecs_task_definition.frontend.arn
   desired_count   = var.frontend_desired_count
   launch_type     = "FARGATE"
+
+  deployment_controller {
+    type = "CODE_DEPLOY"
+  }
 
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]

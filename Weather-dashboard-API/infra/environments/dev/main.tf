@@ -1,3 +1,17 @@
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
+    }
+  }
+}
+
 provider "aws" {
   region = var.aws_region
 }
@@ -17,13 +31,13 @@ module "vpc" {
 module "ecr" {
   source = "../../modules/ecr"
 
-  env                    = var.env
-  aws_region             = var.aws_region
-  image_tag_mutability   = var.ecr_image_tag_mutability
-  scan_on_push           = var.ecr_scan_on_push
-  prod_image_count       = var.ecr_prod_image_count
-  dev_image_count        = var.ecr_dev_image_count
-  untagged_image_days    = var.ecr_untagged_image_days
+  env                  = var.env
+  aws_region           = var.aws_region
+  image_tag_mutability = var.ecr_image_tag_mutability
+  scan_on_push         = var.ecr_scan_on_push
+  prod_image_count     = var.ecr_prod_image_count
+  dev_image_count      = var.ecr_dev_image_count
+  untagged_image_days  = var.ecr_untagged_image_days
 }
 
 # ALB Module
@@ -55,23 +69,23 @@ module "ecs" {
   frontend_target_group_arn = module.alb.frontend_target_group_arn
   alb_frontend_listener_arn = module.alb.frontend_listener_arn
   alb_api_listener_rule_arn = module.alb.api_listener_rule_arn
-  
+
   # Container configuration
-  api_port             = var.api_port
-  frontend_port        = var.frontend_port
-  api_cpu              = var.ecs_api_cpu
-  api_memory           = var.ecs_api_memory
-  frontend_cpu         = var.ecs_frontend_cpu
-  frontend_memory      = var.ecs_frontend_memory
-  api_desired_count    = var.ecs_api_desired_count
+  api_port               = var.api_port
+  frontend_port          = var.frontend_port
+  api_cpu                = var.ecs_api_cpu
+  api_memory             = var.ecs_api_memory
+  frontend_cpu           = var.ecs_frontend_cpu
+  frontend_memory        = var.ecs_frontend_memory
+  api_desired_count      = var.ecs_api_desired_count
   frontend_desired_count = var.ecs_frontend_desired_count
-  
+
   # Container images
-  api_image           = module.ecr.weather_api_repository_url
-  api_image_tag       = var.ecs_api_image_tag
-  frontend_image      = module.ecr.weather_frontend_repository_url
-  frontend_image_tag  = var.ecs_frontend_image_tag
-  
+  api_image          = module.ecr.weather_api_repository_url
+  api_image_tag      = var.ecs_api_image_tag
+  frontend_image     = module.ecr.weather_frontend_repository_url
+  frontend_image_tag = var.ecs_frontend_image_tag
+
   # Logging
   log_retention_days = var.ecs_log_retention_days
 }
@@ -81,25 +95,36 @@ module "ecs" {
 module "bastion" {
   source = "../../modules/bastion"
 
-  env                   = var.env
-  aws_region            = var.aws_region
-  vpc_id                = module.vpc.vpc_id
-  public_subnet_id      = module.vpc.public_subnet_ids[0]
-  public_key            = var.bastion_public_key
-  allowed_cidr_blocks   = var.bastion_allowed_cidr_blocks
-  ecs_cluster_arn       = module.ecs.cluster_arn
-  log_group_arns        = module.ecs.log_group_arns
+  env                 = var.env
+  aws_region          = var.aws_region
+  vpc_id              = module.vpc.vpc_id
+  public_subnet_id    = module.vpc.public_subnet_ids[0]
+  public_key          = var.bastion_public_key
+  allowed_cidr_blocks = var.bastion_allowed_cidr_blocks
+  ecs_cluster_arn     = module.ecs.cluster_arn
+  log_group_arns      = module.ecs.log_group_arns
+}
+
+# Random suffix for bucket names to ensure global uniqueness
+resource "random_string" "bucket_suffix" {
+  length  = 8
+  special = false
+  upper   = false
 }
 
 # S3 Bucket for CI/CD Pipeline Artifacts (shared between CodeBuild and CodePipeline)
 resource "aws_s3_bucket" "pipeline_artifacts" {
-  bucket        = "${var.env}-weather-dashboard-pipeline-artifacts"
+  bucket        = "${var.env}-weather-dashboard-pipeline-artifacts-${random_string.bucket_suffix.result}"
   force_destroy = false
 
   tags = {
     Environment = var.env
     Purpose     = "CodePipeline artifacts"
     ManagedBy   = "terraform"
+  }
+
+  lifecycle {
+    prevent_destroy = false
   }
 }
 
@@ -135,7 +160,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "pipeline_artifact
 module "codebuild" {
   source = "../../modules/codebuild"
 
-  environment                   = var.env
+  environment                  = var.env
   aws_region                   = var.aws_region
   aws_account_id               = var.aws_account_id
   ecr_api_repository_name      = module.ecr.weather_api_repository_name
@@ -150,10 +175,10 @@ module "codedeploy" {
   source = "../../modules/codedeploy"
 
   environment                    = var.env
-  ecs_cluster_name              = module.ecs.cluster_name
-  ecs_api_service_name          = module.ecs.api_service_name
-  ecs_frontend_service_name     = module.ecs.frontend_service_name
-  alb_api_target_group_name     = module.alb.api_target_group_name
+  ecs_cluster_name               = module.ecs.cluster_name
+  ecs_api_service_name           = module.ecs.api_service_name
+  ecs_frontend_service_name      = module.ecs.frontend_service_name
+  alb_api_target_group_name      = module.alb.api_target_group_name
   alb_frontend_target_group_name = module.alb.frontend_target_group_name
 
   depends_on = [module.ecs, module.alb]
@@ -163,7 +188,7 @@ module "codedeploy" {
 module "codepipeline" {
   source = "../../modules/codepipeline"
 
-  environment                           = var.env
+  environment                          = var.env
   github_owner                         = var.github_owner
   github_repo                          = var.github_repo
   github_branch                        = var.github_branch

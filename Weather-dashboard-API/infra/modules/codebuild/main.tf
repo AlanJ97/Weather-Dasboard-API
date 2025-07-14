@@ -1,3 +1,16 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
+    }
+  }
+}
+
 # CodeBuild Project for Weather Dashboard API
 resource "aws_codebuild_project" "weather_dashboard" {
   name          = "${var.environment}-weather-dashboard-build"
@@ -65,15 +78,26 @@ resource "aws_codebuild_project" "weather_dashboard" {
   }
 }
 
+# Random suffix for bucket names to ensure global uniqueness
+resource "random_string" "bucket_suffix" {
+  length  = 8
+  special = false
+  upper   = false
+}
+
 # S3 Bucket for CodeBuild cache
 resource "aws_s3_bucket" "codebuild_cache" {
-  bucket        = "${var.environment}-weather-dashboard-codebuild-cache"
+  bucket        = "${var.environment}-weather-dashboard-codebuild-cache-${random_string.bucket_suffix.result}"
   force_destroy = false
 
   tags = {
     Environment = var.environment
     Purpose     = "CodeBuild cache"
     ManagedBy   = "terraform"
+  }
+
+  lifecycle {
+    prevent_destroy = false
   }
 }
 
