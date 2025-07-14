@@ -165,7 +165,11 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
           "codedeploy:GetDeploymentConfig",
           "codedeploy:RegisterApplicationRevision"
         ]
-        Resource = "*"
+        Resource = [
+          "arn:aws:codedeploy:*:*:application/${var.codedeploy_application_name}",
+          "arn:aws:codedeploy:*:*:deploymentgroup:${var.codedeploy_application_name}/*",
+          "arn:aws:codedeploy:*:*:deploymentconfig:*"
+        ]
       },
       {
         Effect = "Allow"
@@ -177,19 +181,22 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
           "ecs:RegisterTaskDefinition",
           "ecs:UpdateService"
         ]
-        Resource = "*"
+        Resource = [
+          "arn:aws:ecs:*:*:cluster/*",
+          "arn:aws:ecs:*:*:service/*/*",
+          "arn:aws:ecs:*:*:task-definition/*:*",
+          "arn:aws:ecs:*:*:task/*/*/*"
+        ]
       },
       {
         Effect = "Allow"
         Action = [
           "iam:PassRole"
         ]
-        Resource = "*"
+        Resource = "arn:aws:iam::*:role/*-ecs-task-*"
         Condition = {
-          StringEqualsIfExists = {
-            "iam:PassedToService" = [
-              "ecs-tasks.amazonaws.com"
-            ]
+          StringEquals = {
+            "iam:PassedToService" = "ecs-tasks.amazonaws.com"
           }
         }
       }

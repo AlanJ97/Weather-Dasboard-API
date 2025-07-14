@@ -147,30 +147,60 @@ resource "aws_iam_role_policy" "codedeploy_policy" {
           "ecs:CreateTaskSet",
           "ecs:DeleteTaskSet",
           "ecs:DescribeServices",
-          "ecs:UpdateServicePrimaryTaskSet",
+          "ecs:UpdateServicePrimaryTaskSet"
+        ]
+        Resource = [
+          "arn:aws:ecs:*:*:cluster/${var.ecs_cluster_name}",
+          "arn:aws:ecs:*:*:service/${var.ecs_cluster_name}/*",
+          "arn:aws:ecs:*:*:task-set/${var.ecs_cluster_name}/*/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "elasticloadbalancing:DescribeTargetGroups",
           "elasticloadbalancing:DescribeListeners",
           "elasticloadbalancing:ModifyListener",
           "elasticloadbalancing:DescribeRules",
-          "elasticloadbalancing:ModifyRule",
-          "lambda:InvokeFunction",
-          "cloudwatch:DescribeAlarms",
-          "sns:Publish",
+          "elasticloadbalancing:ModifyRule"
+        ]
+        Resource = [
+          "arn:aws:elasticloadbalancing:*:*:targetgroup/${var.alb_api_target_group_name}/*",
+          "arn:aws:elasticloadbalancing:*:*:targetgroup/${var.alb_frontend_target_group_name}/*",
+          "arn:aws:elasticloadbalancing:*:*:listener/app/*/*",
+          "arn:aws:elasticloadbalancing:*:*:listener-rule/app/*/*/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:DescribeAlarms"
+        ]
+        Resource = "arn:aws:cloudwatch:*:*:alarm:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "sns:Publish"
+        ]
+        Resource = "arn:aws:sns:*:*:codedeploy-*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "s3:GetObject"
         ]
-        Resource = "*"
+        Resource = "arn:aws:s3:::*-pipeline-artifacts/*"
       },
       {
         Effect = "Allow"
         Action = [
           "iam:PassRole"
         ]
-        Resource = "*"
+        Resource = "arn:aws:iam::*:role/*-ecs-task-*"
         Condition = {
-          StringLike = {
-            "iam:PassedToService" = [
-              "ecs-tasks.amazonaws.com"
-            ]
+          StringEquals = {
+            "iam:PassedToService" = "ecs-tasks.amazonaws.com"
           }
         }
       }

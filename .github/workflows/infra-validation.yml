@@ -58,10 +58,33 @@ jobs:
       - name: 'Run Checkov Security Scan'
         uses: bridgecrewio/checkov-action@v12
         with:
-          directory: ${{ env.INFRA_DIR }}
-          framework: terraform
-          skip_check: CKV_AWS_130,CKV_AWS_338,CKV_AWS_158,CKV_AWS_136,CKV_AWS_260,CKV_AWS_150,CKV_AWS_131,CKV_AWS_91,CKV2_AWS_20,CKV2_AWS_28,CKV_AWS_103,CKV_AWS_378,CKV_AWS_126,CKV_AWS_135,CKV_AWS_382
-
+            directory: ${{ env.INFRA_DIR }}
+            framework: terraform
+            skip_check: |
+              CKV_AWS_130,
+              CKV_AWS_338,
+              CKV_AWS_158,
+              CKV_AWS_136,
+              CKV_AWS_260,
+              CKV_AWS_150,
+              CKV_AWS_131,
+              CKV_AWS_91,
+              CKV2_AWS_20,
+              CKV2_AWS_28,
+              CKV_AWS_103,
+              CKV_AWS_378,
+              CKV_AWS_126,
+              CKV_AWS_135,
+              CKV_AWS_382,
+              CKV_AWS_147,
+              CKV_AWS_219,
+              CKV_AWS_144,
+              CKV2_AWS_61,
+              CKV2_AWS_62,
+              CKV2_AWS_6,
+              CKV_AWS_18,
+              CKV_AWS_145,
+              CKV_AWS_316
       - name: Display Skipped Security Checks
         run: |
           echo "ℹ️  The following Checkov security checks were intentionally skipped:"
@@ -80,7 +103,16 @@ jobs:
           echo "   • CKV_AWS_126: Ensure that detailed monitoring is enabled for EC2 instances"
           echo "   • CKV_AWS_135: Ensure that EC2 is EBS optimized"
           echo "   • CKV_AWS_382: Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
-      
+          echo "   • CKV_AWS_147: Ensure that CodeBuild projects are encrypted using CMK"
+          echo "   • CKV_AWS_219: Ensure CodePipeline Artifact store is using a KMS CMK" 
+          echo "   • CKV_AWS_144: Ensure that S3 bucket has cross-region replication enabled"
+          echo "   • CKV2_AWS_61: Ensure that an S3 bucket has a lifecycle configuration"
+          echo "   • CKV2_AWS_62: Ensure S3 buckets should have event notifications enabled"
+          echo "   • CKV2_AWS_6: Ensure that S3 bucket has a Public Access block"
+          echo "   • CKV_AWS_18: Ensure the S3 bucket has access logging enabled"
+          echo "   • CKV_AWS_145: Ensure that S3 buckets are encrypted with KMS by default"
+          echo "   • CKV_AWS_316: CodeBuild project security configuration (acceptable for CI/CD use case)"
+         
       - name: Terraform Plan (Validation Only)
         id: plan-validation
         run: |

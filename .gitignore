@@ -52,7 +52,6 @@ terraform.rc
 
 # Ignore Mac .DS_Store files
 .DS_Store
-
 # Ignore editor files
 .vscode/
 .idea/
@@ -64,6 +63,9 @@ terraform.rc
 *.tmp
 *.temp
 *.bak
+
+# Ignore GitHub Actions logs
+../../../../LogsGitHubActions.txt
 
 # Ignore terraform.lock.hcl if you want to (some teams commit it, some don't)
 # .terraform.lock.hcl

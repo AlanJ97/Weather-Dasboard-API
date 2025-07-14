@@ -151,16 +151,25 @@ resource "aws_iam_role_policy" "codebuild_policy" {
       {
         Effect = "Allow"
         Action = [
+          "ecr:GetAuthorizationToken"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "ecr:BatchCheckLayerAvailability",
           "ecr:GetDownloadUrlForLayer",
           "ecr:BatchGetImage",
-          "ecr:GetAuthorizationToken",
           "ecr:PutImage",
           "ecr:InitiateLayerUpload",
           "ecr:UploadLayerPart",
           "ecr:CompleteLayerUpload"
         ]
-        Resource = "*"
+        Resource = [
+          "arn:aws:ecr:*:*:repository/${var.ecr_api_repository_name}",
+          "arn:aws:ecr:*:*:repository/${var.ecr_frontend_repository_name}"
+        ]
       },
       {
         Effect = "Allow"
@@ -183,7 +192,7 @@ resource "aws_iam_role_policy" "codebuild_policy" {
           "codebuild:BatchPutTestCases",
           "codebuild:BatchPutCodeCoverages"
         ]
-        Resource = "*"
+        Resource = "arn:aws:codebuild:*:*:report-group/${var.environment}-*"
       }
     ]
   })
