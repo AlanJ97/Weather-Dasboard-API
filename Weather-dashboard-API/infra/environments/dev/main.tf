@@ -91,6 +91,43 @@ module "bastion" {
   log_group_arns        = module.ecs.log_group_arns
 }
 
+# S3 Bucket for CI/CD Pipeline Artifacts (shared between CodeBuild and CodePipeline)
+resource "aws_s3_bucket" "pipeline_artifacts" {
+  bucket = "${var.env}-weather-dashboard-pipeline-artifacts"
+
+  tags = {
+    Environment = var.env
+    Purpose     = "CodePipeline artifacts"
+    ManagedBy   = "terraform"
+  }
+}
+
+resource "aws_s3_bucket_versioning" "pipeline_artifacts_versioning" {
+  bucket = aws_s3_bucket.pipeline_artifacts.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "pipeline_artifacts_encryption" {
+  bucket = aws_s3_bucket.pipeline_artifacts.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "pipeline_artifacts_pab" {
+  bucket = aws_s3_bucket.pipeline_artifacts.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 # CodeBuild Module
 module "codebuild" {
   source = "../../modules/codebuild"
@@ -98,9 +135,9 @@ module "codebuild" {
   environment                   = var.env
   aws_region                   = var.aws_region
   aws_account_id               = var.aws_account_id
-  ecr_api_repository_name      = module.ecr.api_repository_name
-  ecr_frontend_repository_name = module.ecr.frontend_repository_name
-  source_bucket_name           = module.codepipeline.artifacts_bucket_name
+  ecr_api_repository_name      = module.ecr.weather_api_repository_name
+  ecr_frontend_repository_name = module.ecr.weather_frontend_repository_name
+  source_bucket_name           = aws_s3_bucket.pipeline_artifacts.bucket
 
   depends_on = [module.ecr]
 }
@@ -132,6 +169,7 @@ module "codepipeline" {
   codedeploy_application_name          = module.codedeploy.application_name
   codedeploy_deployment_group_api      = module.codedeploy.api_deployment_group_name
   codedeploy_deployment_group_frontend = module.codedeploy.frontend_deployment_group_name
+  artifacts_bucket_name                = aws_s3_bucket.pipeline_artifacts.bucket
   enable_webhook                       = var.enable_pipeline_webhook
 
   depends_on = [module.codebuild, module.codedeploy]

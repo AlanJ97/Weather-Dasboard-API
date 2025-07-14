@@ -113,7 +113,7 @@ output "codedeploy_application_name" {
 
 output "pipeline_artifacts_bucket" {
   description = "S3 bucket for pipeline artifacts"
-  value       = module.codepipeline.artifacts_bucket_name
+  value       = aws_s3_bucket.pipeline_artifacts.bucket
 }
 
 # Enhanced Deployment Summary
@@ -130,6 +130,6 @@ output "deployment_summary" {
     codebuild_project   = module.codebuild.codebuild_project_name
     codepipeline_name   = module.codepipeline.pipeline_name
     codedeploy_app      = module.codedeploy.application_name
-    artifacts_bucket    = module.codepipeline.artifacts_bucket_name
+    artifacts_bucket    = aws_s3_bucket.pipeline_artifacts.bucket
   }
 }
