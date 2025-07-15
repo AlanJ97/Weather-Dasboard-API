@@ -62,7 +62,7 @@ resource "aws_codebuild_project" "weather_dashboard" {
 
   cache {
     type  = "S3"
-    location = "${aws_s3_bucket.codebuild_cache.bucket}/build-cache"
+    location = "${var.codebuild_cache_bucket_name}/build-cache"
   }
 
   logs_config {
@@ -77,65 +77,6 @@ resource "aws_codebuild_project" "weather_dashboard" {
     Project     = "weather-dashboard"
     ManagedBy   = "terraform"
   }
-}
-
-# Random suffix for bucket names to ensure global uniqueness
-resource "random_string" "bucket_suffix" {
-  length  = 8
-  special = false
-  upper   = false
-}
-
-# S3 Bucket for CodeBuild cache
-resource "aws_s3_bucket" "codebuild_cache" {
-  bucket        = "${var.environment}-weather-dashboard-codebuild-cache-${random_string.bucket_suffix.result}"
-  force_destroy = false
-
-  tags = {
-    Environment = var.environment
-    Purpose     = "CodeBuild cache"
-    ManagedBy   = "terraform"
-  }
-
-  lifecycle {
-    prevent_destroy = false
-  }
-    
-}
-# Add a null resource to ensure bucket exists before proceeding
-resource "null_resource" "wait_for_cache_bucket" {
-  provisioner "local-exec" {
-    command = "aws s3api wait bucket-exists --bucket ${aws_s3_bucket.codebuild_cache.id}"
-  }
-  
-  depends_on = [aws_s3_bucket.codebuild_cache]
-}
-resource "aws_s3_bucket_public_access_block" "codebuild_cache_pab" {
-  bucket = aws_s3_bucket.codebuild_cache.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_versioning" "codebuild_cache_versioning" {
-  bucket = aws_s3_bucket.codebuild_cache.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-  depends_on = [aws_s3_bucket_public_access_block.codebuild_cache_pab]
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "codebuild_cache_encryption" {
-  bucket = aws_s3_bucket.codebuild_cache.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-  depends_on = [aws_s3_bucket_versioning.codebuild_cache_versioning]
 }
 
 # CloudWatch Log Group for CodeBuild
@@ -224,8 +165,8 @@ resource "aws_iam_role_policy" "codebuild_policy" {
           "s3:PutObject"
         ]
         Resource = [
-          "${aws_s3_bucket.codebuild_cache.arn}",
-          "${aws_s3_bucket.codebuild_cache.arn}/*"
+          "arn:aws:s3:::${var.codebuild_cache_bucket_name}",
+          "arn:aws:s3:::${var.codebuild_cache_bucket_name}/*"
         ]
       },
       {
