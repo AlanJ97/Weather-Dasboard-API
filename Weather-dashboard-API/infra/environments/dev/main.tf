@@ -184,11 +184,11 @@ module "codedeploy" {
   ecs_frontend_service_name      = module.ecs.frontend_service_name
   alb_api_target_group_name      = module.alb.api_target_group_name
   alb_frontend_target_group_name = module.alb.frontend_target_group_name
-  alb_api_listener_arn           = module.alb.https_listener_arn
+  alb_api_listener_arn           = module.alb.https_listener_arn != null ? module.alb.https_listener_arn : module.alb.http_listener_arn
   alb_api_tg_blue_name           = module.alb.api_blue_tg_name
   alb_api_tg_green_name          = module.alb.api_green_tg_name
 
-  alb_front_listener_arn         = module.alb.frontend_listener_arn
+  alb_front_listener_arn         = module.alb.frontend_listener_arn != null ? module.alb.frontend_listener_arn : module.alb.http_listener_arn
   alb_front_tg_blue_name         = module.alb.front_blue_tg_name
   alb_front_tg_green_name        = module.alb.front_green_tg_name
   depends_on = [module.ecs, module.alb]
