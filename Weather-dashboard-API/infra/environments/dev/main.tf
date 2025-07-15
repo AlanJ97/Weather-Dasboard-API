@@ -131,6 +131,7 @@ resource "aws_s3_bucket" "pipeline_artifacts" {
   }
 }
 
+
 resource "aws_s3_bucket_public_access_block" "pipeline_artifacts_pab" {
   bucket = aws_s3_bucket.pipeline_artifacts.id
 
