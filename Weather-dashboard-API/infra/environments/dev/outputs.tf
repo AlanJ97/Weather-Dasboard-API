@@ -130,6 +130,6 @@ output "deployment_summary" {
     codebuild_project = module.codebuild.codebuild_project_name
     #codepipeline_name = module.codepipeline.pipeline_name
     #codedeploy_app    = module.codedeploy.application_name
-    artifacts_bucket  = aws_s3_bucket.pipeline_artifacts.bucket
+    #artifacts_bucket  = aws_s3_bucket.pipeline_artifacts.bucket
   }
 }

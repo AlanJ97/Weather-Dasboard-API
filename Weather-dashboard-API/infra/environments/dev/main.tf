@@ -105,66 +105,6 @@ module "bastion" {
   log_group_arns      = module.ecs.log_group_arns
 }
 
-# Random suffix for bucket names to ensure global uniqueness
-resource "random_string" "bucket_suffix" {
-  length  = 8
-  special = false
-  upper   = false
-}
-
-# S3 Bucket for CI/CD Pipeline Artifacts (shared between CodeBuild and CodePipeline)
-resource "aws_s3_bucket" "pipeline_artifacts" {
-  bucket        = "${var.env}-weather-dashboard-pipeline-artifacts-${random_string.bucket_suffix.result}"
-  force_destroy = false
-
-  tags = {
-    Environment = var.env
-    Purpose     = "CodePipeline artifacts"
-    ManagedBy   = "terraform"
-  }
-
-  lifecycle {
-    prevent_destroy = false
-  }
-
-  
-}
-# Add a null resource to ensure bucket exists before proceeding
-resource "null_resource" "wait_for_pipeline_bucket" {
-  provisioner "local-exec" {
-    command = "aws s3api wait bucket-exists --bucket ${aws_s3_bucket.pipeline_artifacts.id}"
-  }
-  
-  depends_on = [aws_s3_bucket.pipeline_artifacts]
-}
-
-resource "aws_s3_bucket_public_access_block" "pipeline_artifacts_pab" {
-  bucket = aws_s3_bucket.pipeline_artifacts.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_versioning" "pipeline_artifacts_versioning" {
-  bucket = aws_s3_bucket.pipeline_artifacts.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-  depends_on = [aws_s3_bucket_public_access_block.pipeline_artifacts_pab]
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "pipeline_artifacts_encryption" {
-  bucket = aws_s3_bucket.pipeline_artifacts.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-  depends_on = [aws_s3_bucket_versioning.pipeline_artifacts_versioning]
-}
 
 # CodeBuild Module
 module "codebuild" {
@@ -175,7 +115,7 @@ module "codebuild" {
   aws_account_id               = var.aws_account_id
   ecr_api_repository_name      = module.ecr.weather_api_repository_name
   ecr_frontend_repository_name = module.ecr.weather_frontend_repository_name
-  source_bucket_name           = aws_s3_bucket.pipeline_artifacts.bucket
+  source_bucket_name = "dev-weather-dashboard-codebuild-cache-2025"
 
   depends_on = [module.ecr]
 }

@@ -13,7 +13,4 @@ output "codebuild_role_arn" {
   value       = aws_iam_role.codebuild_role.arn
 }
 
-output "cache_bucket_name" {
-  description = "Name of the S3 bucket used for CodeBuild cache"
-  value       = aws_s3_bucket.codebuild_cache.bucket
-}
+
