@@ -12,6 +12,7 @@ terraform {
   }
 }
 
+
 # Security Group for ALB
 resource "aws_security_group" "alb" {
   name_prefix = "${var.env}-weather-alb-"
