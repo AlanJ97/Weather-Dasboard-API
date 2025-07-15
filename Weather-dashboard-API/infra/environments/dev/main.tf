@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.90"     # waiter bug fixed, available in registry
+      version = ">= 5.90" # waiter bug fixed, available in registry
     }
     random = {
       source  = "hashicorp/random"

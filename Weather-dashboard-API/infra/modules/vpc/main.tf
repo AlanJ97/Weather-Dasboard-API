@@ -192,7 +192,7 @@ resource "aws_route_table_association" "private" {
 
 
 
-# Data source for Availability Zones that support NAT Gateway
+ # Data source for Availability Zones that support NAT Gateway
 data "aws_availability_zones" "available" {
   state = "available"
   filter {
@@ -200,8 +200,7 @@ data "aws_availability_zones" "available" {
     values = ["opt-in-not-required"]
   }
   # Exclude AZs that are known to not support NAT Gateway
-  exclude_names = ["us-east-1e"]
+  exclude_names = ["us-east-2c"]
 }
-
-
+ 
 
