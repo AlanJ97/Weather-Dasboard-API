@@ -120,7 +120,7 @@ module "codebuild" {
   depends_on = [module.ecr]
 }
 
-/* # CodeDeploy Module
+# CodeDeploy Module
 module "codedeploy" {
   source = "../../modules/codedeploy"
 
@@ -140,6 +140,7 @@ module "codedeploy" {
   depends_on = [module.ecs, module.alb]
 }
 
+/*
 # CodePipeline Module
 module "codepipeline" {
   source = "../../modules/codepipeline"
@@ -153,9 +154,9 @@ module "codepipeline" {
   codedeploy_application_name          = module.codedeploy.application_name
   codedeploy_deployment_group_api      = module.codedeploy.api_deployment_group_name
   codedeploy_deployment_group_frontend = module.codedeploy.frontend_deployment_group_name
-  artifacts_bucket_name                = aws_s3_bucket.pipeline_artifacts.bucket
+  artifacts_bucket_name                = "dev-weather-dashboard-pipeline-artifacts-2025"
   enable_webhook                       = var.enable_pipeline_webhook
 
   depends_on = [module.codebuild, module.codedeploy]
 }
- */
+*/
