@@ -1,3 +1,16 @@
+terraform {
+  required_version = ">= 1.5"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.90"     # waiter bug fixed, available in registry
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
+    }
+  }
+}
 # CodeDeploy Application
 resource "aws_codedeploy_app" "weather_dashboard" {
   compute_platform = "ECS"

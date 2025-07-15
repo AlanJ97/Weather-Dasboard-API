@@ -1,3 +1,16 @@
+terraform {
+  required_version = ">= 1.5"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.90"     # waiter bug fixed, available in registry
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
+    }
+  }
+}
 # ECS Cluster
 resource "aws_ecs_cluster" "main" {
   name = "${var.env}-weather-cluster"

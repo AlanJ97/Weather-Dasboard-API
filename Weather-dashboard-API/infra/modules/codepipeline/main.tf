@@ -1,3 +1,16 @@
+terraform {
+  required_version = ">= 1.5"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.90"     # waiter bug fixed, available in registry
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
+    }
+  }
+}
 # AWS CodeStar Connection for GitHub
 resource "aws_codestarconnections_connection" "github" {
   name          = "${var.environment}-github-connection"

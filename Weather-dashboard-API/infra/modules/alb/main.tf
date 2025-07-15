@@ -1,3 +1,17 @@
+terraform {
+  required_version = ">= 1.5"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.90"     # waiter bug fixed, available in registry
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
+    }
+  }
+}
+
 # Security Group for ALB
 resource "aws_security_group" "alb" {
   name_prefix = "${var.env}-weather-alb-"

@@ -1,8 +1,9 @@
 terraform {
+  required_version = ">= 1.5"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = ">= 5.90"     # waiter bug fixed, available in registry
     }
     random = {
       source  = "hashicorp/random"
@@ -98,6 +99,9 @@ resource "aws_s3_bucket" "codebuild_cache" {
 
   lifecycle {
     prevent_destroy = false
+  }
+    timeouts {
+    create = "15m"
   }
 }
 
