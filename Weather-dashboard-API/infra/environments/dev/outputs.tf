@@ -100,7 +100,7 @@ output "codebuild_project_name" {
   description = "CodeBuild project name"
   value       = module.codebuild.codebuild_project_name
 }
-
+/* 
 output "codepipeline_name" {
   description = "CodePipeline name"
   value       = module.codepipeline.pipeline_name
@@ -114,7 +114,7 @@ output "codedeploy_application_name" {
 output "pipeline_artifacts_bucket" {
   description = "S3 bucket for pipeline artifacts"
   value       = aws_s3_bucket.pipeline_artifacts.bucket
-}
+} */
 
 # Enhanced Deployment Summary
 output "deployment_summary" {
@@ -128,8 +128,8 @@ output "deployment_summary" {
     bastion_ip        = module.bastion.bastion_public_ip
     ecr_repositories  = module.ecr.repository_names
     codebuild_project = module.codebuild.codebuild_project_name
-    codepipeline_name = module.codepipeline.pipeline_name
-    codedeploy_app    = module.codedeploy.application_name
+    #codepipeline_name = module.codepipeline.pipeline_name
+    #codedeploy_app    = module.codedeploy.application_name
     artifacts_bucket  = aws_s3_bucket.pipeline_artifacts.bucket
   }
 }
