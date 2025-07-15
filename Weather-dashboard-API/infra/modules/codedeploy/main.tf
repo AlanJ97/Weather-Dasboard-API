@@ -59,11 +59,7 @@ resource "aws_codedeploy_deployment_group" "api" {
 
   deployment_config_name = "CodeDeployDefault.ECSAllAtOne"
 
-  load_balancer_info {
-    target_group_info {
-      name = var.alb_api_target_group_name
-    }
-  }
+  
 
   tags = {
     Environment = var.environment
@@ -109,11 +105,7 @@ resource "aws_codedeploy_deployment_group" "frontend" {
 
   deployment_config_name = "CodeDeployDefault.ECSAllAtOne"
 
-  load_balancer_info {
-    target_group_info {
-      name = var.alb_frontend_target_group_name
-    }
-  }
+ 
 
   tags = {
     Environment = var.environment
