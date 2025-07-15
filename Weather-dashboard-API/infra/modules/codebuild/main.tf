@@ -100,11 +100,16 @@ resource "aws_s3_bucket" "codebuild_cache" {
   lifecycle {
     prevent_destroy = false
   }
-    timeouts {
-    create = "15m"
-  }
+    
 }
-
+# Add a null resource to ensure bucket exists before proceeding
+resource "null_resource" "wait_for_cache_bucket" {
+  provisioner "local-exec" {
+    command = "aws s3api wait bucket-exists --bucket ${aws_s3_bucket.codebuild_cache.id}"
+  }
+  
+  depends_on = [aws_s3_bucket.codebuild_cache]
+}
 resource "aws_s3_bucket_public_access_block" "codebuild_cache_pab" {
   bucket = aws_s3_bucket.codebuild_cache.id
 
