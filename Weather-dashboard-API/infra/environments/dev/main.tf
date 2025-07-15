@@ -174,7 +174,7 @@ module "codebuild" {
   depends_on = [module.ecr]
 }
 
-# CodeDeploy Module
+/* # CodeDeploy Module
 module "codedeploy" {
   source = "../../modules/codedeploy"
 
@@ -212,3 +212,4 @@ module "codepipeline" {
 
   depends_on = [module.codebuild, module.codedeploy]
 }
+ */
