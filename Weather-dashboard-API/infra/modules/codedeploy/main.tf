@@ -51,7 +51,20 @@ resource "aws_codedeploy_deployment_group" "api" {
 
     
   }
+      load_balancer_info {
+    target_group_pair_info {
+      prod_traffic_route {
+        listener_arns = [var.alb_api_listener_arn]     # ALB listener
+      }
 
+      target_group {
+        name = var.alb_api_tg_blue_name                # blue TG
+      }
+      target_group {
+        name = var.alb_api_tg_green_name               # green TG
+      }
+    }
+  }
   ecs_service {
     cluster_name = var.ecs_cluster_name
     service_name = var.ecs_api_service_name
@@ -97,7 +110,20 @@ resource "aws_codedeploy_deployment_group" "frontend" {
 
    
   }
+    load_balancer_info {
+    target_group_pair_info {
+      prod_traffic_route {
+        listener_arns = [var.alb_front_listener_arn]
+      }
 
+      target_group {
+        name = var.alb_front_tg_blue_name
+      }
+      target_group {
+        name = var.alb_front_tg_green_name
+      }
+    }
+  }
   ecs_service {
     cluster_name = var.ecs_cluster_name
     service_name = var.ecs_frontend_service_name

@@ -149,6 +149,115 @@ resource "aws_lb_target_group" "frontend" {
   }
 }
 
+# Blue/Green Target Groups for API and Frontend
+resource "aws_lb_target_group" "api_blue" {
+  name        = "${var.env}-weather-api-tg-blue"
+  port        = var.api_port
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    interval            = 30
+    matcher             = "200"
+    path                = "/health"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+    timeout             = 5
+    unhealthy_threshold = 2
+  }
+
+  tags = {
+    Name        = "${var.env}-weather-api-tg-blue"
+    Environment = var.env
+    Project     = "weather-dashboard"
+    ManagedBy   = "terraform"
+  }
+}
+
+resource "aws_lb_target_group" "api_green" {
+  name        = "${var.env}-weather-api-tg-green"
+  port        = var.api_port
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    interval            = 30
+    matcher             = "200"
+    path                = "/health"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+    timeout             = 5
+    unhealthy_threshold = 2
+  }
+
+  tags = {
+    Name        = "${var.env}-weather-api-tg-green"
+    Environment = var.env
+    Project     = "weather-dashboard"
+    ManagedBy   = "terraform"
+  }
+}
+
+resource "aws_lb_target_group" "frontend_blue" {
+  name        = "${var.env}-weather-frontend-tg-blue"
+  port        = var.frontend_port
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    interval            = 30
+    matcher             = "200"
+    path                = "/"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+    timeout             = 5
+    unhealthy_threshold = 2
+  }
+
+  tags = {
+    Name        = "${var.env}-weather-frontend-tg-blue"
+    Environment = var.env
+    Project     = "weather-dashboard"
+    ManagedBy   = "terraform"
+  }
+}
+
+resource "aws_lb_target_group" "frontend_green" {
+  name        = "${var.env}-weather-frontend-tg-green"
+  port        = var.frontend_port
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    interval            = 30
+    matcher             = "200"
+    path                = "/"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+    timeout             = 5
+    unhealthy_threshold = 2
+  }
+
+  tags = {
+    Name        = "${var.env}-weather-frontend-tg-green"
+    Environment = var.env
+    Project     = "weather-dashboard"
+    ManagedBy   = "terraform"
+  }
+}
+
 # HTTP Listener - Redirect to HTTPS (only when SSL certificate is available)
 resource "aws_lb_listener" "http" {
   count             = var.ssl_certificate_arn != null ? 1 : 0
@@ -185,7 +294,7 @@ resource "aws_lb_listener" "https" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.frontend.arn
+    target_group_arn = aws_lb_target_group.frontend_blue.arn
   }
 
 }
@@ -199,7 +308,7 @@ resource "aws_lb_listener" "http_default" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.frontend.arn
+    target_group_arn = aws_lb_target_group.frontend_blue.arn
   }
 
   tags = {
@@ -217,7 +326,7 @@ resource "aws_lb_listener_rule" "api" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.api.arn
+    target_group_arn = aws_lb_target_group.api_blue.arn
   }
 
   condition {

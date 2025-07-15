@@ -27,3 +27,9 @@ variable "alb_frontend_target_group_name" {
   description = "Name of the ALB target group for the frontend"
   type        = string
 }
+variable "alb_api_listener_arn"         { type = string }
+variable "alb_api_tg_blue_name"         { type = string }
+variable "alb_api_tg_green_name"        { type = string }
+variable "alb_front_listener_arn"       { type = string }
+variable "alb_front_tg_blue_name"       { type = string }
+variable "alb_front_tg_green_name"      { type = string }

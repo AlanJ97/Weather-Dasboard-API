@@ -65,8 +65,8 @@ module "ecs" {
   private_subnet_ids        = module.vpc.private_subnet_ids
   alb_security_group_id     = module.alb.alb_security_group_id
   alb_dns_name              = module.alb.alb_dns_name
-  api_target_group_arn      = module.alb.api_target_group_arn
-  frontend_target_group_arn = module.alb.frontend_target_group_arn
+  api_target_group_arn      = module.alb.api_blue_tg_arn
+  frontend_target_group_arn = module.alb.front_blue_tg_arn
   alb_frontend_listener_arn = module.alb.frontend_listener_arn
   alb_api_listener_rule_arn = module.alb.api_listener_rule_arn
 
@@ -184,7 +184,13 @@ module "codedeploy" {
   ecs_frontend_service_name      = module.ecs.frontend_service_name
   alb_api_target_group_name      = module.alb.api_target_group_name
   alb_frontend_target_group_name = module.alb.frontend_target_group_name
+  alb_api_listener_arn           = module.alb.https_listener_arn != null ? module.alb.https_listener_arn : module.alb.http_listener_arn
+  alb_api_tg_blue_name           = module.alb.api_blue_tg_name
+  alb_api_tg_green_name          = module.alb.api_green_tg_name
 
+  alb_front_listener_arn         = module.alb.frontend_listener_arn != null ? module.alb.frontend_listener_arn : module.alb.http_listener_arn
+  alb_front_tg_blue_name         = module.alb.front_blue_tg_name
+  alb_front_tg_green_name        = module.alb.front_green_tg_name
   depends_on = [module.ecs, module.alb]
 }
 
