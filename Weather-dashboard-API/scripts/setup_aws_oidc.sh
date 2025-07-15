@@ -273,7 +273,8 @@ ECS_POLICY=$(cat <<EOF
                 "elasticloadbalancing:DescribeRules",
                 "elasticloadbalancing:DeleteRule",
                 "elasticloadbalancing:ModifyRule",
-                "elasticloadbalancing:UntagResource"
+                "elasticloadbalancing:UntagResource",
+                "elasticloadbalancing:ModifyListener"
             ],
             "Resource": "*"
         }
