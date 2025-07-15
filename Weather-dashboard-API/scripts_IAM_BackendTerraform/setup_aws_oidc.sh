@@ -383,6 +383,7 @@ CICD_POLICY=$(cat <<EOF
                 "codestar-connections:UntagResource",
                 "codestar-connections:ListTagsForResource",
                 "codestar-connections:DeleteConnection",
+                "codestar-connections:PassConnection",
                 "events:PutRule",
                 "events:DeleteRule",
                 "events:DescribeRule",

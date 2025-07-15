@@ -44,7 +44,7 @@ jobs:
         id: init
         run: |
           echo "🔧 Initializing Terraform with S3 backend..."
-          terraform init -input=false
+          terraform init -input=false -upgrade
           echo "✅ Terraform initialized successfully"
         working-directory: Weather-dashboard-API/infra/environments/${{ github.event.inputs.environment }}
 
@@ -116,7 +116,7 @@ jobs:
       - name: Terraform Init
         run: |
           echo "🔧 Initializing Terraform with S3 backend..."
-          terraform init -input=false
+          terraform init -input=false -upgrade
           echo "✅ Terraform initialized successfully"
         working-directory: Weather-dashboard-API/infra/environments/${{ github.event.inputs.environment }}
 
