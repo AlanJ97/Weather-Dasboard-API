@@ -49,9 +49,7 @@ resource "aws_codedeploy_deployment_group" "api" {
       action_on_timeout = "CONTINUE_DEPLOYMENT"
     }
 
-    green_fleet_provisioning_option {
-      action = "COPY_AUTO_SCALING_GROUP"
-    }
+    
   }
 
   ecs_service {
@@ -101,9 +99,7 @@ resource "aws_codedeploy_deployment_group" "frontend" {
       action_on_timeout = "CONTINUE_DEPLOYMENT"
     }
 
-    green_fleet_provisioning_option {
-      action = "COPY_AUTO_SCALING_GROUP"
-    }
+   
   }
 
   ecs_service {
