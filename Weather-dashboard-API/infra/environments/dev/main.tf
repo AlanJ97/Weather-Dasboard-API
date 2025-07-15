@@ -115,7 +115,7 @@ module "codebuild" {
   aws_account_id               = var.aws_account_id
   ecr_api_repository_name      = module.ecr.weather_api_repository_name
   ecr_frontend_repository_name = module.ecr.weather_frontend_repository_name
-  source_bucket_name           = aws_s3_bucket.pipeline_artifacts.bucket
+  source_bucket_name = "dev-weather-dashboard-codebuild-cache-2025"
 
   depends_on = [module.ecr]
 }
