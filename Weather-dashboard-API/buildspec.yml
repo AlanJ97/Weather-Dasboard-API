@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    AWS_DEFAULT_REGION: us-east-1
+    AWS_DEFAULT_REGION: us-east-2
     AWS_ACCOUNT_ID: 622233144821
     IMAGE_REPO_NAME_API: dev-weather-api
     IMAGE_REPO_NAME_FRONTEND: dev-weather-frontend

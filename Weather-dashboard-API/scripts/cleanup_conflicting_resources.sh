@@ -7,7 +7,7 @@ set -e
 
 echo "🧹 Cleaning up conflicting AWS resources..."
 
-AWS_REGION="us-east-1"
+AWS_REGION="us-east-2"
 
 # List of IAM roles to delete
 ROLES=(

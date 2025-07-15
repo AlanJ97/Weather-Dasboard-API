@@ -17,7 +17,7 @@ ROLE_NAME="GitHubActions-Terraform-Backend-Role"
 # We'll create multiple smaller policies instead of one large one
 POLICY_NAMES=("GitHubActions-Terraform-S3-Policy" "GitHubActions-Terraform-EC2-Policy" "GitHubActions-Terraform-ECS-Policy" "GitHubActions-Terraform-Monitoring-Policy" "GitHubActions-Terraform-CICD-Policy")
 BUCKET_NAME="weather-app-backend-terraform-bucket-2025"
-AWS_REGION="us-east-1"
+AWS_REGION="us-east-2"
 
 
 # --- OIDC Provider Details ---

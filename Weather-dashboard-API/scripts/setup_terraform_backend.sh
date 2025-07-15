@@ -5,7 +5,7 @@ set -e
 
 # Define variables
 BUCKET_NAME="weather-app-backend-terraform-bucket-2025"
-AWS_REGION="us-east-1"
+AWS_REGION="us-east-2"
 
 # Check AWS CLI version and object-lock parameter support
 echo "Checking AWS CLI version and object-lock parameter support..."
@@ -30,8 +30,8 @@ fi
 
 # Create the S3 bucket with Object Lock enabled
 echo "Creating S3 bucket with Object Lock: $BUCKET_NAME..."
-if [ "$AWS_REGION" = "us-east-1" ]; then
-    # us-east-1 doesn't need CreateBucketConfiguration
+if [ "$AWS_REGION" = "us-east-2" ]; then
+    # us-east-2 doesn't need CreateBucketConfiguration
     aws s3api create-bucket --bucket $BUCKET_NAME --object-lock-enabled-for-bucket
 else
     # Other regions need CreateBucketConfiguration

@@ -12,7 +12,7 @@ on:
 # Add environment variables for better configuration management
 env:
   TF_VERSION: "1.8.5"
-  AWS_REGION: "us-east-1"
+  AWS_REGION: "us-east-2"
   WORKING_DIR: "./Weather-dashboard-API/infra/environments/dev"
   INFRA_DIR: "./Weather-dashboard-API/infra"
 
