@@ -41,7 +41,7 @@ phases:
       
       # Run application tests if available
       - echo "Running application tests..."
-      - python app_scripts/test_applications.py || echo "Tests require running services - will validate after deployment"
+      - python scripts_tests_app/test_applications.py || echo "Tests require running services - will validate after deployment"
 
   build:
     commands:
@@ -172,10 +172,10 @@ phases:
                   ContainerName: "weather-api"
                   ContainerPort: 8000
         Hooks:
-          - BeforeInstall: "scripts/before-install.sh"
-          - AfterInstall: "scripts/after-install.sh"
-          - ApplicationStart: "scripts/start-server.sh"
-          - ApplicationStop: "scripts/stop-server.sh"
+          - BeforeInstall: "deployment-hooks/before-install.sh"
+          - AfterInstall: "deployment-hooks/after-install.sh"
+          - ApplicationStart: "deployment-hooks/start-server.sh"
+          - ApplicationStop: "deployment-hooks/stop-server.sh"
         EOF
       
       - |
@@ -190,10 +190,10 @@ phases:
                   ContainerName: "weather-frontend"
                   ContainerPort: 3000
         Hooks:
-          - BeforeInstall: "scripts/before-install.sh"
-          - AfterInstall: "scripts/after-install.sh"
-          - ApplicationStart: "scripts/start-server.sh"
-          - ApplicationStop: "scripts/stop-server.sh"
+          - BeforeInstall: "deployment-hooks/before-install.sh"
+          - AfterInstall: "deployment-hooks/after-install.sh"
+          - ApplicationStart: "deployment-hooks/start-server.sh"
+          - ApplicationStop: "deployment-hooks/stop-server.sh"
         EOF
       
       # Create image definitions for backwards compatibility

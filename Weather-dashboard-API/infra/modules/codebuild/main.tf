@@ -57,7 +57,7 @@ resource "aws_codebuild_project" "weather_dashboard" {
 
   source {
     type = "CODEPIPELINE"
-    buildspec = "Weather-dashboard-API/buildspec.yml"
+    buildspec = "buildspec.yml"
   }
 
   cache {
