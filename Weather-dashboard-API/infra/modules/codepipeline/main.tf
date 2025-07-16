@@ -53,6 +53,7 @@ resource "aws_codepipeline" "weather_dashboard" {
     }
   }
 
+
   stage {
     name = "Build"
 

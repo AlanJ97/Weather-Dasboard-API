@@ -11,7 +11,7 @@ env:
 phases:
   install:
     runtime-versions:
-      python: 3.11
+      python: 3.9
       docker: 20
     commands:
       - echo "Installing build dependencies..."
@@ -20,6 +20,13 @@ phases:
 
   pre_build:
     commands:
+      - echo "Current directory:"
+      - pwd
+      - echo "Directory contents:"
+      - ls -la
+      - echo "Searching for buildspec.yml:"
+      - find . -name "buildspec.yml" -type f
+      - echo "Pre-build started on $(date)"
       - echo "Pre-build started on $(date)"
       - echo "Logging in to Amazon ECR..."
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
