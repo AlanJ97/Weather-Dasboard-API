@@ -24,9 +24,11 @@ phases:
       - pwd
       - echo "Directory contents:"
       - ls -la
-      - echo "Searching for buildspec.yml:"
-      - find . -name "buildspec.yml" -type f
-      - echo "Pre-build started on $(date)"
+      - echo "Changing to Weather-dashboard-API directory..."
+      - cd Weather-dashboard-API
+      - echo "New directory:"
+      - pwd
+      - ls -la
       - echo "Pre-build started on $(date)"
       - echo "Logging in to Amazon ECR..."
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
