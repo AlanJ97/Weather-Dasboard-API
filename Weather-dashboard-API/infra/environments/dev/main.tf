@@ -116,6 +116,7 @@ module "codebuild" {
   ecr_api_repository_name      = module.ecr.weather_api_repository_name
   ecr_frontend_repository_name = module.ecr.weather_frontend_repository_name
   source_bucket_name = "dev-weather-dashboard-codebuild-cache-2025"
+  artifacts_bucket_name = "dev-weather-dashboard-pipeline-artifacts-2025"
 
   depends_on = [module.ecr]
 }
