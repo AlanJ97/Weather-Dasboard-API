@@ -90,6 +90,31 @@ This document provides a step-by-step guide to setting up and deploying the Weat
     *   **Development Environment Deployed**: Successfully deployed the complete `dev` environment infrastructure including VPC, ECR, ALB, ECS cluster, and Bastion host.
     *   **Best Practice Implementation**: Used a two-stage CI/CD approach (plan → artifact → apply) for safe and auditable infrastructure deployments.
 
+## Module 4.1: S3 Bucket Creation Workaround for Terraform
+
+Due to persistent Terraform S3 bucket creation errors ("empty result"), we adopted a manual bucket creation approach for CI/CD pipeline artifacts and CodeBuild cache:
+
+1. **Manual S3 Bucket Creation Script**
+   - Created and ran `scripts_infra/CreateS3BucketsCodePipeline.sh` to provision both buckets:
+     - `dev-weather-dashboard-pipeline-artifacts-2025` (for pipeline artifacts)
+     - `dev-weather-dashboard-codebuild-cache-2025` (for CodeBuild cache)
+   - The script configures versioning, encryption, and public access block for both buckets.
+
+2. **Hardcoded Bucket References in Terraform**
+   - Removed all Terraform resources that create or configure these buckets.
+   - Updated `infra/environments/dev/main.tf` and `infra/modules/codebuild/main.tf` to reference the bucket names directly:
+     ```hcl
+     source_bucket_name = "dev-weather-dashboard-codebuild-cache-2025"
+     # (and similarly for pipeline artifacts when CodePipeline is enabled)
+     ```
+   - This avoids the Terraform S3 creation bug and ensures reliable deployments.
+
+3. **Deployment Success**
+   - After this change, infrastructure deployment completed successfully via CI/CD pipeline.
+   - See PR: https://github.com/AlanJ97/Weather-Dasboard-API/pull/62
+
+**Note:** When enabling CodePipeline, manually create and reference the pipeline artifacts bucket in the same way.
+
 ## Module 5: Infrastructure Management and Operations
 
 1.  **Infrastructure State Management**:
@@ -147,20 +172,61 @@ This document provides a step-by-step guide to setting up and deploying the Weat
    * Successful API communication and data visualization
    * All container health checks passing
 
+## Module 7: Complete CI/CD Pipeline Implementation ✅ COMPLETED
+
+**CodeBuild + CodeDeploy + CodePipeline Integration Success**
+
+1. **Progressive CI/CD Module Deployment**:
+   * **Phase 1**: Successfully deployed CodeBuild module with manual S3 bucket workaround
+   * **Phase 2**: Successfully deployed CodeDeploy module with correct Blue/Green configuration
+   * **Phase 3**: Successfully deployed CodePipeline module integrating both services
+
+2. **CodeDeploy Configuration Resolution**:
+   * Fixed deployment configuration name from `CodeDeployDefault.ECSAllAtOne` → `CodeDeployDefault.ECSAllAtOneBlueGreen`
+   * Verified Blue/Green target group integration with ALB module
+   * Confirmed ECS service compatibility with CodeDeploy deployment groups
+
+3. **CodePipeline Integration**:
+   * Verified container name consistency between ECS task definitions and CodePipeline expectations:
+     - API container: `"weather-api"` ✅
+     - Frontend container: `"weather-frontend"` ✅
+   * Used hardcoded S3 bucket references: `"dev-weather-dashboard-pipeline-artifacts-2025"`
+   * Confirmed proper module dependencies and output references
+
+4. **Complete CI/CD Architecture Deployed**:
+   * **CodeStar Connection**: GitHub integration for source code retrieval
+   * **CodeBuild**: Docker image building and ECR push
+   * **CodeDeploy**: Blue/Green ECS deployments with ALB traffic shifting
+   * **CodePipeline**: End-to-end orchestration (Source → Build → Deploy)
+   * **S3 Buckets**: Pipeline artifacts and build cache storage
+
+5. **Infrastructure Components Summary**:
+   * ✅ VPC with public/private subnets
+   * ✅ ECR repositories for API and Frontend
+   * ✅ ALB with Blue/Green target groups
+   * ✅ ECS Fargate cluster and services
+   * ✅ Bastion host for emergency access
+   * ✅ Complete CI/CD pipeline (CodeBuild + CodeDeploy + CodePipeline)
+
 ## Next Steps (Ready for Implementation)
 
-1. **AWS Deployment Phase**:
+1. **Pipeline Activation and Testing**:
+   * Activate CodeStar GitHub connection in AWS Console (one-time manual step)
+   * Create application buildspec.yml files for CodeBuild
+   * Test end-to-end pipeline with sample code push
+
+2. **Application Deployment Phase**:
    * Push Docker images to ECR repositories
    * Update ECS task definitions with new image tags  
    * Deploy applications to existing ECS cluster
    * Configure ALB routing to ECS services
    * Update frontend API_BASE_URL to ALB endpoint
 
-2. **Configuration Management**:
+3. **Configuration Management**:
    * Ansible playbook development for bastion host configuration
    * Environment-specific configuration management
 
-3. **Production Readiness**:
+4. **Production Readiness**:
    * Staging and production environment deployment
    * Monitoring and alerting implementation
    * Load testing and performance optimization
