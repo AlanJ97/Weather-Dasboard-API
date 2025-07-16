@@ -324,6 +324,16 @@ resource "aws_ecs_service" "api" {
 
   depends_on = [var.alb_api_listener_rule_arn]
 
+  # Ignore changes to task_definition and desired_count when using CODE_DEPLOY
+  # CodeDeploy will manage these during blue/green deployments
+  lifecycle {
+    ignore_changes = [
+      task_definition,
+      desired_count,
+      load_balancer,
+    ]
+  }
+
   tags = {
     Name        = "${var.env}-weather-api-service"
     Environment = var.env
@@ -357,6 +367,16 @@ resource "aws_ecs_service" "frontend" {
   }
 
   depends_on = [var.alb_api_listener_rule_arn]
+
+  # Ignore changes to task_definition and desired_count when using CODE_DEPLOY
+  # CodeDeploy will manage these during blue/green deployments
+  lifecycle {
+    ignore_changes = [
+      task_definition,
+      desired_count,
+      load_balancer,
+    ]
+  }
 
   tags = {
     Name        = "${var.env}-weather-frontend-service"
