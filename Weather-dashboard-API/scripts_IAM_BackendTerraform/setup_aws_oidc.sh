@@ -379,6 +379,7 @@ CICD_POLICY=$(cat <<EOF
                 "codestar-connections:CreateConnection",
                 "codestar-connections:GetConnection",
                 "codestar-connections:ListConnections",
+                "codestar-connections:UseConnection",
                 "codestar-connections:TagResource",
                 "codestar-connections:UntagResource",
                 "codestar-connections:ListTagsForResource",
