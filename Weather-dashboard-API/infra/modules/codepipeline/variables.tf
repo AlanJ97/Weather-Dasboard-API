@@ -18,7 +18,7 @@ variable "github_repo" {
 variable "github_branch" {
   description = "GitHub branch to trigger pipeline"
   type        = string
-  default     = "main"
+  default     = "master"
 }
 
 variable "codebuild_project_name" {
