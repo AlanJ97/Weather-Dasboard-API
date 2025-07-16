@@ -172,6 +172,18 @@ resource "aws_iam_role_policy" "codebuild_policy" {
       {
         Effect = "Allow"
         Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:PutObject"
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.artifacts_bucket_name}",
+          "arn:aws:s3:::${var.artifacts_bucket_name}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "codebuild:CreateReportGroup",
           "codebuild:CreateReport",
           "codebuild:UpdateReport",

@@ -28,6 +28,12 @@ variable "source_bucket_name" {
   description = "S3 bucket name for pipeline artifacts"
   type        = string
 }
+
+variable "artifacts_bucket_name" {
+  description = "S3 bucket name for CodePipeline artifacts"
+  type        = string
+}
+
 variable "codebuild_cache_bucket_name" {
   default = "dev-weather-dashboard-codebuild-cache-2025"
 }
