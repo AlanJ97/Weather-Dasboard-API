@@ -87,24 +87,49 @@ output "bastion_connection_info" {
 output "application_urls" {
   description = "Application URLs"
   value = {
-    alb_dns              = module.alb.alb_dns_name
-    api_url              = "http://${module.alb.alb_dns_name}/api"
-    frontend_url         = "http://${module.alb.alb_dns_name}"
-    api_docs_url         = "http://${module.alb.alb_dns_name}/docs"
-    api_health_url       = "http://${module.alb.alb_dns_name}/health"
+    alb_dns        = module.alb.alb_dns_name
+    api_url        = "http://${module.alb.alb_dns_name}/api"
+    frontend_url   = "http://${module.alb.alb_dns_name}"
+    api_docs_url   = "http://${module.alb.alb_dns_name}/docs"
+    api_health_url = "http://${module.alb.alb_dns_name}/health"
   }
 }
 
-# Summary Output
+# CI/CD Pipeline Outputs
+output "codebuild_project_name" {
+  description = "CodeBuild project name"
+  value       = module.codebuild.codebuild_project_name
+}
+/* 
+output "codepipeline_name" {
+  description = "CodePipeline name"
+  value       = module.codepipeline.pipeline_name
+}
+
+output "codedeploy_application_name" {
+  description = "CodeDeploy application name"
+  value       = module.codedeploy.application_name
+}
+
+output "pipeline_artifacts_bucket" {
+  description = "S3 bucket for pipeline artifacts"
+  value       = aws_s3_bucket.pipeline_artifacts.bucket
+} */
+
+# Enhanced Deployment Summary
 output "deployment_summary" {
-  description = "Deployment summary"
+  description = "Complete deployment summary including CI/CD"
   value = {
     environment       = var.env
-    region           = var.aws_region
-    vpc_id           = module.vpc.vpc_id
-    alb_dns          = module.alb.alb_dns_name
-    ecs_cluster      = module.ecs.cluster_name
-    bastion_ip       = module.bastion.bastion_public_ip
-    ecr_repositories = module.ecr.repository_names
+    region            = var.aws_region
+    vpc_id            = module.vpc.vpc_id
+    alb_dns           = module.alb.alb_dns_name
+    ecs_cluster       = module.ecs.cluster_name
+    bastion_ip        = module.bastion.bastion_public_ip
+    ecr_repositories  = module.ecr.repository_names
+    codebuild_project = module.codebuild.codebuild_project_name
+    #codepipeline_name = module.codepipeline.pipeline_name
+    #codedeploy_app    = module.codedeploy.application_name
+    #artifacts_bucket  = aws_s3_bucket.pipeline_artifacts.bucket
   }
 }

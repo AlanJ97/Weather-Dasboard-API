@@ -1,4 +1,18 @@
+terraform {
+  required_version = ">= 1.5"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.90"     # waiter bug fixed, available in registry
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
+    }
+  }
+}
 # VPC
+
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
@@ -178,7 +192,7 @@ resource "aws_route_table_association" "private" {
 
 
 
-# Data source for Availability Zones that support NAT Gateway
+ # Data source for Availability Zones that support NAT Gateway
 data "aws_availability_zones" "available" {
   state = "available"
   filter {
@@ -186,8 +200,7 @@ data "aws_availability_zones" "available" {
     values = ["opt-in-not-required"]
   }
   # Exclude AZs that are known to not support NAT Gateway
-  exclude_names = ["us-east-1e"]
+  exclude_names = ["us-east-2c"]
 }
-
-
+ 
 

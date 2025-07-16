@@ -4,6 +4,9 @@
 # Bastion Host Configuration
 bastion_allowed_cidr_blocks = ["189.128.81.59/32"]
 
+# Pipeline Configuration
+enable_pipeline_webhook = false # Set to true to enable automatic triggers
+
 # You can add other sensitive variables here, for example:
 # db_username = "admin"
 # db_password = "your-secret-password"

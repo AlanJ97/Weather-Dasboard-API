@@ -1,31 +1,79 @@
- Warning: Value is base64 encoded
-│ 
-│   with module.bastion.aws_instance.bastion,
-│   on ../../modules/bastion/main.tf line 163, in resource "aws_instance" "bastion":
-│  163:   user_data               = local.user_data
-│ 
-│ The value is base64 encoded. If you want to use base64 encoding, please use
-│ the user_data_base64 argument. user_data attribute is set as cleartext in
-│ state
-╵
+BACKEND
+
+AzureAD+AlanSegundo@DESKTOP-2SCE5EB MINGW64 ~/OneDrive - SPS/Capacitaciones SPS/AWS DevOps Profesional/Weather-dashboard-API/app_scripts (feature/small-change)
+$ ./start.sh api
+🌤️  Weather Dashboard API - Quick Start (Bash)
+🚀 Starting API only...
+📡 Starting FastAPI server on http://localhost:8000
+INFO:     Will watch for changes in these directories: ['C:\\Users\\AlanSegundo\\OneDrive - SPS\\Capacitaciones SPS\\AWS DevOps Profesional\\Weather-dashboard-API\\app\\api']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [12584] using WatchFiles
+INFO:     Started server process [28272]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:57461 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57461 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57479 - "GET /health HTTP/1.1" 200 OK
+INFO:main:Getting weather data for all cities
+INFO:     127.0.0.1:57489 - "GET /api/weather HTTP/1.1" 200 OK
+INFO:main:Getting weather data for all cities
+INFO:     127.0.0.1:57491 - "GET /api/weather HTTP/1.1" 200 OK
+
+FRONT END
+AzureAD+AlanSegundo@DESKTOP-2SCE5EB MINGW64 ~/OneDrive - SPS/Capacitaciones SPS/AWS DevOps Profesional/Weather-dashboard-API/app_scripts (feature/small-change)
+$ ./start.sh frontend
+🌤️  Weather Dashboard API - Quick Start (Bash)
+🎨 Starting Frontend only...
+🌐 Starting Streamlit on http://localhost:8501
+
+      Welcome to Streamlit!
+
+      If you'd like to receive helpful onboarding emails, news, offers, promotions,
+      and the occasional swag, please enter your email address below. Otherwise,
+      leave this field blank.
+
+      Email:
+
+  You can find our privacy policy at https://streamlit.io/privacy-policy
+
+  Summary:
+  - This open source library collects usage statistics.
+  - We cannot see and do not store information contained inside Streamlit apps,
+    such as text, charts, images, etc.
+  - Telemetry data is stored in servers in the United States.
+  - If you'd like to opt out, add the following to %userprofile%/.streamlit/config.toml,
+    creating that file if necessary:
+
+    [browser]
+    gatherUsageStats = false
 
 
+  You can now view your Streamlit app in your browser.
 
-╷
-│ Error: creating ECS Service (dev-weather-api): operation error ECS: CreateService, https response error StatusCode: 400, RequestID: bec864af-f6ae-454a-8dab-9493ad13e4cf, InvalidParameterException: The target group with targetGroupArn arn:aws:elasticloadbalancing:us-east-1:622233144821:targetgroup/dev-weather-api-tg/75fc7a6d80ea0381 does not have an associated load balancer.
-│ 
-│   with module.ecs.aws_ecs_service.api,
-│   on ../../modules/ecs/main.tf line 289, in resource "aws_ecs_service" "api":
-│  289: resource "aws_ecs_service" "api" {
-│ 
-╵
-╷
-│ Error: creating ECS Service (dev-weather-frontend): operation error ECS: CreateService, https response error StatusCode: 400, RequestID: 36ad27f1-aaea-46e4-8476-f19d7e6138de, InvalidParameterException: The target group with targetGroupArn arn:aws:elasticloadbalancing:us-east-1:622233144821:targetgroup/dev-weather-frontend-tg/9f74ee19a92eaf00 does not have an associated load balancer.
-│ 
-│   with module.ecs.aws_ecs_service.frontend,
-│   on ../../modules/ecs/main.tf line 319, in resource "aws_ecs_service" "frontend":
-│  319: resource "aws_ecs_service" "frontend" {
-│ 
-╵
-Error: Terraform exited with code 1.
-Error: Process completed with exit code 1.
+  URL: http://0.0.0.0:8501
+
+2025-07-14 11:21:01.527 Uncaught app execution
+Traceback (most recent call last):
+  File "C:\Users\AlanSegundo\OneDrive - SPS\Capacitaciones SPS\AWS DevOps Profesional\Weather-dashboard-API\app\frontend\venv\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 128, in exec_func_with_error_handling
+    result = func()
+  File "C:\Users\AlanSegundo\OneDrive - SPS\Capacitaciones SPS\AWS DevOps Profesional\Weather-dashboard-API\app\frontend\venv\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 669, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AlanSegundo\OneDrive - SPS\Capacitaciones SPS\AWS DevOps Profesional\Weather-dashboard-API\app\frontend\main.py", line 194, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\AlanSegundo\OneDrive - SPS\Capacitaciones SPS\AWS DevOps Profesional\Weather-dashboard-API\app\frontend\main.py", line 171, in main
+    temps = [item['temperature'] for item in all_weather]
+             ~~~~^^^^^^^^^^^^^^^
+TypeError: string indices must be integers, not 'str'
+
+TEST
+AzureAD+AlanSegundo@DESKTOP-2SCE5EB MINGW64 ~/OneDrive - SPS/Capacitaciones SPS/AWS DevOps Profesional/Weather-dashboard-API/app_scripts (feature/small-change)
+$ ./start.sh test
+🌤️  Weather Dashboard API - Quick Start (Bash)
+🧪 Running application tests...
+⚠️  Make sure both applications are running first (e.g., in 'docker' mode)!
+C:\Users\AlanSegundo\AppData\Local\Programs\Python\Python313\python.exe: can't open file 'C:\\Users\\AlanSegundo\\OneDrive - SPS\\Capacitaciones SPS\\AWS DevOps Profesional\\Weather-dashboard-API\\test_applications.py': [Errno 2] No such file or directory
+
+
+SETUP-DEV.sh

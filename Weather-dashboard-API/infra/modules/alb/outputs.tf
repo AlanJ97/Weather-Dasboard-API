@@ -70,3 +70,44 @@ output "api_listener_rule_arn" {
   description = "The ARN of the listener rule for the API"
   value       = aws_lb_listener_rule.api.arn
 }
+
+# Blue/Green Target Group Outputs
+output "api_blue_tg_name" {
+  description = "Name of the API blue target group"
+  value       = aws_lb_target_group.api_blue.name
+}
+
+output "api_blue_tg_arn" {
+  description = "ARN of the API blue target group"
+  value       = aws_lb_target_group.api_blue.arn
+}
+
+output "api_green_tg_name" {
+  description = "Name of the API green target group"
+  value       = aws_lb_target_group.api_green.name
+}
+
+output "api_green_tg_arn" {
+  description = "ARN of the API green target group"
+  value       = aws_lb_target_group.api_green.arn
+}
+
+output "front_blue_tg_name" {
+  description = "Name of the frontend blue target group"
+  value       = aws_lb_target_group.frontend_blue.name
+}
+
+output "front_blue_tg_arn" {
+  description = "ARN of the frontend blue target group"
+  value       = aws_lb_target_group.frontend_blue.arn
+}
+
+output "front_green_tg_name" {
+  description = "Name of the frontend green target group"
+  value       = aws_lb_target_group.frontend_green.name
+}
+
+output "front_green_tg_arn" {
+  description = "ARN of the frontend green target group"
+  value       = aws_lb_target_group.frontend_green.arn
+}

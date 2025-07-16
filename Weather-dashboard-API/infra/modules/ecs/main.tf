@@ -1,3 +1,16 @@
+terraform {
+  required_version = ">= 1.5"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.90"     # waiter bug fixed, available in registry
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
+    }
+  }
+}
 # ECS Cluster
 resource "aws_ecs_cluster" "main" {
   name = "${var.env}-weather-cluster"
@@ -293,6 +306,10 @@ resource "aws_ecs_service" "api" {
   desired_count   = var.api_desired_count
   launch_type     = "FARGATE"
 
+  deployment_controller {
+    type = "CODE_DEPLOY"
+  }
+
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
     subnets          = var.private_subnet_ids
@@ -306,6 +323,16 @@ resource "aws_ecs_service" "api" {
   }
 
   depends_on = [var.alb_api_listener_rule_arn]
+
+  # Ignore changes to task_definition and desired_count when using CODE_DEPLOY
+  # CodeDeploy will manage these during blue/green deployments
+  lifecycle {
+    ignore_changes = [
+      task_definition,
+      desired_count,
+      load_balancer,
+    ]
+  }
 
   tags = {
     Name        = "${var.env}-weather-api-service"
@@ -323,6 +350,10 @@ resource "aws_ecs_service" "frontend" {
   desired_count   = var.frontend_desired_count
   launch_type     = "FARGATE"
 
+  deployment_controller {
+    type = "CODE_DEPLOY"
+  }
+
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
     subnets          = var.private_subnet_ids
@@ -336,6 +367,16 @@ resource "aws_ecs_service" "frontend" {
   }
 
   depends_on = [var.alb_api_listener_rule_arn]
+
+  # Ignore changes to task_definition and desired_count when using CODE_DEPLOY
+  # CodeDeploy will manage these during blue/green deployments
+  lifecycle {
+    ignore_changes = [
+      task_definition,
+      desired_count,
+      load_balancer,
+    ]
+  }
 
   tags = {
     Name        = "${var.env}-weather-frontend-service"

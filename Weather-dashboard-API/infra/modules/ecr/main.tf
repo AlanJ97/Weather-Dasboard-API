@@ -1,3 +1,17 @@
+terraform {
+  required_version = ">= 1.5"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.90"     # waiter bug fixed, available in registry
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
+    }
+  }
+}
+
 # ECR Repository for Weather Dashboard API
 resource "aws_ecr_repository" "weather_api" {
   name                 = "${var.env}-weather-api"
