@@ -405,7 +405,8 @@ CICD_POLICY=$(cat <<EOF
                 "s3:PutBucketPublicAccessBlock",
                 "s3:GetBucketTagging",
                 "s3:PutBucketTagging",
-                "s3:DeleteBucketTagging"
+                "s3:DeleteBucketTagging",
+                "s3:ListBucket"
             ],
             "Resource": "*"
         },
