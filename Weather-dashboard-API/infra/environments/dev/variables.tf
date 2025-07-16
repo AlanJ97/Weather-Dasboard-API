@@ -183,7 +183,7 @@ variable "github_repo" {
 variable "github_branch" {
   description = "GitHub branch to trigger pipeline"
   type        = string
-  default     = "master"
+  default     = "develop"
 }
 
 # CI/CD Variables
