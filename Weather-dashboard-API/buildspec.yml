@@ -74,6 +74,14 @@ phases:
 
   post_build:
     commands:
+      - echo "Verifying artifact files..."
+      - ls -la imagedefinitions.json
+      - ls -la taskdef-api.json
+      - ls -la taskdef-frontend.json
+      - ls -la appspec-api.yml
+      - ls -la appspec-frontend.yml
+      - echo "Current working directory:"
+      - pwd
       - echo "Post-build started on $(date)"
       - echo "Pushing Docker images to ECR..."
       
@@ -216,11 +224,11 @@ phases:
 
 artifacts:
   files:
-    - imagedefinitions.json
-    - taskdef-api.json
-    - taskdef-frontend.json
-    - appspec-api.yml
-    - appspec-frontend.yml
+    - Weather-dashboard-API/imagedefinitions.json
+    - Weather-dashboard-API/taskdef-api.json
+    - Weather-dashboard-API/taskdef-frontend.json
+    - Weather-dashboard-API/appspec-api.yml
+    - Weather-dashboard-API/appspec-frontend.yml
   name: weather-dashboard-artifacts
   
 cache:
