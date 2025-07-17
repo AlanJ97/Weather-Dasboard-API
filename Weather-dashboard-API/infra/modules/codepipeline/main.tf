@@ -184,7 +184,10 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
           "codedeploy:CreateDeployment",
           "codedeploy:GetDeployment",
           "codedeploy:GetDeploymentConfig",
-          "codedeploy:RegisterApplicationRevision"
+          "codedeploy:RegisterApplicationRevision",
+          "codedeploy:GetApplication",
+          "codedeploy:GetApplicationRevision"
+
         ]
         Resource = [
           "arn:aws:codedeploy:*:*:application/${var.codedeploy_application_name}",
