@@ -218,18 +218,20 @@ phases:
       - ls -la taskdef-frontend.json
       - ls -la appspec-api.yml
       - ls -la appspec-frontend.yml
-      
+      - echo "Final directory contents:"
+      - pwd
+      - ls -la Weather-dashboard-API/
       # Log successful completion
       - echo "Build completed successfully on $(date)"
       - echo "API Image URI:" $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_API:$IMAGE_TAG
       - echo "Frontend Image URI:" $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG
 artifacts:
   files:
-    - imagedefinitions.json
-    - taskdef-api.json
-    - taskdef-frontend.json
-    - appspec-api.yml
-    - appspec-frontend.yml
+    - Weather-dashboard-API/imagedefinitions.json
+    - Weather-dashboard-API/taskdef-api.json
+    - Weather-dashboard-API/taskdef-frontend.json
+    - Weather-dashboard-API/appspec-api.yml
+    - Weather-dashboard-API/appspec-frontend.yml
   name: weather-dashboard-artifacts
   
 cache:
