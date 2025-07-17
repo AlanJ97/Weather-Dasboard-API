@@ -74,14 +74,6 @@ phases:
 
   post_build:
     commands:
-      - echo "Verifying artifact files..."
-      - ls -la imagedefinitions.json
-      - ls -la taskdef-api.json
-      - ls -la taskdef-frontend.json
-      - ls -la appspec-api.yml
-      - ls -la appspec-frontend.yml
-      - echo "Current working directory:"
-      - pwd
       - echo "Post-build started on $(date)"
       - echo "Pushing Docker images to ECR..."
       
@@ -217,11 +209,20 @@ phases:
       - echo "Creating image definitions file..."
       - printf '[{"name":"weather-api","imageUri":"%s"},{"name":"weather-frontend","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_API:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG > imagedefinitions.json
       
+      # NOW verify the files exist (AFTER creating them!)
+      - echo "Verifying artifact files..."
+      - echo "Current working directory:"
+      - pwd
+      - ls -la imagedefinitions.json
+      - ls -la taskdef-api.json
+      - ls -la taskdef-frontend.json
+      - ls -la appspec-api.yml
+      - ls -la appspec-frontend.yml
+      
       # Log successful completion
       - echo "Build completed successfully on $(date)"
       - echo "API Image URI:" $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_API:$IMAGE_TAG
       - echo "Frontend Image URI:" $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG
-
 artifacts:
   files:
     - imagedefinitions.json
