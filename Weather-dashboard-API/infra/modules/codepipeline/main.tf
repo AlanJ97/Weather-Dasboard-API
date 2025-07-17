@@ -85,15 +85,13 @@ resource "aws_codepipeline" "weather_dashboard" {
 
       configuration = {
         ApplicationName                = var.codedeploy_application_name
-        DeploymentGroupName           = var.codedeploy_deployment_group_api
+        DeploymentGroupName            = var.codedeploy_deployment_group_api
         TaskDefinitionTemplateArtifact = "build_output"
-        TaskDefinitionTemplatePath    = "taskdef-api.json"   
-        AppSpecTemplateArtifact       = "build_output"
-        AppSpecTemplatePath           = "appspec-api.yml"       
-        Image1ArtifactName            = "build_output"
-        Image1ContainerName           = "IMAGE1_NAME"        
-        ImageDefinitionsArtifactName  = "build_output"              # ADD THIS
-        ImageDefinitionsFileName      = "imagedefinitions.json"     # ADD THIS   
+        TaskDefinitionTemplatePath     = "taskdef-api.json"
+        AppSpecTemplateArtifact        = "build_output"
+        AppSpecTemplatePath            = "appspec-api.yml"
+        Image1ArtifactName             = "build_output"   # ← artifact that holds imagedefinitions.json
+        Image1ContainerName            = "weather-api"    # ← container name in taskdef
       }
     }
 
@@ -107,15 +105,13 @@ resource "aws_codepipeline" "weather_dashboard" {
 
       configuration = {
         ApplicationName                = var.codedeploy_application_name
-        DeploymentGroupName           = var.codedeploy_deployment_group_frontend
+        DeploymentGroupName            = var.codedeploy_deployment_group_frontend
         TaskDefinitionTemplateArtifact = "build_output"
-        TaskDefinitionTemplatePath    = "taskdef-frontend.json"  
-        AppSpecTemplateArtifact       = "build_output"
-        AppSpecTemplatePath           = "appspec-frontend.yml"   
-        Image1ArtifactName            = "build_output"
-        Image1ContainerName           = "IMAGE1_NAME"            
-        ImageDefinitionsArtifactName  = "build_output"      
-        ImageDefinitionsFileName      = "imagedefinitions.json"     
+        TaskDefinitionTemplatePath     = "taskdef-frontend.json"
+        AppSpecTemplateArtifact        = "build_output"
+        AppSpecTemplatePath            = "appspec-frontend.yml"
+        Image1ArtifactName             = "build_output"
+        Image1ContainerName            = "weather-frontend"
       }
     }
   }
