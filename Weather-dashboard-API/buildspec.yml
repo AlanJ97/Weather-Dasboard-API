@@ -55,22 +55,35 @@ phases:
   build:
     commands:
       - echo "Build started on $(date)"
+      - echo "Cleaning Docker system..."
+      - docker system prune -f || true
       - echo "Building Docker images..."
       
       # Build API image
       - echo "Building API Docker image..."
-      - docker build -t $IMAGE_REPO_NAME_API:$IMAGE_TAG ./app/api || echo "Docker api build failed, continuing..."
-      - docker tag $IMAGE_REPO_NAME_API:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_API:$IMAGE_TAG || echo "Docker api tag failed"
+      - |
+        if docker build -t $IMAGE_REPO_NAME_API:$IMAGE_TAG ./app/api; then
+          echo "API Docker build succeeded"
+          docker tag $IMAGE_REPO_NAME_API:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_API:$IMAGE_TAG
+        else
+          echo "API Docker build failed"
+          exit 1
+        fi
       
       # Build Frontend image
       - echo "Building Frontend Docker image..."
-      - docker build -t $IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG ./app/frontend || echo "Docker frontend build failed, continuing..."
-      - docker tag $IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG || echo "Docker frontend tag failed"
+      - |
+        if docker build -t $IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG ./app/frontend; then
+          echo "Frontend Docker build succeeded"
+          docker tag $IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG
+        else
+          echo "Frontend Docker build failed"
+          exit 1
+        fi
       
       # Verify images were built successfully
       - echo "Verifying Docker images..."
-      - docker images | grep $IMAGE_REPO_NAME_API
-      - docker images | grep $IMAGE_REPO_NAME_FRONTEND
+      - docker images
 
   post_build:
     commands:
@@ -236,5 +249,4 @@ artifacts:
   
 cache:
   paths:
-    - '/root/.cache/pip/**/*'
-    - '/var/lib/docker/**/*'
+   - '/root/.cache/pip/**/*'
