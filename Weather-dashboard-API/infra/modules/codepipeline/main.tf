@@ -195,6 +195,7 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
         ]
         Resource = [
         "arn:aws:codedeploy:us-east-2:622233144821:application/${var.codedeploy_application_name}",
+        "arn:aws:codedeploy:us-east-2:622233144821:application:${var.codedeploy_application_name}",
         "arn:aws:codedeploy:us-east-2:622233144821:deploymentgroup:${var.codedeploy_application_name}/*",
         "arn:aws:codedeploy:us-east-2:622233144821:deploymentconfig:*"
         ]
