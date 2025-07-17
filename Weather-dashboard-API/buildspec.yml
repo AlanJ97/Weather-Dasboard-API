@@ -229,6 +229,10 @@ phases:
         $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_API:$IMAGE_TAG \
         $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG > imagedefinitions.json
       
+      # Verify the imagedefinitions.json content
+      - echo "Checking imagedefinitions.json content:"
+      - cat imagedefinitions.json
+      
       # OPTIONAL: Also tag and push as 'latest' for convenience (if your ECR allows mutable tags)
       # This is optional - only if you want a 'latest' tag that always points to newest build
       - echo "Tagging images as latest (optional)..."
