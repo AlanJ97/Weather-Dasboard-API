@@ -258,3 +258,12 @@ phases:
 cache:
   paths:
    - '/root/.cache/pip/**/*'
+
+artifacts:
+  files:
+    - imagedefinitions.json
+    - taskdef-api.json
+    - taskdef-frontend.json
+    - appspec-api.yml
+    - appspec-frontend.yml
+  name: weather-dashboard-artifacts
