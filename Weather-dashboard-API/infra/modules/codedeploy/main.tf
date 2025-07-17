@@ -70,7 +70,7 @@ resource "aws_codedeploy_deployment_group" "api" {
     service_name = var.ecs_api_service_name
   }
 
-  deployment_config_name = "CodeDeployDefault.ECSAllAtOneBG"
+  deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
 
   
 
@@ -129,7 +129,7 @@ resource "aws_codedeploy_deployment_group" "frontend" {
     service_name = var.ecs_frontend_service_name
   }
 
-  deployment_config_name = "CodeDeployDefault.ECSAllAtOneBG"
+  deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
 
  
 
