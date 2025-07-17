@@ -161,7 +161,7 @@ phases:
               "essential": true,
               "portMappings": [
                 {
-                  "containerPort": 3000,
+                  "containerPort": 8501,
                   "protocol": "tcp"
                 }
               ],
@@ -176,7 +176,7 @@ phases:
               "environment": [
                 {
                   "name": "PORT",
-                  "value": "3000"
+                  "value": "8501"
                 }
               ]
             }
@@ -214,7 +214,7 @@ phases:
                 TaskDefinition: <TASK_DEFINITION>
                 LoadBalancerInfo:
                   ContainerName: "weather-frontend"
-                  ContainerPort: 3000
+                  ContainerPort: 8501
         Hooks:
           - BeforeInstall: "deployment-hooks/before-install.sh"
           - AfterInstall: "deployment-hooks/after-install.sh"
@@ -232,6 +232,16 @@ phases:
       # Verify the imagedefinitions.json content
       - echo "Checking imagedefinitions.json content:"
       - cat imagedefinitions.json
+      
+      # Verify task definition files content
+      - echo "Checking taskdef-api.json content:"
+      - cat taskdef-api.json
+      - echo "Validating taskdef-api.json format:"
+      - python -m json.tool taskdef-api.json > /dev/null && echo "taskdef-api.json is valid JSON" || echo "taskdef-api.json has JSON errors"
+      - echo "Checking taskdef-frontend.json content:"
+      - cat taskdef-frontend.json
+      - echo "Validating taskdef-frontend.json format:"
+      - python -m json.tool taskdef-frontend.json > /dev/null && echo "taskdef-frontend.json is valid JSON" || echo "taskdef-frontend.json has JSON errors"
       
       # OPTIONAL: Also tag and push as 'latest' for convenience (if your ECR allows mutable tags)
       # This is optional - only if you want a 'latest' tag that always points to newest build
