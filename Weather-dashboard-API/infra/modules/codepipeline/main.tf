@@ -87,9 +87,11 @@ resource "aws_codepipeline" "weather_dashboard" {
         ApplicationName                = var.codedeploy_application_name
         DeploymentGroupName           = var.codedeploy_deployment_group_api
         TaskDefinitionTemplateArtifact = "build_output"
+        TaskDefinitionTemplatePath    = "taskdef-api.json"      # ADD THIS
         AppSpecTemplateArtifact       = "build_output"
+        AppSpecTemplatePath           = "appspec-api.yml"       # ADD THIS
         Image1ArtifactName            = "build_output"
-        Image1ContainerName           = "weather-api"
+        Image1ContainerName           = "IMAGE1_NAME"           # CHANGE THIS
       }
     }
 
@@ -105,9 +107,11 @@ resource "aws_codepipeline" "weather_dashboard" {
         ApplicationName                = var.codedeploy_application_name
         DeploymentGroupName           = var.codedeploy_deployment_group_frontend
         TaskDefinitionTemplateArtifact = "build_output"
+        TaskDefinitionTemplatePath    = "taskdef-frontend.json"  # ADD THIS
         AppSpecTemplateArtifact       = "build_output"
+        AppSpecTemplatePath           = "appspec-frontend.yml"   # ADD THIS
         Image1ArtifactName            = "build_output"
-        Image1ContainerName           = "weather-frontend"
+        Image1ContainerName           = "IMAGE1_NAME"            # CHANGE THIS
       }
     }
   }
@@ -190,9 +194,9 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
 
         ]
         Resource = [
-          "arn:aws:codedeploy:*:*:application/${var.codedeploy_application_name}",
-          "arn:aws:codedeploy:*:*:deploymentgroup:${var.codedeploy_application_name}/*",
-          "arn:aws:codedeploy:*:*:deploymentconfig:*"
+        "arn:aws:codedeploy:us-east-2:622233144821:application/${var.codedeploy_application_name}",
+        "arn:aws:codedeploy:us-east-2:622233144821:deploymentgroup:${var.codedeploy_application_name}/*",
+        "arn:aws:codedeploy:us-east-2:622233144821:deploymentconfig:*"
         ]
       },
       {
