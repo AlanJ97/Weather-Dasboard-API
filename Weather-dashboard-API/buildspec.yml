@@ -258,6 +258,7 @@ cache:
    - '/root/.cache/pip/**/*'
 
 artifacts:
+  base-directory: Weather-dashboard-API
   files:
     - imagedefinitions.json
     - taskdef-api.json
