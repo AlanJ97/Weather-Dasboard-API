@@ -225,9 +225,7 @@ phases:
       # Create image definitions file with the NEW VERSION TAG (not latest)
       - echo "Creating image definitions file..."
       - |
-        printf '[{"name":"weather-api","imageUri":"%s"},{"name":"weather-frontend","imageUri":"%s"}]' \
-        $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_API:$IMAGE_TAG \
-        $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG > imagedefinitions.json
+        echo "[{\"name\":\"weather-api\",\"imageUri\":\"$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_API:$IMAGE_TAG\"},{\"name\":\"weather-frontend\",\"imageUri\":\"$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG\"}]" > imagedefinitions.json
       
       # Verify the imagedefinitions.json content
       - echo "Checking imagedefinitions.json content:"
