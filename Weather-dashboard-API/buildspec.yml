@@ -117,7 +117,7 @@ phases:
           "containerDefinitions": [
             {
               "name": "weather-api",
-              "image": "<IMAGE1_URI>",
+              "image": "<IMAGE1_NAME>",  
               "essential": true,
               "portMappings": [
                 {
@@ -157,7 +157,7 @@ phases:
           "containerDefinitions": [
             {
               "name": "weather-frontend",
-              "image": "<IMAGE1_URI>",
+              "image": "<IMAGE1_NAME>",
               "essential": true,
               "portMappings": [
                 {
