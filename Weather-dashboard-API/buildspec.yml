@@ -246,9 +246,7 @@ phases:
       - ls -la taskdef-frontend.json
       - ls -la appspec-api.yml
       - ls -la appspec-frontend.yml
-      - echo "Final directory contents:"
-      - pwd
-      - ls -la Weather-dashboard-API/
+
       
       # Log successful completion
       - echo "Build completed successfully on $(date)"
