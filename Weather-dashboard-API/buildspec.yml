@@ -218,7 +218,7 @@ phases:
           - BeforeInstall: "deployment-hooks/before-install.sh"
           - AfterInstall: "deployment-hooks/after-install.sh"
           - BeforeAllowTraffic: "deployment-hooks/start-server.sh"
-          - ApplicationStop: "deployment-hooks/stop-server.sh"
+          - AfterAllowTraffic: "deployment-hooks/stop-server.sh"
         EOF
       
       - |
