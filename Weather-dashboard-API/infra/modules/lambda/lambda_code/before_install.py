@@ -11,7 +11,7 @@ def handler(event, context):
     This function runs before the new ECS task definition is installed
     """
     
-    logger.info(f"BeforeInstall hook triggered for environment: ${environment}")
+    logger.info("BeforeInstall hook triggered")
     logger.info(f"Event: {json.dumps(event, indent=2)}")
     
     # Extract CodeDeploy information from the event

@@ -42,6 +42,43 @@ resource "aws_iam_role_policy" "codedeploy_hooks_policy" {
   })
 }
 
+# Create ZIP files for Lambda functions
+data "archive_file" "before_install_zip" {
+  type        = "zip"
+  output_path = "${path.module}/before_install.zip"
+  source {
+    content  = file("${path.module}/lambda_code/before_install.py")
+    filename = "index.py"
+  }
+}
+
+data "archive_file" "after_install_zip" {
+  type        = "zip"
+  output_path = "${path.module}/after_install.zip"
+  source {
+    content  = file("${path.module}/lambda_code/after_install.py")
+    filename = "index.py"
+  }
+}
+
+data "archive_file" "before_allow_traffic_zip" {
+  type        = "zip"
+  output_path = "${path.module}/before_allow_traffic.zip"
+  source {
+    content  = file("${path.module}/lambda_code/before_allow_traffic.py")
+    filename = "index.py"
+  }
+}
+
+data "archive_file" "after_allow_traffic_zip" {
+  type        = "zip"
+  output_path = "${path.module}/after_allow_traffic.zip"
+  source {
+    content  = file("${path.module}/lambda_code/after_allow_traffic.py")
+    filename = "index.py"
+  }
+}
+
 # Lambda function for BeforeInstall hook
 resource "aws_lambda_function" "before_install" {
   filename         = data.archive_file.before_install_zip.output_path
@@ -111,50 +148,5 @@ resource "aws_lambda_function" "after_allow_traffic" {
     variables = {
       ENVIRONMENT = var.environment
     }
-  }
-}
-
-# Create ZIP files for Lambda functions
-data "archive_file" "before_install_zip" {
-  type        = "zip"
-  output_path = "${path.module}/before_install.zip"
-  source {
-    content = templatefile("${path.module}/lambda_code/before_install.py", {
-      environment = var.environment
-    })
-    filename = "index.py"
-  }
-}
-
-data "archive_file" "after_install_zip" {
-  type        = "zip"
-  output_path = "${path.module}/after_install.zip"
-  source {
-    content = templatefile("${path.module}/lambda_code/after_install.py", {
-      environment = var.environment
-    })
-    filename = "index.py"
-  }
-}
-
-data "archive_file" "before_allow_traffic_zip" {
-  type        = "zip"
-  output_path = "${path.module}/before_allow_traffic.zip"
-  source {
-    content = templatefile("${path.module}/lambda_code/before_allow_traffic.py", {
-      environment = var.environment
-    })
-    filename = "index.py"
-  }
-}
-
-data "archive_file" "after_allow_traffic_zip" {
-  type        = "zip"
-  output_path = "${path.module}/after_allow_traffic.zip"
-  source {
-    content = templatefile("${path.module}/lambda_code/after_allow_traffic.py", {
-      environment = var.environment
-    })
-    filename = "index.py"
   }
 }
