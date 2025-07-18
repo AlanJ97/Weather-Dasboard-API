@@ -204,7 +204,7 @@ phases:
       # Create AppSpec files for CodeDeploy
       - echo "Creating AppSpec files..."
       - |
-        cat > appspec-api.yml << 'EOF'
+        cat > appspec-api.yml << EOF
         version: 0.0
         Resources:
           - TargetService:
@@ -225,7 +225,7 @@ phases:
               location: deployment-hooks/stop-server.sh
         EOF
       - |
-        cat > appspec-frontend.yml << 'EOF'
+        cat > appspec-frontend.yml << EOF
         version: 0.0
         Resources:
           - TargetService:
