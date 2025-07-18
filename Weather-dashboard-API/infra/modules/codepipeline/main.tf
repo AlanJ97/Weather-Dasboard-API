@@ -90,8 +90,6 @@ resource "aws_codepipeline" "weather_dashboard" {
         TaskDefinitionTemplatePath     = "taskdef-api.json"
         AppSpecTemplateArtifact        = "build_output"
         AppSpecTemplatePath            = "appspec-api.yml"
-        Image1ArtifactName             = "build_output"
-        Image1ContainerName            = "weather-api"
       }
     }
 
@@ -110,8 +108,6 @@ resource "aws_codepipeline" "weather_dashboard" {
         TaskDefinitionTemplatePath     = "taskdef-frontend.json"
         AppSpecTemplateArtifact        = "build_output"
         AppSpecTemplatePath            = "appspec-frontend.yml"
-        Image1ArtifactName             = "build_output"
-        Image1ContainerName            = "weather-frontend"
       }
     }
   }
