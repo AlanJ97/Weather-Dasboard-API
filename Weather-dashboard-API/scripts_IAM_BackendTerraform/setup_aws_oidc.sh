@@ -406,7 +406,16 @@ CICD_POLICY=$(cat <<EOF
                 "s3:GetBucketTagging",
                 "s3:PutBucketTagging",
                 "s3:DeleteBucketTagging",
-                "s3:ListBucket"
+                "s3:ListBucket",
+                "Lambda:CreateFunction",
+                "Lambda:UpdateFunctionCode",
+                "Lambda:UpdateFunctionConfiguration",
+                "Lambda:DeleteFunction",
+                "Lambda:GetFunction",
+                "Lambda:ListFunctions",
+                "Lambda:TagResource",
+                "Lambda:UntagResource",
+                "Lambda:ListTagsForResource"
             ],
             "Resource": "*"
         },

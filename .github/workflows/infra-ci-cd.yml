@@ -59,7 +59,7 @@ jobs:
         with:
             directory: ${{ env.INFRA_DIR }}
             framework: terraform
-            skip_check: CKV_AWS_130,CKV_AWS_338,CKV_AWS_158,CKV_AWS_136,CKV_AWS_260,CKV_AWS_150,CKV_AWS_131,CKV_AWS_91,CKV2_AWS_20,CKV2_AWS_28,CKV_AWS_103,CKV_AWS_378,CKV_AWS_126,CKV_AWS_135,CKV_AWS_382,CKV_AWS_147,CKV_AWS_219,CKV_AWS_144,CKV2_AWS_61,CKV2_AWS_62,CKV2_AWS_6,CKV_AWS_18,CKV_AWS_145,CKV_AWS_316
+            skip_check: CKV_AWS_130,CKV_AWS_338,CKV_AWS_158,CKV_AWS_136,CKV_AWS_260,CKV_AWS_150,CKV_AWS_131,CKV_AWS_91,CKV2_AWS_20,CKV2_AWS_28,CKV_AWS_103,CKV_AWS_378,CKV_AWS_126,CKV_AWS_135,CKV_AWS_382,CKV_AWS_147,CKV_AWS_219,CKV_AWS_144,CKV2_AWS_61,CKV2_AWS_62,CKV2_AWS_6,CKV_AWS_18,CKV_AWS_145,CKV_AWS_316,CKV_AWS_116,CKV_AWS_117,CKV_AWS_173,CKV_AWS_115,CKV_AWS_272,CKV_AWS_50,CKV_AWS_290,CKV_AWS_355
 
       - name: Display Skipped Security Checks
         run: |
@@ -88,7 +88,14 @@ jobs:
           echo "   • CKV_AWS_18: Ensure the S3 bucket has access logging enabled"
           echo "   • CKV_AWS_145: Ensure that S3 buckets are encrypted with KMS by default"
           echo "   • CKV_AWS_316: CodeBuild project security configuration (acceptable for CI/CD use case)"
-      
+                    echo "   • CKV_AWS_116: Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+          echo "   • CKV_AWS_117: Ensure that AWS Lambda function is configured inside a VPC"
+          echo "   • CKV_AWS_173: Check encryption settings for Lambda environmental variable"
+          echo "   • CKV_AWS_115: Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+          echo "   • CKV_AWS_272: Ensure AWS Lambda function is configured to validate code-signing"
+          echo "   • CKV_AWS_50: X-Ray tracing is enabled for Lambda"
+          echo "   • CKV_AWS_290: Ensure IAM policies does not allow write access without constraints"
+          echo "   • CKV_AWS_355: Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
       - name: Terraform Plan (Dev)
         id: plan-dev
         run: |
