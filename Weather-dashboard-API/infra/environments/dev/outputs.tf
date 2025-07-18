@@ -100,7 +100,7 @@ output "codebuild_project_name" {
   description = "CodeBuild project name"
   value       = module.codebuild.codebuild_project_name
 }
-
+/*
 # Lambda Hook Function Outputs
 output "lambda_hook_function_names" {
   description = "Lambda hook function names for CodeDeploy"
@@ -111,6 +111,7 @@ output "lambda_hook_function_names" {
     after_allow_traffic  = module.lambda.after_allow_traffic_function_name
   }
 }
+*/
 /* 
 output "codepipeline_name" {
   description = "CodePipeline name"
