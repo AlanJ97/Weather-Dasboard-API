@@ -15,7 +15,6 @@ phases:
       docker: 20
     commands:
       - echo "Installing build dependencies..."
-      - apt-get update && apt-get install -y jq
       - pip install --upgrade pip
       - pip install flake8 black pytest requests
 
