@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.0"
+    }
+  }
+}
+
 # Lambda functions for CodeDeploy ECS hooks
 resource "aws_iam_role" "codedeploy_hooks_lambda_role" {
   name = "${var.environment}-codedeploy-hooks-lambda-role"

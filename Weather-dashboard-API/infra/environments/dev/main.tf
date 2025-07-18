@@ -120,7 +120,7 @@ module "codebuild" {
 
   depends_on = [module.ecr]
 }
-
+/*
 # Lambda Module (for CodeDeploy hooks)
 module "lambda" {
   source = "../../modules/lambda"
@@ -131,7 +131,7 @@ module "lambda" {
     Project     = "weather-dashboard"
   }
 }
-
+*/
 # CodeDeploy Module
 module "codedeploy" {
   source = "../../modules/codedeploy"
@@ -149,7 +149,7 @@ module "codedeploy" {
   alb_front_listener_arn         = module.alb.frontend_listener_arn != null ? module.alb.frontend_listener_arn : module.alb.http_listener_arn
   alb_front_tg_blue_name         = module.alb.front_blue_tg_name
   alb_front_tg_green_name        = module.alb.front_green_tg_name
-  depends_on = [module.ecs, module.alb, module.lambda]
+  depends_on = [module.ecs, module.alb]
 }
 
 
