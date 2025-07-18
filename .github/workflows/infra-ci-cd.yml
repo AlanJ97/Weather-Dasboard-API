@@ -46,7 +46,19 @@ jobs:
         run: terraform init -upgrade
         working-directory: ${{ env.WORKING_DIR }}
 
+      - name: 'Package Lambda Functions'
+        run: |
+          sudo apt-get update && sudo apt-get install -y zip
+          LAMBDA_CODE_DIR="${{ github.workspace }}/Weather-dashboard-API/infra/modules/lambda/lambda_code"
+          LAMBDA_MODULE_DIR="${{ github.workspace }}/Weather-dashboard-API/infra/modules/lambda"
+          
+          zip "${LAMBDA_MODULE_DIR}/before_install.zip" "${LAMBDA_CODE_DIR}/before_install.py"
+          zip "${LAMBDA_MODULE_DIR}/after_install.zip" "${LAMBDA_CODE_DIR}/after_install.py"
+          zip "${LAMBDA_MODULE_DIR}/before_allow_traffic.zip" "${LAMBDA_CODE_DIR}/before_allow_traffic.py"
+          zip "${LAMBDA_MODULE_DIR}/after_allow_traffic.zip" "${LAMBDA_CODE_DIR}/after_allow_traffic.py"
 
+          echo "Verifying created zip files:"
+          ls -la "${LAMBDA_MODULE_DIR}"
 
       - name: 'Terraform Format'
         run: terraform fmt -check
@@ -117,6 +129,15 @@ jobs:
           path: ${{ env.WORKING_DIR }}/tfplan-dev
           retention-days: 1
 
+      - name: Upload Lambda Zip Files
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lambda-zips
+          path: |
+            Weather-dashboard-API/infra/modules/lambda/*.zip
+          retention-days: 1
+
       # Add failure notification
       - name: 'Notify on Failure'
         if: failure()
@@ -154,31 +175,26 @@ jobs:
       - name: 'Checkout'
         uses: actions/checkout@v3
 
-
-      - name: 'Package Lambda Functions'
-        run: |
-          sudo apt-get update && sudo apt-get install -y zip
-          LAMBDA_CODE_DIR="${{ github.workspace }}/Weather-dashboard-API/infra/modules/lambda/lambda_code"
-          LAMBDA_MODULE_DIR="${{ github.workspace }}/Weather-dashboard-API/infra/modules/lambda"
-          
-          zip "${LAMBDA_MODULE_DIR}/before_install.zip" "${LAMBDA_CODE_DIR}/before_install.py"
-          zip "${LAMBDA_MODULE_DIR}/after_install.zip" "${LAMBDA_CODE_DIR}/after_install.py"
-          zip "${LAMBDA_MODULE_DIR}/before_allow_traffic.zip" "${LAMBDA_CODE_DIR}/before_allow_traffic.py"
-          zip "${LAMBDA_MODULE_DIR}/after_allow_traffic.zip" "${LAMBDA_CODE_DIR}/after_allow_traffic.py"
-
-          echo "Verifying created zip files:"
-          ls -la "${LAMBDA_MODULE_DIR}"
-
       - name: Download Terraform Plan
         uses: actions/download-artifact@v4
         with:
           name: tfplan-dev
           path: ${{ env.WORKING_DIR }}
 
-      - name: Verify Plan File
+      - name: Download Lambda Zip Files
+        uses: actions/download-artifact@v4
+        with:
+          name: lambda-zips
+          path: Weather-dashboard-API/infra/modules/lambda/
+
+      - name: Verify Downloaded Files
         run: |
-          echo "Checking if plan file exists..."
+          echo "Checking downloaded files..."
+          echo "Terraform plan:"
           ls -la ${{ env.WORKING_DIR }}/
+          echo "Lambda zip files:"
+          ls -la Weather-dashboard-API/infra/modules/lambda/
+          
           if [ -f ${{ env.WORKING_DIR }}/tfplan-dev ]; then
             echo "✅ Plan file found"
           else
