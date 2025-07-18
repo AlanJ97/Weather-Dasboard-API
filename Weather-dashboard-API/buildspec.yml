@@ -204,7 +204,7 @@ phases:
       # Create AppSpec files for CodeDeploy
       - echo "Creating AppSpec files..."
       - |
-        cat > appspec-api.yml << EOF
+        cat > appspec-api.yml << 'YAML'
         version: 0.0
         Resources:
           - TargetService:
@@ -215,14 +215,18 @@ phases:
                   ContainerName: "weather-api"
                   ContainerPort: 8000
         Hooks:
-          - BeforeInstall: "deployment-hooks/before-install.sh"
-          - AfterInstall: "deployment-hooks/after-install.sh"
-          - BeforeAllowTraffic: "deployment-hooks/start-server.sh"
-          - AfterAllowTraffic: "deployment-hooks/stop-server.sh"
-        EOF
+           - BeforeInstall:
+              location: deployment-hooks/before-install.sh
+          - AfterInstall:
+              location: deployment-hooks/after-install.sh
+          - BeforeAllowTraffic:
+              location: deployment-hooks/start-server.sh
+          - AfterAllowTraffic:
+              location: deployment-hooks/stop-server.sh
+        'YAML'
       
       - |
-        cat > appspec-frontend.yml << EOF
+        cat > appspec-frontend.yml << 'YAML'
         version: 0.0
         Resources:
           - TargetService:
@@ -233,11 +237,15 @@ phases:
                   ContainerName: "weather-frontend"
                   ContainerPort: 8501
         Hooks:
-          - BeforeInstall: "deployment-hooks/before-install.sh"
-          - AfterInstall: "deployment-hooks/after-install.sh"
-          - ApplicationStart: "deployment-hooks/start-server.sh"
-          - ApplicationStop: "deployment-hooks/stop-server.sh"
-        EOF
+           - BeforeInstall:
+              location: deployment-hooks/before-install.sh
+          - AfterInstall:
+              location: deployment-hooks/after-install.sh
+          - BeforeAllowTraffic:
+              location: deployment-hooks/start-server.sh
+          - AfterAllowTraffic:
+              location: deployment-hooks/stop-server.sh
+        'YAML'
       
       # Create image definitions file with the NEW VERSION TAG (not latest)
       - echo "Creating image definitions file..."
