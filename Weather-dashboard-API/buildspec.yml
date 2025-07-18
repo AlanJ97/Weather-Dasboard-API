@@ -214,15 +214,11 @@ phases:
                 LoadBalancerInfo:
                   ContainerName: "weather-api"
                   ContainerPort: 8000
-        Hooks:
-          - BeforeInstall:
-              location: deployment-hooks/before-install.sh
-          - AfterInstall:
-              location: deployment-hooks/after-install.sh
-          - BeforeAllowTraffic:
-              location: deployment-hooks/start-server.sh
-          - AfterAllowTraffic:
-              location: deployment-hooks/stop-server.sh
+        Hooks:         
+          - BeforeInstall: "deployment-hooks/before-install.sh"
+          - AfterInstall: "deployment-hooks/after-install.sh"
+          - BeforeAllowTraffic: "deployment-hooks/start-server.sh"
+          - AfterAllowTraffic: "deployment-hooks/stop-server.sh"
         EOF
       - |
         cat > appspec-frontend.yml << EOF
@@ -236,14 +232,10 @@ phases:
                   ContainerName: "weather-frontend"
                   ContainerPort: 8501
         Hooks:
-          - BeforeInstall:
-              location: deployment-hooks/before-install.sh
-          - AfterInstall:
-              location: deployment-hooks/after-install.sh
-          - BeforeAllowTraffic:
-              location: deployment-hooks/start-server.sh
-          - AfterAllowTraffic:
-              location: deployment-hooks/stop-server.sh
+          - BeforeInstall: "deployment-hooks/before-install.sh"
+          - AfterInstall: "deployment-hooks/after-install.sh"
+          - BeforeAllowTraffic: "deployment-hooks/start-server.sh"
+          - AfterAllowTraffic: "deployment-hooks/stop-server.sh"
         EOF
       
       # Create image definitions file with the NEW VERSION TAG (not latest)
