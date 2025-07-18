@@ -6,6 +6,11 @@ env:
     AWS_ACCOUNT_ID: 622233144821
     IMAGE_REPO_NAME_API: dev-weather-api
     IMAGE_REPO_NAME_FRONTEND: dev-weather-frontend
+    # Lambda function names for CodeDeploy hooks
+    LAMBDA_BEFORE_INSTALL: dev-codedeploy-before-install
+    LAMBDA_AFTER_INSTALL: dev-codedeploy-after-install
+    LAMBDA_BEFORE_ALLOW_TRAFFIC: dev-codedeploy-before-allow-traffic
+    LAMBDA_AFTER_ALLOW_TRAFFIC: dev-codedeploy-after-allow-traffic
 
 
 phases:
@@ -214,11 +219,11 @@ phases:
                 LoadBalancerInfo:
                   ContainerName: "weather-api"
                   ContainerPort: 8000
-        Hooks:         
-          - BeforeInstall: "deployment-hooks/before-install.sh"
-          - AfterInstall: "deployment-hooks/after-install.sh"
-          - BeforeAllowTraffic: "deployment-hooks/start-server.sh"
-          - AfterAllowTraffic: "deployment-hooks/stop-server.sh"
+        Hooks:
+          - BeforeInstall: "$LAMBDA_BEFORE_INSTALL"
+          - AfterInstall: "$LAMBDA_AFTER_INSTALL"
+          - BeforeAllowTraffic: "$LAMBDA_BEFORE_ALLOW_TRAFFIC"
+          - AfterAllowTraffic: "$LAMBDA_AFTER_ALLOW_TRAFFIC"
         EOF
       - |
         cat > appspec-frontend.yml << EOF
@@ -232,10 +237,10 @@ phases:
                   ContainerName: "weather-frontend"
                   ContainerPort: 8501
         Hooks:
-          - BeforeInstall: "deployment-hooks/before-install.sh"
-          - AfterInstall: "deployment-hooks/after-install.sh"
-          - BeforeAllowTraffic: "deployment-hooks/start-server.sh"
-          - AfterAllowTraffic: "deployment-hooks/stop-server.sh"
+          - BeforeInstall: "$LAMBDA_BEFORE_INSTALL"
+          - AfterInstall: "$LAMBDA_AFTER_INSTALL"
+          - BeforeAllowTraffic: "$LAMBDA_BEFORE_ALLOW_TRAFFIC"
+          - AfterAllowTraffic: "$LAMBDA_AFTER_ALLOW_TRAFFIC"
         EOF
       
       # Create image definitions file with the NEW VERSION TAG (not latest)
@@ -256,6 +261,12 @@ phases:
       - cat taskdef-frontend.json
       - echo "Validating taskdef-frontend.json format:"
       - python -m json.tool taskdef-frontend.json > /dev/null && echo "taskdef-frontend.json is valid JSON" || echo "taskdef-frontend.json has JSON errors"
+      
+      # Verify AppSpec files content
+      - echo "Checking appspec-api.yml content:"
+      - cat appspec-api.yml
+      - echo "Checking appspec-frontend.yml content:"
+      - cat appspec-frontend.yml
       
       # OPTIONAL: Also tag and push as 'latest' for convenience (if your ECR allows mutable tags)
       # This is optional - only if you want a 'latest' tag that always points to newest build
