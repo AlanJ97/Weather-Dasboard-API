@@ -1,7 +1,6 @@
 import json
 import boto3
 import logging
-import requests
 import time
 
 logger = logging.getLogger()
@@ -13,7 +12,7 @@ def handler(event, context):
     This function runs before traffic is allowed to the new ECS tasks
     """
     
-    logger.info(f"BeforeAllowTraffic hook triggered for environment: ${environment}")
+    logger.info("BeforeAllowTraffic hook triggered")
     logger.info(f"Event: {json.dumps(event, indent=2)}")
     
     # Extract CodeDeploy information from the event
@@ -30,10 +29,11 @@ def handler(event, context):
         time.sleep(10)
         
         # Example: Health check endpoint (uncomment and modify as needed)
+        # import urllib.request
         # health_check_url = "http://your-alb-endpoint/health"
-        # response = requests.get(health_check_url, timeout=30)
-        # if response.status_code != 200:
-        #     raise Exception(f"Health check failed: {response.status_code}")
+        # response = urllib.request.urlopen(health_check_url, timeout=30)
+        # if response.status != 200:
+        #     raise Exception(f"Health check failed: {response.status}")
         
         logger.info("BeforeAllowTraffic validation passed")
         

@@ -11,7 +11,7 @@ def handler(event, context):
     This function runs after traffic is allowed to the new ECS tasks
     """
     
-    logger.info(f"AfterAllowTraffic hook triggered for environment: ${environment}")
+    logger.info("AfterAllowTraffic hook triggered")
     logger.info(f"Event: {json.dumps(event, indent=2)}")
     
     # Extract CodeDeploy information from the event
