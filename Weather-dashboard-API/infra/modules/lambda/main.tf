@@ -42,41 +42,16 @@ resource "aws_iam_role_policy" "codedeploy_hooks_policy" {
   })
 }
 
-# Create ZIP files for Lambda functions
-data "archive_file" "before_install_zip" {
-  type        = "zip"
-  source_file = "${path.module}/lambda_code/before_install.py"
-  output_path = "${path.module}/before_install.zip"
-}
-
-data "archive_file" "after_install_zip" {
-  type        = "zip"
-  source_file = "${path.module}/lambda_code/after_install.py"
-  output_path = "${path.module}/after_install.zip"
-}
-
-data "archive_file" "before_allow_traffic_zip" {
-  type        = "zip"
-  source_file = "${path.module}/lambda_code/before_allow_traffic.py"
-  output_path = "${path.module}/before_allow_traffic.zip"
-}
-
-data "archive_file" "after_allow_traffic_zip" {
-  type        = "zip"
-  source_file = "${path.module}/lambda_code/after_allow_traffic.py"
-  output_path = "${path.module}/after_allow_traffic.zip"
-}
-
 # Lambda function for BeforeInstall hook
 resource "aws_lambda_function" "before_install" {
-  filename         = data.archive_file.before_install_zip.output_path
+  filename         = "${path.module}/before_install.zip"
   function_name    = "${var.environment}-codedeploy-before-install"
   role             = aws_iam_role.codedeploy_hooks_lambda_role.arn
   handler          = "before_install.handler"
   runtime          = "python3.9"
   timeout          = 60
 
-  source_code_hash = data.archive_file.before_install_zip.output_base64sha256
+  source_code_hash = filebase64sha256("${path.module}/before_install.zip")
 
   environment {
     variables = {
@@ -87,14 +62,14 @@ resource "aws_lambda_function" "before_install" {
 
 # Lambda function for AfterInstall hook
 resource "aws_lambda_function" "after_install" {
-  filename         = data.archive_file.after_install_zip.output_path
+  filename         = "${path.module}/after_install.zip"
   function_name    = "${var.environment}-codedeploy-after-install"
   role             = aws_iam_role.codedeploy_hooks_lambda_role.arn
   handler          = "after_install.handler"
   runtime          = "python3.9"
   timeout          = 60
 
-  source_code_hash = data.archive_file.after_install_zip.output_base64sha256
+  source_code_hash = filebase64sha256("${path.module}/after_install.zip")
 
   environment {
     variables = {
@@ -105,14 +80,14 @@ resource "aws_lambda_function" "after_install" {
 
 # Lambda function for BeforeAllowTraffic hook
 resource "aws_lambda_function" "before_allow_traffic" {
-  filename         = data.archive_file.before_allow_traffic_zip.output_path
+  filename         = "${path.module}/before_allow_traffic.zip"
   function_name    = "${var.environment}-codedeploy-before-allow-traffic"
   role             = aws_iam_role.codedeploy_hooks_lambda_role.arn
   handler          = "before_allow_traffic.handler"
   runtime          = "python3.9"
   timeout          = 60
 
-  source_code_hash = data.archive_file.before_allow_traffic_zip.output_base64sha256
+  source_code_hash = filebase64sha256("${path.module}/before_allow_traffic.zip")
 
   environment {
     variables = {
@@ -123,14 +98,14 @@ resource "aws_lambda_function" "before_allow_traffic" {
 
 # Lambda function for AfterAllowTraffic hook
 resource "aws_lambda_function" "after_allow_traffic" {
-  filename         = data.archive_file.after_allow_traffic_zip.output_path
+  filename         = "${path.module}/after_allow_traffic.zip"
   function_name    = "${var.environment}-codedeploy-after-allow-traffic"
   role             = aws_iam_role.codedeploy_hooks_lambda_role.arn
   handler          = "after_allow_traffic.handler"
   runtime          = "python3.9"
   timeout          = 60
 
-  source_code_hash = data.archive_file.after_allow_traffic_zip.output_base64sha256
+  source_code_hash = filebase64sha256("${path.module}/after_allow_traffic.zip")
 
   environment {
     variables = {

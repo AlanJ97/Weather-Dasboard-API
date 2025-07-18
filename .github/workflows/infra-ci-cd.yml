@@ -46,6 +46,20 @@ jobs:
         run: terraform init -upgrade
         working-directory: ${{ env.WORKING_DIR }}
 
+      - name: 'Package Lambda Functions'
+        run: |
+          sudo apt-get update && sudo apt-get install -y zip
+          LAMBDA_CODE_DIR="${{ github.workspace }}/Weather-dashboard-API/infra/modules/lambda/lambda_code"
+          LAMBDA_MODULE_DIR="${{ github.workspace }}/Weather-dashboard-API/infra/modules/lambda"
+          
+          zip "${LAMBDA_MODULE_DIR}/before_install.zip" "${LAMBDA_CODE_DIR}/before_install.py"
+          zip "${LAMBDA_MODULE_DIR}/after_install.zip" "${LAMBDA_CODE_DIR}/after_install.py"
+          zip "${LAMBDA_MODULE_DIR}/before_allow_traffic.zip" "${LAMBDA_CODE_DIR}/before_allow_traffic.py"
+          zip "${LAMBDA_MODULE_DIR}/after_allow_traffic.zip" "${LAMBDA_CODE_DIR}/after_allow_traffic.py"
+
+          echo "Verifying created zip files:"
+          ls -la "${LAMBDA_MODULE_DIR}"
+
       - name: 'Terraform Format'
         run: terraform fmt -check
         working-directory: ${{ env.INFRA_DIR }}
@@ -152,16 +166,19 @@ jobs:
       - name: 'Checkout'
         uses: actions/checkout@v3
 
-      - name: 'Debug Paths'
+      - name: 'Package Lambda Functions'
         run: |
-          echo "--- Debugging File Paths ---"
-          echo "GitHub Workspace: ${{ github.workspace }}"
-          echo "Current Directory: $(pwd)"
-          echo ""
-          echo "Listing workspace contents recursively..."
-          ls -laR ${{ github.workspace }}
-          echo ""
-          echo "--- End Debugging ---"
+          sudo apt-get update && sudo apt-get install -y zip
+          LAMBDA_CODE_DIR="${{ github.workspace }}/Weather-dashboard-API/infra/modules/lambda/lambda_code"
+          LAMBDA_MODULE_DIR="${{ github.workspace }}/Weather-dashboard-API/infra/modules/lambda"
+          
+          zip "${LAMBDA_MODULE_DIR}/before_install.zip" "${LAMBDA_CODE_DIR}/before_install.py"
+          zip "${LAMBDA_MODULE_DIR}/after_install.zip" "${LAMBDA_CODE_DIR}/after_install.py"
+          zip "${LAMBDA_MODULE_DIR}/before_allow_traffic.zip" "${LAMBDA_CODE_DIR}/before_allow_traffic.py"
+          zip "${LAMBDA_MODULE_DIR}/after_allow_traffic.zip" "${LAMBDA_CODE_DIR}/after_allow_traffic.py"
+
+          echo "Verifying created zip files:"
+          ls -la "${LAMBDA_MODULE_DIR}"
 
       - name: Download Terraform Plan
         uses: actions/download-artifact@v4
