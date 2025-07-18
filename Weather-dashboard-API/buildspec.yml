@@ -210,7 +210,7 @@ phases:
           - TargetService:
               Type: AWS::ECS::Service
               Properties:
-                TaskDefinition: <TASK_DEFINITION>
+                TaskDefinition: dev-weather-api-task
                 LoadBalancerInfo:
                   ContainerName: weather-api
                   ContainerPort: 8000
@@ -231,7 +231,7 @@ phases:
           - TargetService:
               Type: AWS::ECS::Service
               Properties:
-                TaskDefinition: <TASK_DEFINITION>
+                TaskDefinition: dev-weather-frontend-task
                 LoadBalancerInfo:
                   ContainerName: weather-frontend
                   ContainerPort: 8501
