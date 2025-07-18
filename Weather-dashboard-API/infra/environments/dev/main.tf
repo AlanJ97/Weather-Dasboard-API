@@ -120,7 +120,7 @@ module "codebuild" {
 
   depends_on = [module.ecr]
 }
-
+/*
 # Lambda Module (for CodeDeploy hooks)
 module "lambda" {
   source = "../../modules/lambda"
@@ -131,7 +131,7 @@ module "lambda" {
     Project     = "weather-dashboard"
   }
 }
-
+*/
 # CodeDeploy Module
 module "codedeploy" {
   source = "../../modules/codedeploy"
