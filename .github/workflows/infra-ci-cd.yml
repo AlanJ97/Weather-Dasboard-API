@@ -219,3 +219,12 @@ jobs:
           echo "  • Checking resource limits"
           echo "  • Reviewing Terraform state"
           exit 1
+
+      - name: 'Debug Paths'
+        run: |
+          echo "GitHub Workspace: ${{ github.workspace }}"
+          echo "Working Directory: ${{ env.WORKING_DIR }}"
+          echo "Listing files in workspace..."
+          ls -la ${{ github.workspace }}
+          echo "Listing files in working directory..."
+          ls -la ${{ env.WORKING_DIR }}
