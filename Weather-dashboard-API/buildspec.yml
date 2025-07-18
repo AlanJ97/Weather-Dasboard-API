@@ -204,7 +204,7 @@ phases:
       # Create AppSpec files for CodeDeploy
       - echo "Creating AppSpec files..."
       - |
-        cat > appspec-api.yml << 'YAML'
+        cat > appspec-api.yml << EOF
         version: 0.0
         Resources:
           - TargetService:
@@ -223,10 +223,10 @@ phases:
               location: deployment-hooks/start-server.sh
           - AfterAllowTraffic:
               location: deployment-hooks/stop-server.sh
-        'YAML'
+        EOF
       
       - |
-        cat > appspec-frontend.yml << 'YAML'
+        cat > appspec-frontend.yml << EOF
         version: 0.0
         Resources:
           - TargetService:
@@ -245,7 +245,7 @@ phases:
               location: deployment-hooks/start-server.sh
           - AfterAllowTraffic:
               location: deployment-hooks/stop-server.sh
-        'YAML'
+        EOF
       
       # Create image definitions file with the NEW VERSION TAG (not latest)
       - echo "Creating image definitions file..."
