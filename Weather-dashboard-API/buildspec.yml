@@ -184,6 +184,23 @@ phases:
         }
         EOF
       
+          # ------------------------------------------------------------------
+      # Replace image field with the real ECR URI in each task definition
+      # ------------------------------------------------------------------
+      - echo "Injecting image URIs with jq ..."
+      - |
+        API_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_API:$IMAGE_TAG"
+        FRONT_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG"
+
+        # update API task-def
+        jq --arg uri "$API_URI" '
+            (.containerDefinitions[] | select(.name=="weather-api") ).image = $uri
+        ' taskdef-api.json > tmp && mv tmp taskdef-api.json
+
+        # update Frontend task-def
+        jq --arg uri "$FRONT_URI" '
+            (.containerDefinitions[] | select(.name=="weather-frontend") ).image = $uri
+        ' taskdef-frontend.json > tmp && mv tmp taskdef-frontend.json
       # Create AppSpec files for CodeDeploy
       - echo "Creating AppSpec files..."
       - |
