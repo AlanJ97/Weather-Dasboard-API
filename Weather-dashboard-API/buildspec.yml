@@ -15,6 +15,7 @@ phases:
       docker: 20
     commands:
       - echo "Installing build dependencies..."
+      - apt-get update && apt-get install -y jq
       - pip install --upgrade pip
       - pip install flake8 black pytest requests
 
@@ -204,7 +205,7 @@ phases:
       # Create AppSpec files for CodeDeploy
       - echo "Creating AppSpec files..."
       - |
-        cat > appspec-api.yml << EOF
+        cat > appspec-api.yml << 'EOF'
         version: 0.0
         Resources:
           - TargetService:
@@ -212,10 +213,10 @@ phases:
               Properties:
                 TaskDefinition: <TASK_DEFINITION>
                 LoadBalancerInfo:
-                  ContainerName: "weather-api"
+                  ContainerName: weather-api
                   ContainerPort: 8000
         Hooks:
-           - BeforeInstall:
+          - BeforeInstall:
               location: deployment-hooks/before-install.sh
           - AfterInstall:
               location: deployment-hooks/after-install.sh
@@ -224,9 +225,8 @@ phases:
           - AfterAllowTraffic:
               location: deployment-hooks/stop-server.sh
         EOF
-      
       - |
-        cat > appspec-frontend.yml << EOF
+        cat > appspec-frontend.yml << 'EOF'
         version: 0.0
         Resources:
           - TargetService:
@@ -234,10 +234,10 @@ phases:
               Properties:
                 TaskDefinition: <TASK_DEFINITION>
                 LoadBalancerInfo:
-                  ContainerName: "weather-frontend"
+                  ContainerName: weather-frontend
                   ContainerPort: 8501
         Hooks:
-           - BeforeInstall:
+          - BeforeInstall:
               location: deployment-hooks/before-install.sh
           - AfterInstall:
               location: deployment-hooks/after-install.sh
