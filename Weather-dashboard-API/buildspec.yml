@@ -210,9 +210,9 @@ phases:
           - TargetService:
               Type: AWS::ECS::Service
               Properties:
-                TaskDefinition: dev-weather-api-task
+                TaskDefinition: "arn:aws:ecs:$AWS_DEFAULT_REGION:$AWS_ACCOUNT_ID:task-definition/dev-weather-api-task"
                 LoadBalancerInfo:
-                  ContainerName: weather-api
+                  ContainerName: "weather-api"
                   ContainerPort: 8000
         Hooks:
           - BeforeInstall:
@@ -231,9 +231,9 @@ phases:
           - TargetService:
               Type: AWS::ECS::Service
               Properties:
-                TaskDefinition: dev-weather-frontend-task
+                TaskDefinition: "arn:aws:ecs:$AWS_DEFAULT_REGION:$AWS_ACCOUNT_ID:task-definition/dev-weather-frontend-task"
                 LoadBalancerInfo:
-                  ContainerName: weather-frontend
+                  ContainerName: "weather-frontend"
                   ContainerPort: 8501
         Hooks:
           - BeforeInstall:
