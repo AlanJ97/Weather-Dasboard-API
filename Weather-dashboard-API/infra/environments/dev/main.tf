@@ -16,6 +16,39 @@ provider "aws" {
   region = var.aws_region
 }
 
+# Centralized tagging strategy
+locals {
+  common_tags = {
+    # Essential tags
+    Environment         = var.env
+    Project            = "weather-dashboard"
+    Application        = "weather-dashboard"
+    Owner              = "devops-team"
+    Team               = "platform-engineering"
+    
+    # Management tags
+    ManagedBy          = "terraform"
+    CreatedBy          = "terraform"
+    
+    # Cost allocation tags
+    CostCenter         = "engineering"
+    BusinessUnit       = "technology"
+    
+    # Security and compliance tags
+    DataClassification = "internal"
+    SecurityLevel      = "standard"
+    
+    # Backup and monitoring tags
+    BackupRequired     = "true"
+    MonitoringLevel    = "standard"
+    AlertingEnabled    = "true"
+    
+    # Lifecycle tags
+    TemporaryResource  = "false"
+    RetentionPeriod    = "30-days"
+  }
+}
+
 # VPC Module
 module "vpc" {
   source = "../../modules/vpc"
@@ -25,6 +58,7 @@ module "vpc" {
   vpc_cidr             = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
+  common_tags          = local.common_tags
 }
 
 # ECR Module
@@ -38,6 +72,7 @@ module "ecr" {
   prod_image_count     = var.ecr_prod_image_count
   dev_image_count      = var.ecr_dev_image_count
   untagged_image_days  = var.ecr_untagged_image_days
+  common_tags          = local.common_tags
 }
 
 # ALB Module
@@ -53,6 +88,7 @@ module "alb" {
   ssl_certificate_arn        = var.ssl_certificate_arn
   enable_access_logs         = var.alb_enable_access_logs
   access_logs_bucket         = var.alb_access_logs_bucket
+  common_tags                = local.common_tags
 }
 
 # ECS Module
@@ -88,6 +124,7 @@ module "ecs" {
 
   # Logging
   log_retention_days = var.ecs_log_retention_days
+  common_tags        = local.common_tags
 }
 
 
@@ -103,6 +140,7 @@ module "bastion" {
   allowed_cidr_blocks = var.bastion_allowed_cidr_blocks
   ecs_cluster_arn     = module.ecs.cluster_arn
   log_group_arns      = module.ecs.log_group_arns
+  common_tags         = local.common_tags
 }
 
 
@@ -117,6 +155,7 @@ module "codebuild" {
   ecr_frontend_repository_name = module.ecr.weather_frontend_repository_name
   source_bucket_name = "dev-weather-dashboard-codebuild-cache-2025"
   artifacts_bucket_name = "dev-weather-dashboard-pipeline-artifacts-2025"
+  common_tags                  = local.common_tags
 
   depends_on = [module.ecr]
 }
@@ -137,6 +176,7 @@ module "codedeploy" {
   alb_front_listener_arn         = module.alb.frontend_listener_arn != null ? module.alb.frontend_listener_arn : module.alb.http_listener_arn
   alb_front_tg_blue_name         = module.alb.front_blue_tg_name
   alb_front_tg_green_name        = module.alb.front_green_tg_name
+  common_tags                    = local.common_tags
   depends_on = [module.ecs, module.alb]
 }
 
@@ -156,6 +196,7 @@ module "codepipeline" {
   codedeploy_deployment_group_frontend = module.codedeploy.frontend_deployment_group_name
   artifacts_bucket_name                = "dev-weather-dashboard-pipeline-artifacts-2025"
   enable_webhook                       = var.enable_pipeline_webhook
+  common_tags                          = local.common_tags
 
   depends_on = [module.codebuild, module.codedeploy]
 }

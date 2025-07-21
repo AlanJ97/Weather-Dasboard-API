@@ -37,3 +37,9 @@ variable "artifacts_bucket_name" {
 variable "codebuild_cache_bucket_name" {
   default = "dev-weather-dashboard-codebuild-cache-2025"
 }
+
+variable "common_tags" {
+  description = "Common tags to apply to all resources"
+  type        = map(string)
+  default     = {}
+}
