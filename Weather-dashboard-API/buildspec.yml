@@ -118,8 +118,8 @@ phases:
           "requiresCompatibilities": ["FARGATE"],
           "cpu": "256",
           "memory": "512",
-          "executionRoleArn": "arn:aws:iam::$AWS_ACCOUNT_ID:role/dev-weather-dashboard-ecs-task-execution-role",
-          "taskRoleArn": "arn:aws:iam::$AWS_ACCOUNT_ID:role/dev-weather-dashboard-ecs-task-role",
+          "executionRoleArn": "arn:aws:iam::$AWS_ACCOUNT_ID:role/dev-weather-ecs-task-execution-role",
+          "taskRoleArn": "arn:aws:iam::$AWS_ACCOUNT_ID:role/dev-weather-ecs-task-role",
           "containerDefinitions": [
             {
               "name": "weather-api",
@@ -158,8 +158,8 @@ phases:
           "requiresCompatibilities": ["FARGATE"],
           "cpu": "256",
           "memory": "512",
-          "executionRoleArn": "arn:aws:iam::$AWS_ACCOUNT_ID:role/dev-weather-dashboard-ecs-task-execution-role",
-          "taskRoleArn": "arn:aws:iam::$AWS_ACCOUNT_ID:role/dev-weather-dashboard-ecs-task-role",
+          "executionRoleArn": "arn:aws:iam::$AWS_ACCOUNT_ID:role/dev-weather-ecs-task-execution-role",
+          "taskRoleArn": "arn:aws:iam::$AWS_ACCOUNT_ID:role/dev-weather-ecs-task-role",
           "containerDefinitions": [
             {
               "name": "weather-frontend",
