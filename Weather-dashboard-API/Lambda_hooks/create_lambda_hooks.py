@@ -26,6 +26,11 @@ LAMBDA_FUNCTIONS = [
         'description': 'CodeDeploy hook - executed before install phase'
     },
     {
+        'name': 'install',
+        'file': 'install.py',
+        'description': 'CodeDeploy hook - executed during install phase'
+    },
+    {
         'name': 'after_install',
         'file': 'after_install.py',
         'description': 'CodeDeploy hook - executed after install phase'
@@ -83,7 +88,12 @@ class LambdaHooksCreator:
                 {
                     "Effect": "Allow",
                     "Action": [
-                        "codedeploy:PutLifecycleEventHookExecutionStatus"
+                        "codedeploy:PutLifecycleEventHookExecutionStatus",
+                        "codedeploy:GetDeployment",
+                        "codedeploy:GetApplication",
+                        "codedeploy:GetDeploymentGroup",
+                        "codedeploy:GetDeploymentConfig",
+                        "codedeploy:GetApplicationRevision"
                     ],
                     "Resource": "*"
                 }
@@ -94,6 +104,16 @@ class LambdaHooksCreator:
             # Check if role already exists
             self.iam_client.get_role(RoleName=role_name)
             print(f"✓ IAM role '{role_name}' already exists")
+            
+            # Update the policy even if role exists to ensure it has latest permissions
+            print(f"🔄 Updating IAM policy with latest permissions...")
+            self.iam_client.put_role_policy(
+                RoleName=role_name,
+                PolicyName=f'LambdaCodeDeployHooksPolicy-{self.environment}',
+                PolicyDocument=json.dumps(policy_document)
+            )
+            print(f"✓ Updated IAM policy with latest permissions")
+            
         except self.iam_client.exceptions.NoSuchEntityException:
             # Create role
             print(f"Creating IAM role '{role_name}'...")
