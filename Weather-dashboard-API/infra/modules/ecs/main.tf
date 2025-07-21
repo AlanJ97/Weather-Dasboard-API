@@ -78,8 +78,6 @@ resource "aws_cloudwatch_log_group" "ecs_frontend" {
   }
 }
 
-}
-
 # ECS Task Execution Role
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "${var.env}-weather-ecs-task-execution-role"
