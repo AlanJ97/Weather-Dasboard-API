@@ -294,7 +294,7 @@ resource "aws_lb_listener" "https" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.frontend_blue.arn
+    target_group_arn = aws_lb_target_group.frontend_green.arn
   }
 
 }
@@ -308,7 +308,7 @@ resource "aws_lb_listener" "http_default" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.frontend_blue.arn
+    target_group_arn = aws_lb_target_group.frontend_green.arn
   }
 
   tags = {
@@ -326,7 +326,7 @@ resource "aws_lb_listener_rule" "api" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.api_blue.arn
+    target_group_arn = aws_lb_target_group.api_green.arn
   }
 
   condition {
