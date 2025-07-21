@@ -9,6 +9,7 @@ env:
     # Lambda function names for CodeDeploy hooks
     LAMBDA_BEFORE_INSTALL: codedeploy-hook-before_install-dev
     LAMBDA_AFTER_INSTALL: codedeploy-hook-after_install-dev
+    LAMBDA_AFTER_ALLOW_TEST_TRAFFIC: codedeploy-hook-after_allow_test_traffic-dev
     LAMBDA_BEFORE_ALLOW_TRAFFIC: codedeploy-hook-before_allow_traffic-dev
     LAMBDA_AFTER_ALLOW_TRAFFIC: codedeploy-hook-after_allow_traffic-dev
 
@@ -222,6 +223,7 @@ phases:
         Hooks:
           - BeforeInstall: "$LAMBDA_BEFORE_INSTALL"
           - AfterInstall: "$LAMBDA_AFTER_INSTALL"
+          - AfterAllowTestTraffic: "$LAMBDA_AFTER_ALLOW_TEST_TRAFFIC"
           - BeforeAllowTraffic: "$LAMBDA_BEFORE_ALLOW_TRAFFIC"
           - AfterAllowTraffic: "$LAMBDA_AFTER_ALLOW_TRAFFIC"
         EOF
@@ -239,6 +241,7 @@ phases:
         Hooks:
           - BeforeInstall: "$LAMBDA_BEFORE_INSTALL"
           - AfterInstall: "$LAMBDA_AFTER_INSTALL"
+          - AfterAllowTestTraffic: "$LAMBDA_AFTER_ALLOW_TEST_TRAFFIC"
           - BeforeAllowTraffic: "$LAMBDA_BEFORE_ALLOW_TRAFFIC"
           - AfterAllowTraffic: "$LAMBDA_AFTER_ALLOW_TRAFFIC"
         EOF
