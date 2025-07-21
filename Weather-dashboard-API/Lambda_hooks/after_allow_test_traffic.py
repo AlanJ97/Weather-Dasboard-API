@@ -1,5 +1,5 @@
 """
-CodeDeploy Hook: Before Allow Traffic
+CodeDeploy Hook: After Allow Test Traffic
 Simple minimal implementation.
 """
 
@@ -12,9 +12,9 @@ logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
     """
-    Simple handler for before_allow_traffic
+    Simple handler for after_allow_test_traffic
     """
-    logger.info("BeforeAllowTraffic hook executed successfully")
+    logger.info("AfterAllowTestTraffic hook executed successfully")
     
     # Get required parameters
     deployment_id = event.get('DeploymentId')
@@ -32,7 +32,7 @@ def lambda_handler(event, context):
         
         return {
             'statusCode': 200,
-            'body': json.dumps('BeforeAllowTraffic hook completed successfully')
+            'body': json.dumps('AfterAllowTestTraffic hook completed successfully')
         }
         
     except Exception as e:

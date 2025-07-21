@@ -26,14 +26,14 @@ LAMBDA_FUNCTIONS = [
         'description': 'CodeDeploy hook - executed before install phase'
     },
     {
-        'name': 'install',
-        'file': 'install.py',
-        'description': 'CodeDeploy hook - executed during install phase'
-    },
-    {
         'name': 'after_install',
         'file': 'after_install.py',
         'description': 'CodeDeploy hook - executed after install phase'
+    },
+    {
+        'name': 'after_allow_test_traffic',
+        'file': 'after_allow_test_traffic.py',
+        'description': 'CodeDeploy hook - executed after allowing test traffic'
     },
     {
         'name': 'before_allow_traffic',

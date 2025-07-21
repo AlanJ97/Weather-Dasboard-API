@@ -8,7 +8,6 @@ env:
     IMAGE_REPO_NAME_FRONTEND: dev-weather-frontend
     # Lambda function names for CodeDeploy hooks
     LAMBDA_BEFORE_INSTALL: codedeploy-hook-before_install-dev
-    LAMBDA_INSTALL: codedeploy-hook-install-dev
     LAMBDA_AFTER_INSTALL: codedeploy-hook-after_install-dev
     LAMBDA_BEFORE_ALLOW_TRAFFIC: codedeploy-hook-before_allow_traffic-dev
     LAMBDA_AFTER_ALLOW_TRAFFIC: codedeploy-hook-after_allow_traffic-dev
@@ -222,7 +221,6 @@ phases:
                   ContainerPort: 8000
         Hooks:
           - BeforeInstall: "$LAMBDA_BEFORE_INSTALL"
-          - Install: "$LAMBDA_INSTALL"
           - AfterInstall: "$LAMBDA_AFTER_INSTALL"
           - BeforeAllowTraffic: "$LAMBDA_BEFORE_ALLOW_TRAFFIC"
           - AfterAllowTraffic: "$LAMBDA_AFTER_ALLOW_TRAFFIC"
@@ -240,7 +238,6 @@ phases:
                   ContainerPort: 8501
         Hooks:
           - BeforeInstall: "$LAMBDA_BEFORE_INSTALL"
-          - Install: "$LAMBDA_INSTALL"
           - AfterInstall: "$LAMBDA_AFTER_INSTALL"
           - BeforeAllowTraffic: "$LAMBDA_BEFORE_ALLOW_TRAFFIC"
           - AfterAllowTraffic: "$LAMBDA_AFTER_ALLOW_TRAFFIC"
