@@ -53,12 +53,11 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name        = "${var.env}-weather-alb-sg"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-alb-sg"
+    Type      = "security-group"
+    Component = "networking"
+  })
 
   lifecycle {
     create_before_destroy = true
@@ -84,12 +83,11 @@ resource "aws_lb" "main" {
     }
   }
 
-  tags = {
-    Name        = "${var.env}-weather-alb"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-alb"
+    Type      = "load-balancer"
+    Component = "networking"
+  })
 }
 
 # Target Group for API
@@ -113,12 +111,11 @@ resource "aws_lb_target_group" "api" {
     unhealthy_threshold = 2
   }
 
-  tags = {
-    Name        = "${var.env}-weather-api-tg"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-api-tg"
+    Type      = "target-group"
+    Component = "api"
+  })
 }
 
 # Target Group for Frontend
@@ -141,12 +138,11 @@ resource "aws_lb_target_group" "frontend" {
     unhealthy_threshold = 2
   }
 
-  tags = {
-    Name        = "${var.env}-weather-frontend-tg"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-frontend-tg"
+    Type      = "target-group"
+    Component = "frontend"
+  })
 }
 
 # Blue/Green Target Groups for API and Frontend
@@ -169,12 +165,12 @@ resource "aws_lb_target_group" "api_blue" {
     unhealthy_threshold = 2
   }
 
-  tags = {
-    Name        = "${var.env}-weather-api-tg-blue"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-api-tg-blue"
+    Type      = "target-group"
+    Component = "api"
+    Color     = "blue"
+  })
 }
 
 resource "aws_lb_target_group" "api_green" {
@@ -196,12 +192,12 @@ resource "aws_lb_target_group" "api_green" {
     unhealthy_threshold = 2
   }
 
-  tags = {
-    Name        = "${var.env}-weather-api-tg-green"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-api-tg-green"
+    Type      = "target-group"
+    Component = "api"
+    Color     = "green"
+  })
 }
 
 resource "aws_lb_target_group" "frontend_blue" {
@@ -223,12 +219,12 @@ resource "aws_lb_target_group" "frontend_blue" {
     unhealthy_threshold = 2
   }
 
-  tags = {
-    Name        = "${var.env}-weather-frontend-tg-blue"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-frontend-tg-blue"
+    Type      = "target-group"
+    Component = "frontend"
+    Color     = "blue"
+  })
 }
 
 resource "aws_lb_target_group" "frontend_green" {
@@ -250,12 +246,12 @@ resource "aws_lb_target_group" "frontend_green" {
     unhealthy_threshold = 2
   }
 
-  tags = {
-    Name        = "${var.env}-weather-frontend-tg-green"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-frontend-tg-green"
+    Type      = "target-group"
+    Component = "frontend"
+    Color     = "green"
+  })
 }
 
 # HTTP Listener - Redirect to HTTPS (only when SSL certificate is available)
@@ -275,12 +271,10 @@ resource "aws_lb_listener" "http" {
     }
   }
 
-  tags = {
-    Name        = "${var.env}-weather-http-listener"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name = "${var.env}-weather-http-listener"
+    Type = "alb-listener"
+  })
 }
 
 # HTTPS Listener
@@ -297,6 +291,10 @@ resource "aws_lb_listener" "https" {
     target_group_arn = aws_lb_target_group.frontend_green.arn
   }
 
+  tags = merge(var.common_tags, {
+    Name = "${var.env}-weather-https-listener"
+    Type = "alb-listener"
+  })
 }
 
 # HTTP Listener for environments without SSL
@@ -311,12 +309,10 @@ resource "aws_lb_listener" "http_default" {
     target_group_arn = aws_lb_target_group.frontend_green.arn
   }
 
-  tags = {
-    Name        = "${var.env}-weather-http-default-listener"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name = "${var.env}-weather-http-default-listener"
+    Type = "alb-listener"
+  })
 }
 
 # Listener Rule for API paths
@@ -335,10 +331,8 @@ resource "aws_lb_listener_rule" "api" {
     }
   }
 
-  tags = {
-    Name        = "${var.env}-weather-api-rule"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name = "${var.env}-weather-api-rule"
+    Type = "alb-listener-rule"
+  })
 }

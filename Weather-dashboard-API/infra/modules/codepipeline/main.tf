@@ -16,11 +16,10 @@ resource "aws_codestarconnections_connection" "github" {
   name          = "${var.environment}-github-connection"
   provider_type = "GitHub"
 
-  tags = {
-    Environment = var.environment
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name = "${var.environment}-github-connection"
+    Type = "codestar-connection"
+  })
 }
 
 # CodePipeline
@@ -112,11 +111,10 @@ resource "aws_codepipeline" "weather_dashboard" {
     }
   }
 
-  tags = {
-    Environment = var.environment
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name = "${var.environment}-weather-dashboard-pipeline"
+    Type = "codepipeline"
+  })
 }
 
 # IAM Role for CodePipeline
@@ -136,11 +134,10 @@ resource "aws_iam_role" "codepipeline_role" {
     ]
   })
 
-  tags = {
-    Environment = var.environment
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name = "${var.environment}-weather-dashboard-codepipeline-role"
+    Type = "iam-role"
+  })
 }
 
 # IAM Policy for CodePipeline
@@ -245,11 +242,10 @@ resource "aws_cloudwatch_event_rule" "github_webhook" {
     }
   })
 
-  tags = {
-    Environment = var.environment
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name = "${var.environment}-weather-dashboard-github-webhook"
+    Type = "cloudwatch-event-rule"
+  })
 }
 
 resource "aws_cloudwatch_event_target" "codepipeline" {
@@ -278,11 +274,10 @@ resource "aws_iam_role" "events_role" {
     ]
   })
 
-  tags = {
-    Environment = var.environment
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name = "${var.environment}-weather-dashboard-events-role"
+    Type = "iam-role"
+  })
 }
 
 resource "aws_iam_role_policy" "events_policy" {

@@ -16,12 +16,11 @@ resource "aws_key_pair" "bastion" {
   key_name   = "${var.env}-weather-bastion-key"
   public_key = var.public_key
 
-  tags = {
-    Name        = "${var.env}-weather-bastion-key"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-bastion-key"
+    Type      = "key-pair"
+    Component = "bastion"
+  })
 }
 
 # Security Group for Bastion Host
@@ -46,12 +45,11 @@ resource "aws_security_group" "bastion" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name        = "${var.env}-weather-bastion-sg"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-bastion-sg"
+    Type      = "security-group"
+    Component = "bastion"
+  })
 
   lifecycle {
     create_before_destroy = true
@@ -75,12 +73,11 @@ resource "aws_iam_role" "bastion" {
     ]
   })
 
-  tags = {
-    Name        = "${var.env}-weather-bastion-role"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-bastion-role"
+    Type      = "iam-role"
+    Component = "bastion"
+  })
 }
 
 # IAM Policy for Bastion Host
@@ -133,12 +130,11 @@ resource "aws_iam_instance_profile" "bastion" {
   name = "${var.env}-weather-bastion-profile"
   role = aws_iam_role.bastion.name
 
-  tags = {
-    Name        = "${var.env}-weather-bastion-profile"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-bastion-profile"
+    Type      = "iam-instance-profile"
+    Component = "bastion"
+  })
 }
 
 # Get latest Amazon Linux 2 AMI
@@ -188,13 +184,12 @@ resource "aws_instance" "bastion" {
     delete_on_termination = true
   }
 
-  tags = {
-    Name        = "${var.env}-weather-bastion"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-    Role        = "bastion"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-bastion"
+    Type      = "ec2-instance"
+    Component = "bastion"
+    Role      = "bastion"
+  })
 
   lifecycle {
     ignore_changes = [ami]
@@ -206,12 +201,11 @@ resource "aws_eip" "bastion" {
   instance = aws_instance.bastion.id
   domain   = "vpc"
 
-  tags = {
-    Name        = "${var.env}-weather-bastion-eip"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-bastion-eip"
+    Type      = "elastic-ip"
+    Component = "bastion"
+  })
 
   depends_on = [aws_instance.bastion]
 }

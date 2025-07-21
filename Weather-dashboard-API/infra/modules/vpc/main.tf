@@ -37,6 +37,11 @@ resource "aws_flow_log" "vpc_flow_log" {
 resource "aws_cloudwatch_log_group" "vpc_flow_log" {
   name              = "/aws/vpc/flow-logs-${var.env}"
   retention_in_days = 7
+
+  tags = merge(var.common_tags, {
+    Name = "/aws/vpc/flow-logs-${var.env}"
+    Type = "log-group"
+  })
 }
 
 resource "aws_iam_role" "flow_log_role" {
@@ -53,6 +58,11 @@ resource "aws_iam_role" "flow_log_role" {
         }
       }
     ]
+  })
+
+  tags = merge(var.common_tags, {
+    Name = "${var.env}-vpc-flow-log-role"
+    Type = "iam-role"
   })
 }
 
@@ -90,9 +100,10 @@ resource "aws_default_security_group" "default" {
   vpc_id = aws_vpc.main.id
 
   # Remove all default rules by not specifying any ingress/egress rules
-  tags = {
+  tags = merge(var.common_tags, {
     Name = "${var.env}-default-sg-restricted"
-  }
+    Type = "security-group"
+  })
 }
 
 # Public Subnets
@@ -103,9 +114,11 @@ resource "aws_subnet" "public" {
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = true
 
-  tags = {
+  tags = merge(var.common_tags, {
     Name = "${var.env}-public-subnet-${count.index + 1}"
-  }
+    Type = "subnet"
+    Tier = "public"
+  })
 }
 
 # Private Subnets
@@ -115,18 +128,21 @@ resource "aws_subnet" "private" {
   cidr_block        = var.private_subnet_cidrs[count.index]
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
-  tags = {
+  tags = merge(var.common_tags, {
     Name = "${var.env}-private-subnet-${count.index + 1}"
-  }
+    Type = "subnet"
+    Tier = "private"
+  })
 }
 
 # Internet Gateway
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
 
-  tags = {
+  tags = merge(var.common_tags, {
     Name = "${var.env}-igw"
-  }
+    Type = "internet-gateway"
+  })
 }
 
 # Public Route Table
@@ -138,9 +154,11 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.gw.id
   }
 
-  tags = {
+  tags = merge(var.common_tags, {
     Name = "${var.env}-public-rt"
-  }
+    Type = "route-table"
+    Tier = "public"
+  })
 }
 
 # Public Route Table Association
@@ -153,9 +171,10 @@ resource "aws_route_table_association" "public" {
 # Elastic IP for NAT Gateway
 resource "aws_eip" "nat" {
   domain = "vpc"
-  tags = {
+  tags = merge(var.common_tags, {
     Name = "${var.env}-nat-eip"
-  }
+    Type = "elastic-ip"
+  })
 }
 
 # NAT Gateway
@@ -163,9 +182,10 @@ resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat.id
   subnet_id     = aws_subnet.public[0].id
 
-  tags = {
+  tags = merge(var.common_tags, {
     Name = "${var.env}-nat-gw"
-  }
+    Type = "nat-gateway"
+  })
 
   depends_on = [aws_internet_gateway.gw]
 }
@@ -179,9 +199,11 @@ resource "aws_route_table" "private" {
     nat_gateway_id = aws_nat_gateway.nat.id
   }
 
-  tags = {
+  tags = merge(var.common_tags, {
     Name = "${var.env}-private-rt"
-  }
+    Type = "route-table"
+    Tier = "private"
+  })
 }
 
 # Private Route Table Association

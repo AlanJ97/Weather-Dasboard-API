@@ -28,12 +28,11 @@ resource "aws_ecr_repository" "weather_api" {
   encryption_configuration {
     encryption_type = "AES256"
   }
-  tags = {
-    Name        = "${var.env}-weather-api"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-api"
+    Type      = "container-registry"
+    Component = "api"
+  })
 }
 
 
@@ -54,12 +53,11 @@ resource "aws_ecr_repository" "weather_frontend" {
     encryption_type = "AES256"
   }
 
-  tags = {
-    Name        = "${var.env}-weather-frontend"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-frontend"
+    Type      = "container-registry"
+    Component = "frontend"
+  })
 }
 
 # Lifecycle policy to manage image retention
