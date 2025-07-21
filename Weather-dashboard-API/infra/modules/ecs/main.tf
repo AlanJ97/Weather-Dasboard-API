@@ -20,12 +20,11 @@ resource "aws_ecs_cluster" "main" {
     value = "enabled"
   }
 
-  tags = {
-    Name        = "${var.env}-weather-cluster"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-cluster"
+    Type      = "ecs-cluster"
+    Component = "compute"
+  })
 }
 
 # ECS Cluster Capacity Providers
@@ -46,36 +45,33 @@ resource "aws_cloudwatch_log_group" "ecs" {
   name              = "/ecs/${var.env}-weather"
   retention_in_days = var.log_retention_days
 
-  tags = {
-    Name        = "${var.env}-weather-ecs-logs"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-ecs-logs"
+    Type      = "cloudwatch-log-group"
+    Component = "logging"
+  })
 }
 
 resource "aws_cloudwatch_log_group" "ecs_api" {
   name              = "/ecs/dev-weather-api"
   retention_in_days = 7
 
-  tags = {
-    Name        = "${var.env}-weather-ecs-logs"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-api-logs"
+    Type      = "cloudwatch-log-group"
+    Component = "api-logging"
+  })
 }
 
 resource "aws_cloudwatch_log_group" "ecs_frontend" {
   name              = "/ecs/dev-weather-frontend"
   retention_in_days = 7
 
-  tags = {
-    Name        = "${var.env}-weather-ecs-logs"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-frontend-logs"
+    Type      = "cloudwatch-log-group"
+    Component = "frontend-logging"
+  })
 }
 
 # ECS Task Execution Role
@@ -95,12 +91,11 @@ resource "aws_iam_role" "ecs_task_execution_role" {
     ]
   })
 
-  tags = {
-    Name        = "${var.env}-weather-ecs-task-execution-role"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-ecs-task-execution-role"
+    Type      = "iam-role"
+    Component = "ecs-execution"
+  })
 }
 
 # Attach the ECS Task Execution Role Policy
@@ -126,12 +121,11 @@ resource "aws_iam_role" "ecs_task_role" {
     ]
   })
 
-  tags = {
-    Name        = "${var.env}-weather-ecs-task-role"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-ecs-task-role"
+    Type      = "iam-role"
+    Component = "ecs-task"
+  })
 }
 
 # Custom policy for ECS tasks (if needed for specific permissions)
@@ -186,12 +180,11 @@ resource "aws_security_group" "ecs_tasks" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name        = "${var.env}-weather-ecs-tasks-sg"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-ecs-tasks-sg"
+    Type      = "security-group"
+    Component = "ecs-tasks"
+  })
 
   lifecycle {
     create_before_destroy = true
@@ -252,12 +245,11 @@ resource "aws_ecs_task_definition" "api" {
     }
   ])
 
-  tags = {
-    Name        = "${var.env}-weather-api-task"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-api-task"
+    Type      = "ecs-task-definition"
+    Component = "api"
+  })
 }
 
 # ECS Task Definition for Frontend
@@ -314,12 +306,11 @@ resource "aws_ecs_task_definition" "frontend" {
     }
   ])
 
-  tags = {
-    Name        = "${var.env}-weather-frontend-task"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-frontend-task"
+    Type      = "ecs-task-definition"
+    Component = "frontend"
+  })
 }
 
 # ECS Service for API
@@ -358,12 +349,11 @@ resource "aws_ecs_service" "api" {
     ]
   }
 
-  tags = {
-    Name        = "${var.env}-weather-api-service"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-api-service"
+    Type      = "ecs-service"
+    Component = "api"
+  })
 }
 
 # ECS Service for Frontend
@@ -402,10 +392,9 @@ resource "aws_ecs_service" "frontend" {
     ]
   }
 
-  tags = {
-    Name        = "${var.env}-weather-frontend-service"
-    Environment = var.env
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.env}-weather-frontend-service"
+    Type      = "ecs-service"
+    Component = "frontend"
+  })
 }

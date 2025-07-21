@@ -16,11 +16,10 @@ resource "aws_codedeploy_app" "weather_dashboard" {
   compute_platform = "ECS"
   name             = "${var.environment}-weather-dashboard-app"
 
-  tags = {
-    Environment = var.environment
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name = "${var.environment}-weather-dashboard-app"
+    Type = "codedeploy-application"
+  })
 }
 
 # CodeDeploy Deployment Group for API
@@ -74,12 +73,11 @@ resource "aws_codedeploy_deployment_group" "api" {
 
   
 
-  tags = {
-    Environment = var.environment
-    Project     = "weather-dashboard"
-    Component   = "api"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.environment}-weather-api-deployment-group"
+    Type      = "codedeploy-deployment-group"
+    Component = "api"
+  })
 }
 
 # CodeDeploy Deployment Group for Frontend
@@ -133,12 +131,11 @@ resource "aws_codedeploy_deployment_group" "frontend" {
 
  
 
-  tags = {
-    Environment = var.environment
-    Project     = "weather-dashboard"
-    Component   = "frontend"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.environment}-weather-frontend-deployment-group"
+    Type      = "codedeploy-deployment-group"
+    Component = "frontend"
+  })
 }
 
 # IAM Role for CodeDeploy
@@ -158,11 +155,10 @@ resource "aws_iam_role" "codedeploy_role" {
     ]
   })
 
-  tags = {
-    Environment = var.environment
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name = "${var.environment}-weather-dashboard-codedeploy-role"
+    Type = "iam-role"
+  })
 }
 
 # Attach AWS managed policy for ECS deployments
@@ -250,9 +246,8 @@ resource "aws_cloudwatch_log_group" "codedeploy_logs" {
   name              = "/aws/codedeploy/${var.environment}-weather-dashboard"
   retention_in_days = 30
 
-  tags = {
-    Environment = var.environment
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name = "/aws/codedeploy/${var.environment}-weather-dashboard"
+    Type = "log-group"
+  })
 }

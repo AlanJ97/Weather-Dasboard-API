@@ -72,11 +72,11 @@ resource "aws_codebuild_project" "weather_dashboard" {
     }
   }
 
-  tags = {
-    Environment = var.environment
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.environment}-weather-dashboard-build"
+    Type      = "codebuild-project"
+    Component = "ci-cd"
+  })
 }
 
 # CloudWatch Log Group for CodeBuild
@@ -84,11 +84,11 @@ resource "aws_cloudwatch_log_group" "codebuild_logs" {
   name              = "/aws/codebuild/${var.environment}-weather-dashboard-build"
   retention_in_days = 30
 
-  tags = {
-    Environment = var.environment
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "/aws/codebuild/${var.environment}-weather-dashboard-build"
+    Type      = "cloudwatch-log-group"
+    Component = "ci-cd-logging"
+  })
 }
 
 # IAM Role for CodeBuild
@@ -108,11 +108,11 @@ resource "aws_iam_role" "codebuild_role" {
     ]
   })
 
-  tags = {
-    Environment = var.environment
-    Project     = "weather-dashboard"
-    ManagedBy   = "terraform"
-  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.environment}-weather-dashboard-codebuild-role"
+    Type      = "iam-role"
+    Component = "ci-cd"
+  })
 }
 
 # IAM Policy for CodeBuild
