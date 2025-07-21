@@ -22,3 +22,9 @@ variable "aws_region" {
   description = "The AWS region to deploy to."
   type        = string
 }
+
+variable "common_tags" {
+  description = "Common tags to apply to all resources"
+  type        = map(string)
+  default     = {}
+}

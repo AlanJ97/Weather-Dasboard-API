@@ -33,3 +33,9 @@ variable "alb_api_tg_green_name"        { type = string }
 variable "alb_front_listener_arn"       { type = string }
 variable "alb_front_tg_blue_name"       { type = string }
 variable "alb_front_tg_green_name"      { type = string }
+
+variable "common_tags" {
+  description = "Common tags to apply to all resources"
+  type        = map(string)
+  default     = {}
+}

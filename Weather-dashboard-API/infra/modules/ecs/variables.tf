@@ -158,3 +158,9 @@ variable "target_memory_utilization" {
   type        = number
   default     = 80
 }
+
+variable "common_tags" {
+  description = "Common tags to apply to all resources"
+  type        = map(string)
+  default     = {}
+}

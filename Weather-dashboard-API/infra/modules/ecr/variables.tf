@@ -56,3 +56,9 @@ variable "untagged_image_days" {
   type        = number
   default     = 1
 }
+
+variable "common_tags" {
+  description = "Common tags to apply to all resources"
+  type        = map(string)
+  default     = {}
+}

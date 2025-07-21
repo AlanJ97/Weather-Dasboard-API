@@ -97,3 +97,9 @@ variable "log_group_arns" {
   description = "ARNs of the CloudWatch log groups the bastion needs to access"
   type        = list(string)
 }
+
+variable "common_tags" {
+  description = "Common tags to apply to all resources"
+  type        = map(string)
+  default     = {}
+}
