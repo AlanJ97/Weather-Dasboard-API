@@ -113,7 +113,7 @@ phases:
       - |
         cat > taskdef-api.json << EOF
         {
-          "family": "dev-weather-api-task",
+          "family": "dev-weather-api",
           "networkMode": "awsvpc",
           "requiresCompatibilities": ["FARGATE"],
           "cpu": "256",
@@ -153,7 +153,7 @@ phases:
       - |
         cat > taskdef-frontend.json << EOF
         {
-          "family": "dev-weather-frontend-task",
+          "family": "dev-weather-frontend",
           "networkMode": "awsvpc",
           "requiresCompatibilities": ["FARGATE"],
           "cpu": "256",
@@ -216,7 +216,7 @@ phases:
           - TargetService:
               Type: AWS::ECS::Service
               Properties:
-                TaskDefinition: "arn:aws:ecs:$AWS_DEFAULT_REGION:$AWS_ACCOUNT_ID:task-definition/dev-weather-api-task"
+                TaskDefinition: "arn:aws:ecs:$AWS_DEFAULT_REGION:$AWS_ACCOUNT_ID:task-definition/dev-weather-api"
                 LoadBalancerInfo:
                   ContainerName: "weather-api"
                   ContainerPort: 8000
@@ -234,7 +234,7 @@ phases:
           - TargetService:
               Type: AWS::ECS::Service
               Properties:
-                TaskDefinition: "arn:aws:ecs:$AWS_DEFAULT_REGION:$AWS_ACCOUNT_ID:task-definition/dev-weather-frontend-task"
+                TaskDefinition: "arn:aws:ecs:$AWS_DEFAULT_REGION:$AWS_ACCOUNT_ID:task-definition/dev-weather-frontend"
                 LoadBalancerInfo:
                   ContainerName: "weather-frontend"
                   ContainerPort: 8501
