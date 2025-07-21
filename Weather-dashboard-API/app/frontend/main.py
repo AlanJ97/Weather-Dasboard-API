@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import json
 import time
+import os
 from datetime import datetime
 import plotly.express as px
 import plotly.graph_objects as go
@@ -16,7 +17,7 @@ st.set_page_config(
 )
 
 # API Configuration
-API_BASE_URL = "http://localhost:8000"  # Will be updated with ALB URL later
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 
 def get_weather_data(city=None):
     """Fetch weather data from the API"""
