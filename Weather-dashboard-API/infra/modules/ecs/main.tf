@@ -54,6 +54,32 @@ resource "aws_cloudwatch_log_group" "ecs" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "ecs_api" {
+  name              = "/ecs/dev-weather-api"
+  retention_in_days = 7
+
+  tags = {
+    Name        = "${var.env}-weather-ecs-logs"
+    Environment = var.env
+    Project     = "weather-dashboard"
+    ManagedBy   = "terraform"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "ecs_frontend" {
+  name              = "/ecs/dev-weather-frontend"
+  retention_in_days = 7
+
+  tags = {
+    Name        = "${var.env}-weather-ecs-logs"
+    Environment = var.env
+    Project     = "weather-dashboard"
+    ManagedBy   = "terraform"
+  }
+}
+
+}
+
 # ECS Task Execution Role
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "${var.env}-weather-ecs-task-execution-role"
@@ -210,7 +236,7 @@ resource "aws_ecs_task_definition" "api" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = aws_cloudwatch_log_group.ecs.name
+          awslogs-group         = aws_cloudwatch_log_group.ecs_api.name 
           awslogs-region        = var.aws_region
           awslogs-stream-prefix = "api"
         }
@@ -272,7 +298,7 @@ resource "aws_ecs_task_definition" "frontend" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = aws_cloudwatch_log_group.ecs.name
+          awslogs-group         = aws_cloudwatch_log_group.ecs_frontend.name
           awslogs-region        = var.aws_region
           awslogs-stream-prefix = "frontend"
         }
