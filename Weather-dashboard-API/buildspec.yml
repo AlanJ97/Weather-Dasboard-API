@@ -7,10 +7,10 @@ env:
     IMAGE_REPO_NAME_API: dev-weather-api
     IMAGE_REPO_NAME_FRONTEND: dev-weather-frontend
     # Lambda function names for CodeDeploy hooks
-    LAMBDA_BEFORE_INSTALL: dev-codedeploy-before-install
-    LAMBDA_AFTER_INSTALL: dev-codedeploy-after-install
-    LAMBDA_BEFORE_ALLOW_TRAFFIC: dev-codedeploy-before-allow-traffic
-    LAMBDA_AFTER_ALLOW_TRAFFIC: dev-codedeploy-after-allow-traffic
+    LAMBDA_BEFORE_INSTALL: codedeploy-hook-before_install-dev
+    LAMBDA_AFTER_INSTALL: codedeploy-hook-after_install-dev
+    LAMBDA_BEFORE_ALLOW_TRAFFIC: codedeploy-hook-before_allow_traffic-dev
+    LAMBDA_AFTER_ALLOW_TRAFFIC: codedeploy-hook-after_allow_traffic-dev
 
 
 phases:

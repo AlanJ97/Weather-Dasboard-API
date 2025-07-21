@@ -120,18 +120,6 @@ module "codebuild" {
 
   depends_on = [module.ecr]
 }
-/*
-# Lambda Module (for CodeDeploy hooks)
-module "lambda" {
-  source = "../../modules/lambda"
-
-  environment = var.env
-  tags = {
-    Environment = var.env
-    Project     = "weather-dashboard"
-  }
-}
-*/
 # CodeDeploy Module
 module "codedeploy" {
   source = "../../modules/codedeploy"
