@@ -61,6 +61,8 @@ module "vpc" {
   common_tags          = local.common_tags
 }
 
+
+
 # ECR Module
 module "ecr" {
   source = "../../modules/ecr"
