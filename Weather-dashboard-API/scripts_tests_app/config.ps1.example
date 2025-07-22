@@ -1,0 +1,23 @@
+# PowerShell Configuration for application test scripts
+# Copy this file to config.ps1 and update with your values
+# DO NOT commit config.ps1 to version control
+
+# Default configuration - REPLACE WITH YOUR VALUES
+$env:API_HOST = if ($env:API_HOST) { $env:API_HOST } else { "localhost" }
+$env:API_PORT = if ($env:API_PORT) { $env:API_PORT } else { "8000" }
+$env:FRONTEND_HOST = if ($env:FRONTEND_HOST) { $env:FRONTEND_HOST } else { "localhost" }
+$env:FRONTEND_PORT = if ($env:FRONTEND_PORT) { $env:FRONTEND_PORT } else { "8501" }
+$env:PROJECT_NAME = if ($env:PROJECT_NAME) { $env:PROJECT_NAME } else { "weather-dashboard" }
+$env:ENVIRONMENT = if ($env:ENVIRONMENT) { $env:ENVIRONMENT } else { "dev" }
+
+# Generate URLs and image names
+$env:API_BASE_URL = "http://$($env:API_HOST):$($env:API_PORT)"
+$env:FRONTEND_URL = "http://$($env:FRONTEND_HOST):$($env:FRONTEND_PORT)"
+$env:API_IMAGE_NAME = "$($env:PROJECT_NAME)-api:$($env:ENVIRONMENT)"
+$env:FRONTEND_IMAGE_NAME = "$($env:PROJECT_NAME)-frontend:$($env:ENVIRONMENT)"
+
+Write-Host "✅ Application test configuration loaded:" -ForegroundColor Green
+Write-Host "  API URL: $($env:API_BASE_URL)" -ForegroundColor White
+Write-Host "  Frontend URL: $($env:FRONTEND_URL)" -ForegroundColor White
+Write-Host "  API Image: $($env:API_IMAGE_NAME)" -ForegroundColor White
+Write-Host "  Frontend Image: $($env:FRONTEND_IMAGE_NAME)" -ForegroundColor White

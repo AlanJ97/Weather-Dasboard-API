@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Configuration for infrastructure scripts
+# Copy this file to config.sh and update with your values
+# DO NOT commit config.sh to version control
+
+# Default AWS Configuration - REPLACE WITH YOUR VALUES
+DEFAULT_AWS_REGION="${AWS_REGION:-YOUR_AWS_REGION}"  # e.g., us-east-2
+DEFAULT_PROJECT_NAME="${PROJECT_NAME:-YOUR_PROJECT_NAME}"  # e.g., weather-dashboard
+DEFAULT_ORGANIZATION="${ORGANIZATION:-YOUR_ORG}"  # e.g., your-company
+DEFAULT_COST_CENTER="${COST_CENTER:-YOUR_COST_CENTER}"  # e.g., Engineering
+DEFAULT_TEAM_NAME="${TEAM_NAME:-YOUR_TEAM}"  # e.g., DevOps-Team
+
+# Export configuration
+export CONFIGURED_AWS_REGION="$DEFAULT_AWS_REGION"
+export CONFIGURED_PROJECT_NAME="$DEFAULT_PROJECT_NAME"
+export CONFIGURED_ORGANIZATION="$DEFAULT_ORGANIZATION"
+export CONFIGURED_COST_CENTER="$DEFAULT_COST_CENTER"
+export CONFIGURED_TEAM_NAME="$DEFAULT_TEAM_NAME"
+
+# Generate bucket naming function
+get_bucket_names() {
+    local environment="$1"
+    local year=$(date +%Y)
+    
+    # Use configured values for bucket naming
+    export PIPELINE_BUCKET="${environment}-${CONFIGURED_PROJECT_NAME}-pipeline-artifacts-${year}"
+    export CODEBUILD_BUCKET="${environment}-${CONFIGURED_PROJECT_NAME}-codebuild-cache-${year}"
+}
+
+# Standard tags for resources
+get_standard_tags() {
+    local environment="$1"
+    cat << EOF
+[
+    {Key=Environment,Value=$environment},
+    {Key=Project,Value=$CONFIGURED_PROJECT_NAME},
+    {Key=Application,Value=${CONFIGURED_PROJECT_NAME}-api},
+    {Key=Owner,Value=$CONFIGURED_TEAM_NAME},
+    {Key=CostCenter,Value=$CONFIGURED_COST_CENTER},
+    {Key=ManagedBy,Value=terraform},
+    {Key=Organization,Value=$CONFIGURED_ORGANIZATION}
+]
+EOF
+}
+
+echo "✅ Infrastructure configuration loaded:"
+echo "  AWS Region: $CONFIGURED_AWS_REGION"
+echo "  Project: $CONFIGURED_PROJECT_NAME"
+echo "  Organization: $CONFIGURED_ORGANIZATION"
+echo "  Team: $CONFIGURED_TEAM_NAME"
+echo "  Cost Center: $CONFIGURED_COST_CENTER"

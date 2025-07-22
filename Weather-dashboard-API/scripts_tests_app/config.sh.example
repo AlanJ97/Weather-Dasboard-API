@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Configuration for application test scripts
+# Copy this file to config.sh and update with your values
+# DO NOT commit config.sh to version control
+
+# Default configuration - REPLACE WITH YOUR VALUES
+DEFAULT_API_HOST="${API_HOST:-localhost}"
+DEFAULT_API_PORT="${API_PORT:-8000}"
+DEFAULT_FRONTEND_HOST="${FRONTEND_HOST:-localhost}"
+DEFAULT_FRONTEND_PORT="${FRONTEND_PORT:-8501}"
+DEFAULT_PROJECT_NAME="${PROJECT_NAME:-weather-dashboard}"
+DEFAULT_ENVIRONMENT="${ENVIRONMENT:-dev}"
+
+# Export configuration
+export CONFIGURED_API_HOST="$DEFAULT_API_HOST"
+export CONFIGURED_API_PORT="$DEFAULT_API_PORT"
+export CONFIGURED_FRONTEND_HOST="$DEFAULT_FRONTEND_HOST"
+export CONFIGURED_FRONTEND_PORT="$DEFAULT_FRONTEND_PORT"
+export CONFIGURED_PROJECT_NAME="$DEFAULT_PROJECT_NAME"
+export CONFIGURED_ENVIRONMENT="$DEFAULT_ENVIRONMENT"
+
+# Generate URLs
+export API_BASE_URL="http://${CONFIGURED_API_HOST}:${CONFIGURED_API_PORT}"
+export FRONTEND_URL="http://${CONFIGURED_FRONTEND_HOST}:${CONFIGURED_FRONTEND_PORT}"
+
+# Docker image names
+export API_IMAGE_NAME="${CONFIGURED_PROJECT_NAME}-api:${CONFIGURED_ENVIRONMENT}"
+export FRONTEND_IMAGE_NAME="${CONFIGURED_PROJECT_NAME}-frontend:${CONFIGURED_ENVIRONMENT}"
+
+echo "✅ Application test configuration loaded:"
+echo "  API URL: $API_BASE_URL"
+echo "  Frontend URL: $FRONTEND_URL"
+echo "  API Image: $API_IMAGE_NAME"
+echo "  Frontend Image: $FRONTEND_IMAGE_NAME"
