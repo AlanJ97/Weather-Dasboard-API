@@ -172,11 +172,16 @@ def main():
         
         # Get all cities data for stats
         all_weather = get_weather_data()
-        if all_weather:
-            temps = [item['temperature'] for item in all_weather]
-            st.metric("Average Temp", f"{sum(temps)/len(temps):.1f}°C")
-            st.metric("Highest Temp", f"{max(temps)}°C")
-            st.metric("Lowest Temp", f"{min(temps)}°C")
+        if all_weather and isinstance(all_weather, list) and len(all_weather) > 0:
+            temps = [item['temperature'] for item in all_weather if isinstance(item, dict) and 'temperature' in item]
+            if temps:
+                st.metric("Average Temp", f"{sum(temps)/len(temps):.1f}°C")
+                st.metric("Highest Temp", f"{max(temps)}°C")
+                st.metric("Lowest Temp", f"{min(temps)}°C")
+            else:
+                st.error("No valid temperature data available")
+        else:
+            st.error("API not available - cannot load weather statistics")
     
     with col3:
         st.subheader("System Info")
