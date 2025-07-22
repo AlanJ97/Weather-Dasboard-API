@@ -29,6 +29,9 @@ INSTANCE_PROFILES=(
 LOG_GROUPS=(
     "/ecs/dev-weather"
     "/aws/vpc/flow-logs-dev"
+    "/ecs/dev-weather-api"
+    "/ecs/dev-weather-frontend"
+    "/aws/ecs/containerinsights/dev-weather-cluster/performance"
     "/aws/lambda/codedeploy-hook-after_allow_traffic-dev"
     "/aws/lambda/codedeploy-hook-after_install-dev"
     "/aws/lambda/codedeploy-hook-before_allow_traffic-dev"
