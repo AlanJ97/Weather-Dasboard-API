@@ -11,9 +11,17 @@ import time
 from botocore.exceptions import ClientError, NoCredentialsError
 from typing import Dict
 
-# Terraform backend bucket configuration
-BUCKET_NAME = "weather-app-backend-terraform-bucket-2025-ohio"
-AWS_REGION = "us-east-2"
+# Import config for consistent bucket naming
+try:
+    from config import get_config, get_terraform_backend_bucket
+except ImportError:
+    print("❌ Could not import config.py. Please ensure config.py exists.")
+    sys.exit(1)
+
+# Get bucket configuration from config file
+config = get_config()
+BUCKET_NAME = get_terraform_backend_bucket(config)
+AWS_REGION = config['aws_region']
 
 def confirm_deletion() -> bool:
     """Ask user for confirmation before deletion."""
