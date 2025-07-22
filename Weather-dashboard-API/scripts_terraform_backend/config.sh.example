@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Configuration for Terraform backend scripts
+# Copy this file to config.sh and update with your values
+# DO NOT commit config.sh to version control
+
+# Default configuration - REPLACE WITH YOUR VALUES
+DEFAULT_AWS_REGION="${AWS_REGION:-YOUR_AWS_REGION}"  # e.g., us-east-2
+DEFAULT_PROJECT_NAME="${PROJECT_NAME:-YOUR_PROJECT_NAME}"  # e.g., weather-app
+DEFAULT_LOCATION_SUFFIX="${LOCATION_SUFFIX:-YOUR_LOCATION}"  # e.g., ohio, virginia, etc.
+
+# Export configuration
+export CONFIGURED_AWS_REGION="$DEFAULT_AWS_REGION"
+export CONFIGURED_PROJECT_NAME="$DEFAULT_PROJECT_NAME"
+export CONFIGURED_LOCATION_SUFFIX="$DEFAULT_LOCATION_SUFFIX"
+
+# Generate bucket name function
+get_terraform_backend_bucket() {
+    local current_year=$(date +%Y)
+    echo "${CONFIGURED_PROJECT_NAME}-backend-terraform-bucket-${current_year}-${CONFIGURED_LOCATION_SUFFIX}"
+}
+
+echo "✅ Terraform backend configuration loaded:"
+echo "  AWS Region: $CONFIGURED_AWS_REGION"
+echo "  Project: $CONFIGURED_PROJECT_NAME"
+echo "  Location: $CONFIGURED_LOCATION_SUFFIX"
+echo "  Bucket: $(get_terraform_backend_bucket)"

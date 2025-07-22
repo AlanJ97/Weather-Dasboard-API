@@ -1,0 +1,41 @@
+"""
+Configuration for infrastructure Python scripts
+Copy this file to config.py and update with your values
+DO NOT commit config.py to version control
+"""
+import os
+from datetime import datetime
+
+# Default configuration - REPLACE WITH YOUR VALUES
+DEFAULT_CONFIG = {
+    'aws_region': 'YOUR_AWS_REGION',  # e.g., 'us-east-2'
+    'project_name': 'YOUR_PROJECT_NAME',  # e.g., 'weather-dashboard'
+    'organization': 'YOUR_ORG',  # e.g., 'your-company'
+    'cost_center': 'YOUR_COST_CENTER',  # e.g., 'Engineering'
+    'team_name': 'YOUR_TEAM'  # e.g., 'DevOps-Team'
+}
+
+def get_config():
+    """
+    Get configuration from environment variables with fallback to defaults
+    """
+    return {
+        'aws_region': os.getenv('AWS_REGION', DEFAULT_CONFIG['aws_region']),
+        'project_name': os.getenv('PROJECT_NAME', DEFAULT_CONFIG['project_name']),
+        'organization': os.getenv('ORGANIZATION', DEFAULT_CONFIG['organization']),
+        'cost_center': os.getenv('COST_CENTER', DEFAULT_CONFIG['cost_center']),
+        'team_name': os.getenv('TEAM_NAME', DEFAULT_CONFIG['team_name'])
+    }
+
+def get_bucket_names(environment: str, config: dict = None) -> dict:
+    """Generate bucket names for the given environment."""
+    if config is None:
+        config = get_config()
+    
+    current_year = datetime.now().year
+    project_name = config['project_name']
+    
+    return {
+        'pipeline': f"{environment}-{project_name}-pipeline-artifacts-{current_year}",
+        'codebuild': f"{environment}-{project_name}-codebuild-cache-{current_year}"
+    }

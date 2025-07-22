@@ -29,6 +29,13 @@ INSTANCE_PROFILES=(
 LOG_GROUPS=(
     "/ecs/dev-weather"
     "/aws/vpc/flow-logs-dev"
+    "/aws/lambda/codedeploy-hook-after_allow_traffic-dev"
+    "/aws/lambda/codedeploy-hook-after_install-dev"
+    "/aws/lambda/codedeploy-hook-before_allow_traffic-dev"
+    "/aws/lambda/codedeploy-hook-before_install-dev"
+    "/aws/lambda/codedeploy-hook-after_allow_test_traffic-dev"
+    "/aws/codebuild/dev-weather-dashboard-build"
+    "/aws/codedeploy/dev-weather-dashboard"
 )
 
 # List of EC2 Key Pairs to delete  
@@ -96,24 +103,18 @@ done
 echo ""
 echo "🗑️  Deleting conflicting CloudWatch log groups..."
 
-# Delete log groups individually to avoid path conversion issues
-echo "Checking log group: /ecs/dev-weather"
-if MSYS_NO_PATHCONV=1 aws logs describe-log-groups --region "$AWS_REGION" --query "logGroups[?logGroupName=='/ecs/dev-weather'].logGroupName" --output text 2>/dev/null | grep -q "dev-weather"; then
-    echo "  Deleting log group: /ecs/dev-weather"
-    MSYS_NO_PATHCONV=1 aws logs delete-log-group --log-group-name "/ecs/dev-weather" --region "$AWS_REGION"
-    echo "  ✅ Deleted log group: /ecs/dev-weather"
-else
-    echo "  ℹ️  Log group /ecs/dev-weather does not exist, skipping"
-fi
-
-echo "Checking log group: /aws/vpc/flow-logs-dev"
-if MSYS_NO_PATHCONV=1 aws logs describe-log-groups --region "$AWS_REGION" --query "logGroups[?logGroupName=='/aws/vpc/flow-logs-dev'].logGroupName" --output text 2>/dev/null | grep -q "flow-logs-dev"; then
-    echo "  Deleting log group: /aws/vpc/flow-logs-dev"
-    MSYS_NO_PATHCONV=1 aws logs delete-log-group --log-group-name "/aws/vpc/flow-logs-dev" --region "$AWS_REGION"
-    echo "  ✅ Deleted log group: /aws/vpc/flow-logs-dev"
-else
-    echo "  ℹ️  Log group /aws/vpc/flow-logs-dev does not exist, skipping"
-fi
+# Delete all log groups from the array
+for log_group in "${LOG_GROUPS[@]}"; do
+    echo "Checking log group: $log_group"
+    # Use MSYS_NO_PATHCONV=1 to prevent Git Bash from converting Unix paths on Windows
+    if MSYS_NO_PATHCONV=1 aws logs describe-log-groups --region "$AWS_REGION" --log-group-name-prefix "$log_group" --query "logGroups[?logGroupName=='$log_group'].logGroupName" --output text 2>/dev/null | grep -q "$(basename "$log_group")"; then
+        echo "  Deleting log group: $log_group"
+        MSYS_NO_PATHCONV=1 aws logs delete-log-group --log-group-name "$log_group" --region "$AWS_REGION"
+        echo "  ✅ Deleted log group: $log_group"
+    else
+        echo "  ℹ️  Log group $log_group does not exist, skipping"
+    fi
+done
 
 echo ""
 echo "🗑️  Deleting conflicting EC2 Key Pairs..."

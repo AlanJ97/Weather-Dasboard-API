@@ -151,6 +151,8 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
   })
 }
 
+
+
 # Security Group for ECS Tasks
 resource "aws_security_group" "ecs_tasks" {
   name_prefix = "${var.env}-weather-ecs-tasks-"
