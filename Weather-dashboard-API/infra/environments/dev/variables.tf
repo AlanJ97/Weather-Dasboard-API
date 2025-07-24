@@ -193,3 +193,16 @@ variable "enable_pipeline_webhook" {
   default     = false
 }
 
+# S3 Bucket Variables
+variable "codebuild_cache_bucket_name" {
+  description = "Name of the S3 bucket for CodeBuild cache"
+  type        = string
+  default     = "dev-dashboard-weather-app-codebuild-cache-2025"
+}
+
+variable "pipeline_artifacts_bucket_name" {
+  description = "Name of the S3 bucket for pipeline artifacts"
+  type        = string
+  default     = "dev-dashboard-weather-app-pipeline-artifacts-2025"
+}
+

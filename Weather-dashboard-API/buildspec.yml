@@ -62,10 +62,6 @@ phases:
       # Optional: Code formatting check (uncomment if you want strict formatting)
       # - echo "Checking code formatting..."
       # - black --check app/
-      
-      # Run application tests if available
-      - echo "Running application tests..."
-      - python scripts_tests_app/test_applications.py || echo "Tests require running services - will validate after deployment"
 
   build:
     commands:

@@ -10,12 +10,17 @@ import time
 from botocore.exceptions import ClientError, NoCredentialsError
 from typing import List, Dict, Any
 
+# Import config for consistent bucket naming
+try:
+    from config import get_config, get_bucket_names as config_get_bucket_names
+except ImportError:
+    print("❌ Could not import config.py. Please ensure config.py exists.")
+    sys.exit(1)
+
 def get_bucket_names(environment: str) -> Dict[str, str]:
-    """Generate bucket names for the given environment."""
-    return {
-        'pipeline': f"{environment}-weather-dashboard-pipeline-artifacts-2025",
-        'codebuild': f"{environment}-weather-dashboard-codebuild-cache-2025"
-    }
+    """Generate bucket names for the given environment using config."""
+    config = get_config()
+    return config_get_bucket_names(environment, config)
 
 def confirm_deletion(buckets: Dict[str, str], environment: str) -> bool:
     """Ask user for confirmation before deletion."""

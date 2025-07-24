@@ -155,9 +155,9 @@ module "codebuild" {
   aws_account_id               = var.aws_account_id
   ecr_api_repository_name      = module.ecr.weather_api_repository_name
   ecr_frontend_repository_name = module.ecr.weather_frontend_repository_name
-  codebuild_cache_bucket_name = "dev-dashboard-weather-app-codebuild-cache-2025"
-  artifacts_bucket_name = "dev-dashboard-weather-app-pipeline-artifacts-2025"
-  source_bucket_name = "dev-dashboard-weather-app-pipeline-artifacts-2025"
+  codebuild_cache_bucket_name  = var.codebuild_cache_bucket_name
+  artifacts_bucket_name        = var.pipeline_artifacts_bucket_name
+  source_bucket_name           = var.pipeline_artifacts_bucket_name
   common_tags                  = local.common_tags
 
   depends_on = [module.ecr]
@@ -197,7 +197,7 @@ module "codepipeline" {
   codedeploy_application_name          = module.codedeploy.application_name
   codedeploy_deployment_group_api      = module.codedeploy.api_deployment_group_name
   codedeploy_deployment_group_frontend = module.codedeploy.frontend_deployment_group_name
-  artifacts_bucket_name                = "dev-dashboard-weather-app-pipeline-artifacts-2025"
+  artifacts_bucket_name                = var.pipeline_artifacts_bucket_name
   enable_webhook                       = var.enable_pipeline_webhook
   common_tags                          = local.common_tags
 
