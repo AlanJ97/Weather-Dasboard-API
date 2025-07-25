@@ -60,14 +60,15 @@ phases:
       - flake8 app/frontend/ --count --select=E9,F63,F7,F82 --show-source --statistics || echo "Linting warnings found, continuing build..."
       - flake8 app/frontend/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-      # Run unit tests with proper quality gate
-      - echo "Running FastAPI unit tests..."
-      - mkdir -p test-reports
-      - python -m pytest app/api/tests --junitxml=test-reports/pytest-report.xml --disable-warnings -v
-
   build:
     commands:
       - echo "Build started on $(date)"
+      
+      # Run unit tests with proper quality gate (AWS recommends this in build phase)
+      - echo "Running FastAPI unit tests..."
+      - mkdir -p test-reports
+      - python -m pytest app/api/tests --junitxml=test-reports/pytest-report.xml --disable-warnings -v
+      
       - echo "Cleaning Docker system..."
       - docker system prune -f || true
       - echo "Building Docker images..."
