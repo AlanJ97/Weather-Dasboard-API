@@ -22,7 +22,7 @@ phases:
     commands:
       - echo "Installing build dependencies..."
       - pip install --upgrade pip
-      - pip install flake8 black pytest requests
+      - pip install flake8 black pytest pytest-cov requests
 
   pre_build:
     commands:
@@ -58,10 +58,10 @@ phases:
       - echo "Linting Frontend code..."
       - flake8 app/frontend/ --count --select=E9,F63,F7,F82 --show-source --statistics || echo "Linting warnings found, continuing build..."
       - flake8 app/frontend/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      
-      # Optional: Code formatting check (uncomment if you want strict formatting)
-      # - echo "Checking code formatting..."
-      # - black --check app/
+
+      # Run unit tests
+      - echo "Running FastAPI unit tests..."
+      - python -m pytest app/api/tests --junitxml=test-reports/pytest-report.xml --maxfail=1 --disable-warnings -q
 
   build:
     commands:
@@ -303,6 +303,13 @@ phases:
 cache:
   paths:
    - '/root/.cache/pip/**/*'
+
+reports:
+  pytest_reports:
+    files:
+      - pytest-report.xml
+    base-directory: Weather-dashboard-API/test-reports
+    file-format: JUNITXML
 
 artifacts:
   base-directory: Weather-dashboard-API
