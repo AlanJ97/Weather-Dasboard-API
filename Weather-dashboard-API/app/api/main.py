@@ -1,6 +1,7 @@
 """
 Weather Dashboard API - FastAPI Backend
 A simple weather API for DevOps training purposes.
+Testing pytest integration with intentional test failure.
 """
 
 import os
