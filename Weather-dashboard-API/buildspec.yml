@@ -49,10 +49,10 @@ phases:
     commands:
       - echo "Build started on $(date)"
       
-      # Run unit tests with coverage reporting
+      # Run unit tests with coverage reporting and quality gates
       - echo "Running FastAPI unit tests with coverage..."
       - mkdir -p test-reports
-      - python -m pytest --cov=app/api app/api/tests --cov-report=xml --cov-report=term-missing --junitxml=test-reports/pytest-report.xml --disable-warnings -v
+      - python -m pytest --cov=app/api app/api/tests --cov-report=xml --cov-report=term-missing --cov-fail-under=80 --junitxml=test-reports/pytest-report.xml --disable-warnings -v
       
       # Build Docker images
       - echo "Building Docker images..."
