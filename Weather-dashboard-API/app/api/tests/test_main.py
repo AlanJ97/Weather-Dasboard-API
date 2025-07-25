@@ -8,8 +8,7 @@ def test_health():
     response = client.get("/health")
     assert response.status_code == 200
     # API returns 'healthy' for health status
-    # INTENTIONALLY FAIL THIS TEST TO SEE HOW CODEBUILD REPORTS FAILURES
-    assert response.json()["status"] == "BROKEN_ON_PURPOSE"
+    assert response.json()["status"] == "healthy"
 
 def test_weather_all():
     response = client.get("/api/weather")

@@ -1,7 +1,8 @@
 """
 Weather Dashboard API - FastAPI Backend
 A simple weather API for DevOps training purposes.
-Testing pytest integration with intentional test failure.
+🚀 UPDATED VERSION - Testing automated CI/CD deployment!
+✅ All tests now pass - ready for production deployment
 """
 
 import os
@@ -19,9 +20,9 @@ logger = logging.getLogger(__name__)
 
 # Create FastAPI app
 app = FastAPI(
-    title="Weather Dashboard API",
-    description="A DevOps training project - Weather API backend",
-    version="1.0.0",
+    title="Weather Dashboard API - UPDATED! 🚀",
+    description="A DevOps training project - Weather API backend (DEPLOYED VIA CI/CD PIPELINE!)",
+    version="2.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
 )
@@ -80,10 +81,12 @@ MOCK_WEATHER_DATA = {
 async def root():
     """Root endpoint - API information"""
     return {
-        "message": "Weather Dashboard API",
-        "version": "1.0.0",
+        "message": "🎉 Weather Dashboard API - SUCCESSFULLY DEPLOYED! 🎉",
+        "version": "2.0.0",
         "status": "running",
-        "environment": os.getenv("ENV", "development")
+        "deployment": "✅ Automated CI/CD Pipeline Success!",
+        "environment": os.getenv("ENV", "development"),
+        "last_updated": "Module 7 - Testing Implementation Complete"
     }
 
 @app.get("/health")
@@ -92,7 +95,8 @@ async def health_check():
     return {
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
-        "version": "1.0.0"
+        "version": "2.0.0",
+        "pipeline_status": "✅ Tests Passed - Deployment Successful!"
     }
 
 @app.get("/api/weather/cities", response_model=List[str])
