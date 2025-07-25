@@ -23,7 +23,7 @@ phases:
       - echo "Installing build dependencies..."
       - pip install --upgrade pip
       # Install API dependencies (includes testing and code quality tools)
-      - pip install -r app/api/requirements.txt
+      - pip install -r Weather-dashboard-API/app/api/requirements.txt
 
   pre_build:
     commands:
