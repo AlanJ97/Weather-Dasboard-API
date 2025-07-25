@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.882" timestamp="2025-07-25T10:44:20.048598-06:00" hostname="DESKTOP-2SCE5EB"><testcase classname="app.api.tests.test_main" name="test_health" time="0.011"><failure message="AssertionError: assert 'healthy' == 'BROKEN_ON_PURPOSE'&#10;  &#10;  #x1B[0m#x1B[91m- BROKEN_ON_PURPOSE#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+ healthy#x1B[39;49;00m#x1B[90m#x1B[39;49;00m">def test_health():
+        response = client.get("/health")
+        assert response.status_code == 200
+        # API returns 'healthy' for health status
+        # INTENTIONALLY FAIL THIS TEST TO SEE HOW CODEBUILD REPORTS FAILURES
+&gt;       assert response.json()["status"] == "BROKEN_ON_PURPOSE"
+E       AssertionError: assert 'healthy' == 'BROKEN_ON_PURPOSE'
+E         
+E         #x1B[0m#x1B[91m- BROKEN_ON_PURPOSE#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+ healthy#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+
+app\api\tests\test_main.py:12: AssertionError</failure></testcase></testsuite></testsuites>
