@@ -60,24 +60,25 @@ phases:
       - flake8 app/frontend/ --count --select=E9,F63,F7,F82 --show-source --statistics || echo "Linting warnings found, continuing build..."
       - flake8 app/frontend/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-      # Run unit tests with proper quality gate
-      - echo "Running FastAPI unit tests..."
-      - mkdir -p test-reports
-      # Run tests and capture result, but always continue to check exit code
+         # Run unit tests with proper quality gate
       - |
-        set +e  # Disable exit on error temporarily
-        python -m pytest app/api/tests --junitxml=test-reports/pytest-report.xml --disable-warnings -v
-        TEST_RESULT=$?
-        set -e  # Re-enable exit on error
-        
-        if [ $TEST_RESULT -ne 0 ]; then
-          echo "❌ Tests failed with exit code $TEST_RESULT"
-          echo "📊 Test reports have been generated for review"
-          echo "🚫 Stopping pipeline - will not deploy with failing tests"
-          exit 1
-        else
-          echo "✅ All tests passed - pipeline can continue"
-        fi
+        echo "Running FastAPI unit tests..."
+        mkdir -p test-reports
+
+        bash -eu -o pipefail -c '
+          python -m pytest app/api/tests \
+                --junitxml=test-reports/pytest-report.xml \
+                --disable-warnings -v
+          EXIT=$?
+
+          if [ "$EXIT" -ne 0 ]; then
+            echo "❌ Tests failed. Exit code $EXIT"
+            echo "📊 Test report generated in test-reports/pytest-report.xml"
+            exit 1
+          else
+            echo "✅ All tests passed. Pipeline can continue"
+          fi
+        '
 
   build:
     commands:
