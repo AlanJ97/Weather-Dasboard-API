@@ -27,22 +27,12 @@ phases:
 
   pre_build:
     commands:
-      - echo "Current directory:"
-      - pwd
-      - echo "Directory contents:"
-      - ls -la
-      - echo "Changing to Weather-dashboard-API directory..."
-      - cd Weather-dashboard-API
-      - echo "New directory:"
-      - pwd
-      - ls -la
       - echo "Pre-build started on $(date)"
+      - cd Weather-dashboard-API
       - echo "Logging in to Amazon ECR..."
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-      - echo "Setting up build environment..."
       
       # Get ALB DNS name dynamically
-      - echo "Getting ALB DNS name dynamically..."
       - 'export ALB_DNS_NAME=$(aws elbv2 describe-load-balancers --region $AWS_DEFAULT_REGION --query "LoadBalancers[?starts_with(LoadBalancerName, \`dev-weather\`)].DNSName" --output text)'
       - 'echo "ALB DNS Name: $ALB_DNS_NAME"'
       
@@ -52,26 +42,21 @@ phases:
 
       # Code quality checks
       - echo "Running code quality checks..."
-      - echo "Linting API code..."
       - flake8 app/api/ --count --select=E9,F63,F7,F82 --show-source --statistics || echo "Linting warnings found, continuing build..."
-      - flake8 app/api/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      
-      - echo "Linting Frontend code..."
       - flake8 app/frontend/ --count --select=E9,F63,F7,F82 --show-source --statistics || echo "Linting warnings found, continuing build..."
-      - flake8 app/frontend/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
   build:
     commands:
       - echo "Build started on $(date)"
       
-      # Run unit tests with proper quality gate (AWS recommends this in build phase)
+      # Run unit tests with proper quality gate
       - echo "Running FastAPI unit tests..."
       - mkdir -p test-reports
       - python -m pytest app/api/tests --junitxml=test-reports/pytest-report.xml --disable-warnings -v
       
-      - echo "Cleaning Docker system..."
-      - docker system prune -f || true
+      # Build Docker images
       - echo "Building Docker images..."
+      - docker system prune -f || true
       
       # Build API image
       - echo "Building API Docker image..."
@@ -94,22 +79,14 @@ phases:
           echo "Frontend Docker build failed"
           exit 1
         fi
-      
-      # Verify images were built successfully
-      - echo "Verifying Docker images..."
-      - docker images
 
   post_build:
     commands:
       - echo "Post-build started on $(date)"
       - echo "Pushing Docker images to ECR..."
       
-      # Push API image (with dynamic tag like build-123)
-      - echo "Pushing API image..."
+      # Push Docker images to ECR
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_API:$IMAGE_TAG
-      
-      # Push Frontend image (with dynamic tag like build-123)
-      - echo "Pushing Frontend image..."
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG
       
       # Create task definition templates for CodeDeploy
@@ -259,46 +236,10 @@ phases:
       - |
         echo "[{\"name\":\"weather-api\",\"imageUri\":\"$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_API:$IMAGE_TAG\"},{\"name\":\"weather-frontend\",\"imageUri\":\"$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG\"}]" > imagedefinitions.json
       
-      # Verify the imagedefinitions.json content
-      - echo "Checking imagedefinitions.json content:"
-      - cat imagedefinitions.json
-      
-      # Verify task definition files content
-      - echo "Checking taskdef-api.json content:"
-      - cat taskdef-api.json
-      - echo "Validating taskdef-api.json format:"
-      - python -m json.tool taskdef-api.json > /dev/null && echo "taskdef-api.json is valid JSON" || echo "taskdef-api.json has JSON errors"
-      - echo "Checking taskdef-frontend.json content:"
-      - cat taskdef-frontend.json
-      - echo "Validating taskdef-frontend.json format:"
-      - python -m json.tool taskdef-frontend.json > /dev/null && echo "taskdef-frontend.json is valid JSON" || echo "taskdef-frontend.json has JSON errors"
-      
-      # Verify AppSpec files content
-      - echo "Checking appspec-api.yml content:"
-      - cat appspec-api.yml
-      - echo "Checking appspec-frontend.yml content:"
-      - cat appspec-frontend.yml
-      
-      # OPTIONAL: Also tag and push as 'latest' for convenience (if your ECR allows mutable tags)
-      # This is optional - only if you want a 'latest' tag that always points to newest build
-      - echo "Tagging images as latest (optional)..."
+      # Optional: Tag as latest for convenience
       - docker tag $IMAGE_REPO_NAME_API:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_API:latest || true
       - docker tag $IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_FRONTEND:latest || true
-      # - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_API:latest || true
-      # - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_FRONTEND:latest || true
       
-      # NOW verify the files exist (AFTER creating them!)
-      - echo "Verifying artifact files..."
-      - echo "Current working directory:"
-      - pwd
-      - ls -la imagedefinitions.json
-      - ls -la taskdef-api.json
-      - ls -la taskdef-frontend.json
-      - ls -la appspec-api.yml
-      - ls -la appspec-frontend.yml
-
-      
-      # Log successful completion
       - echo "Build completed successfully on $(date)"
       - echo "API Image URI:" $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_API:$IMAGE_TAG
       - echo "Frontend Image URI:" $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME_FRONTEND:$IMAGE_TAG
