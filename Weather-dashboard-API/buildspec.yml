@@ -60,26 +60,10 @@ phases:
       - flake8 app/frontend/ --count --select=E9,F63,F7,F82 --show-source --statistics || echo "Linting warnings found, continuing build..."
       - flake8 app/frontend/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-         # Run unit tests with proper quality gate
-      - |
-        echo "Running FastAPI unit tests..."
-        mkdir -p test-reports
-
-        # Run tests but do not kill the shell immediately on failure
-        set +e
-        python -m pytest app/api/tests \
-              --junitxml=test-reports/pytest-report.xml \
-              --disable-warnings -v
-        TEST_RESULT=$?
-        set -e
-
-        if [ $TEST_RESULT -ne 0 ]; then
-          echo "❌ Tests failed – exit code $TEST_RESULT"
-          echo "📊 JUnit report generated at test-reports/pytest-report.xml"
-          exit 1
-        else
-          echo "✅ All tests passed – pipeline can continue"
-        fi
+      # Run unit tests with proper quality gate
+      - echo "Running FastAPI unit tests..."
+      - mkdir -p test-reports
+      - python -m pytest app/api/tests --junitxml=test-reports/pytest-report.xml --disable-warnings -v
 
   build:
     commands:
@@ -323,7 +307,7 @@ cache:
    - '/root/.cache/pip/**/*'
 
 reports:
-  weather-api-unit-tests:
+  pytest_reports:
     files:
       - pytest-report.xml
     base-directory: Weather-dashboard-API/test-reports
