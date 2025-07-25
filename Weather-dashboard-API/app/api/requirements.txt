@@ -6,9 +6,10 @@ requests==2.32.3
 
 # Testing dependencies (needed for CI/CD)
 pytest==8.3.4
-pytest-cov==6.0.0
+pytest-cov==6.2.1
 httpx==0.28.1  # For FastAPI TestClient (async support)
 
 # Code quality (needed for CI/CD)
 flake8==7.1.1
 black==24.8.0
+

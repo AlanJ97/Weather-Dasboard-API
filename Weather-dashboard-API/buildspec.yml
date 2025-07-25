@@ -49,10 +49,10 @@ phases:
     commands:
       - echo "Build started on $(date)"
       
-      # Run unit tests with proper quality gate
-      - echo "Running FastAPI unit tests..."
+      # Run unit tests with coverage reporting
+      - echo "Running FastAPI unit tests with coverage..."
       - mkdir -p test-reports
-      - python -m pytest app/api/tests --junitxml=test-reports/pytest-report.xml --disable-warnings -v
+      - python -m pytest --cov=app/api app/api/tests --cov-report=xml --cov-report=term-missing --junitxml=test-reports/pytest-report.xml --disable-warnings -v
       
       # Build Docker images
       - echo "Building Docker images..."
@@ -254,6 +254,11 @@ reports:
       - pytest-report.xml
     base-directory: Weather-dashboard-API/test-reports
     file-format: JUNITXML
+  coverage_reports:
+    files:
+      - coverage.xml
+    base-directory: Weather-dashboard-API
+    file-format: COBERTURAXML
 
 artifacts:
   base-directory: Weather-dashboard-API
@@ -263,4 +268,5 @@ artifacts:
     - taskdef-frontend.json
     - appspec-api.yml
     - appspec-frontend.yml
+    - coverage.xml
   name: weather-dashboard-artifacts
