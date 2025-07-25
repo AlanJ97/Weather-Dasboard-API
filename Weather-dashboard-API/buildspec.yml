@@ -22,7 +22,8 @@ phases:
     commands:
       - echo "Installing build dependencies..."
       - pip install --upgrade pip
-      - pip install flake8 black pytest pytest-cov requests
+      # Install API dependencies (includes testing and code quality tools)
+      - pip install -r app/api/requirements.txt
 
   pre_build:
     commands:

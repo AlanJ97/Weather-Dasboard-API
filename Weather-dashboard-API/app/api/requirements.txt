@@ -1,3 +1,14 @@
+# Production dependencies
 fastapi[standard]==0.116.1
 pydantic==2.11.7
 uvicorn[standard]==0.35.0
+requests==2.32.3
+
+# Testing dependencies (needed for CI/CD)
+pytest==8.3.4
+pytest-cov==6.0.0
+httpx==0.28.1  # For FastAPI TestClient (async support)
+
+# Code quality (needed for CI/CD)
+flake8==7.1.1
+black==24.8.0
