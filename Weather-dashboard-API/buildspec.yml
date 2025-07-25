@@ -63,12 +63,15 @@ phases:
       # Run unit tests with proper quality gate
       - echo "Running FastAPI unit tests..."
       - mkdir -p test-reports
-      # First run tests to generate reports (regardless of result)  
-      - python -m pytest app/api/tests --junitxml=test-reports/pytest-report.xml --disable-warnings -v || TEST_EXIT_CODE=$?
-      # Then check if tests passed and fail pipeline if not
+      # Run tests and capture result, but always continue to check exit code
       - |
-        if [ "$TEST_EXIT_CODE" != "0" ]; then
-          echo "❌ Tests failed with exit code $TEST_EXIT_CODE"
+        set +e  # Disable exit on error temporarily
+        python -m pytest app/api/tests --junitxml=test-reports/pytest-report.xml --disable-warnings -v
+        TEST_RESULT=$?
+        set -e  # Re-enable exit on error
+        
+        if [ $TEST_RESULT -ne 0 ]; then
+          echo "❌ Tests failed with exit code $TEST_RESULT"
           echo "📊 Test reports have been generated for review"
           echo "🚫 Stopping pipeline - will not deploy with failing tests"
           exit 1
